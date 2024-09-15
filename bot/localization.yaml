@@ -1,0 +1,41 @@
+EN:
+    MAIN_MENU_MESSAGE:
+        - Welcome, {user_name}! 🎉
+        -
+        - 3X-UI SHOP — your reliable assistant in the world of free internet.
+        - We offer safe and fast connections to any internet services using the XRAY protocol.
+        - Our service works even in China, Iran, and Russia.
+        -
+        - 🚀 HIGH SPEED
+        - 🔒 SECURITY
+        - 📱 SUPPORT FOR ALL PLATFORMS
+        - ♾️ UNLIMITED
+        - ✅ GUARANTEE AND TRIAL PERIOD
+    MAIN_MENU_KEYBOARD:
+        PROFILE: 👤 Profile
+        SUBSCRIPTION: 💳 Subscription
+        REFERRAL: 👥 Referral Program
+        PROMOCODE: 🏷 Activate Promo Code
+        DOWNLOAD: 📲 Download App
+        SUPPORT: 🆘 Support
+
+RU:
+    MAIN_MENU_MESSAGE:
+        - Добро пожаловать, {user_name}! 🎉
+        -
+        - 3X-UI SHOP — ваш надежный помощник в мире свободного интернета.
+        - Мы предлагаем безопасное и быстрое подключение к любым интернет-сервисам с использованием протокола XRAY.
+        - Наш сервис работает даже в Китае, Иране и России.
+        -
+        - 🚀 ВЫСОКАЯ СКОРОСТЬ
+        - 🔒 БЕЗОПАСНОСТЬ
+        - 📱 ПОДДЕРЖКА ВСЕХ ПЛАТФОРМ
+        - ♾️ БЕЗЛИМИТ
+        - ✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД
+    MAIN_MENU_KEYBOARD:
+        PROFILE: 👤 Профиль
+        SUBSCRIPTION: 💳 Подписка
+        REFERRAL: 👥 Реферальная программа
+        PROMOCODE: 🏷 Активировать промокод
+        DOWNLOAD: 📲 Скачать приложение
+        SUPPORT: 🆘 Поддержка

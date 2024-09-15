@@ -11,6 +11,10 @@ DEFAULT_LOG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
 DEFAULT_LOG_DIR = "logs"
 DEFAULT_LOG_ARCHIVE_DIR = "logs/archive"
 
+# Default values for localization configurations
+DEFAULT_LOC_LANG = "EN"
+DEFAULT_LOC_YAML_PATH = "bot/localization.yaml"
+
 
 def get_env_var(name: str, required: bool = True) -> str | None:
     """
@@ -128,6 +132,34 @@ class LogConfig:
 
 
 @dataclass(frozen=True)
+class LocConfig:
+    """
+    Configuration for localization.
+
+    Attributes:
+        default_lang (str): The default language code (e.g., "EN", "RU").
+        yaml_path (str): The path to the localization YAML file.
+    """
+
+    default_lang: str
+    yaml_path: str
+
+    @staticmethod
+    def from_env() -> "LocConfig":
+        """
+        Creates an instance of LocConfig by reading environment variables.
+
+        Provides default values if certain environment variables are not set.
+
+        Returns:
+            LocConfig: An instance of LocConfig with all attributes set.
+        """
+        default_lang = get_env_var("LOC_DEFAULT_LANG", required=False) or DEFAULT_LOC_LANG
+        yaml_path = get_env_var("LOC_YAML_PATH", required=False) or DEFAULT_LOC_YAML_PATH
+        return LocConfig(default_lang=default_lang, yaml_path=yaml_path)
+
+
+@dataclass(frozen=True)
 class Config:
     """
     Main configuration for the application.
@@ -136,22 +168,28 @@ class Config:
         bot (BotConfig): Configuration settings for the Telegram bot.
         xui (XUIConfig): Configuration settings for XUI.
         log (LogConfig): Configuration settings for logging.
+        localization (LocConfig): Configuration settings for localization.
     """
 
     bot: BotConfig
     xui: XUIConfig
     log: LogConfig
+    loc: LocConfig
 
     @staticmethod
     def load() -> "Config":
         """
-        Loads the entire application configuration by initializing BotConfig, XUIConfig, and LogConfig.
+        Load all configuration settings.
 
         Returns:
-            Config: An instance of Config with bot, xui, and log configurations set.
+            Config: Config object containing bot, xui, log, and localization configurations.
         """
-        return Config(bot=BotConfig.from_env(), xui=XUIConfig.from_env(), log=LogConfig.from_env())
+        return Config(
+            bot=BotConfig.from_env(),
+            xui=XUIConfig.from_env(),
+            log=LogConfig.from_env(),
+            loc=LocConfig.from_env(),
+        )
 
 
-# Initialize configuration upon module import
 config: Config = Config.load()

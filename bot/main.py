@@ -2,6 +2,7 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 
+from bot.handlers import main_menu
 from bot.utils.config import config
 from bot.utils.logger import Logger
 
@@ -13,13 +14,9 @@ dp: Dispatcher = Dispatcher()
 
 
 async def main() -> None:
-    """
-    Main entry point for the bot. Initializes the bot, dispatcher, middlewares,
-    and registers all handlers. Starts polling for updates.
-    """
     logger.info("Bot is starting...")
 
-    # register_handlers()
+    main_menu.register_handler(dp)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
