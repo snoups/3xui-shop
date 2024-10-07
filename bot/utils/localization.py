@@ -65,7 +65,17 @@ class Localization:
             lang = config.loc.default_lang
 
         try:
-            text = self.localization_data.get(lang, {}).get(key)
+            keys = key.split(".")
+            text = self.localization_data.get(lang, {})
+
+            for k in keys:
+                if text is None or not type(text) == dict:
+                    logger.error(
+                        f"Translation key '{key}' not found at '{k}' for language '{lang}'"
+                    )
+                    return f"[{key} not found]"
+                text = text.get(k)
+
             if text is None:
                 logger.error(f"Translation key '{key}' not found for language '{lang}'")
                 return f"[{key}]"

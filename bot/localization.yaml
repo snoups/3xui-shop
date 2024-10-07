@@ -1,41 +1,120 @@
 EN:
     MAIN_MENU_MESSAGE:
-        - Welcome, {user_name}! 🎉
-        -
-        - 3X-UI SHOP — your reliable assistant in the world of free internet.
-        - We offer safe and fast connections to any internet services using the XRAY protocol.
-        - Our service works even in China, Iran, and Russia.
-        -
-        - 🚀 HIGH SPEED
-        - 🔒 SECURITY
-        - 📱 SUPPORT FOR ALL PLATFORMS
-        - ♾️ UNLIMITED
-        - ✅ GUARANTEE AND TRIAL PERIOD
+        - "Welcome, {user_name}! 🎉"
+        - ""
+        - "3X-UI SHOP — your reliable assistant in the world of free internet."
+        - "We offer safe and fast connections to any internet services using the XRAY protocol."
+        - "Our service works even in China, Iran, and Russia."
+        - ""
+        - "🚀 HIGH SPEED"
+        - "🔒 SECURITY"
+        - "📱 SUPPORT FOR ALL PLATFORMS"
+        - "♾️ UNLIMITED"
+        - "✅ GUARANTEE AND TRIAL PERIOD"
     MAIN_MENU_KEYBOARD:
-        PROFILE: 👤 Profile
-        SUBSCRIPTION: 💳 Subscription
-        REFERRAL: 👥 Referral Program
-        PROMOCODE: 🏷 Activate Promo Code
-        DOWNLOAD: 📲 Download App
-        SUPPORT: 🆘 Support
+        PROFILE: "👤 Profile"
+        SUBSCRIPTION: "💳 Subscription"
+        REFERRAL: "👥 Referral Program"
+        PROMOCODE: "🏷 Activate Promo Code"
+        DOWNLOAD: "📲 Download App"
+        SUPPORT: "🆘 Support"
+    PROFILE_MESSAGE:
+        - "👤 Your Profile:"
+        - "Name: {user_name}"
+        - "ID: {user_id}"
+        - ""
+        - "📅 Subscription:"
+        - "Plan: {plan}"
+        - "Expires on: {expiry_time}"
+        - ""
+        - "📊 Statistics:"
+        - "Total Traffic: {total}"
+        - "Sent: ↑ {up}"
+        - "Received: ↓ {down}"
+    DOWNLOAD_MESSAGE:
+        - "📲 Download the app"
+        - "Choose your platform to get the app."
+    PROMOCODE_MESSAGE:
+        - "Please enter your promo code."
+    REFERRAL_MESSAGE:
+        - "Invite friends and earn bonuses!"
+    SUBSCRIPTION_MESSAGE:
+        - "Manage your subscription here."
+    SUPPORT_MESSAGE:
+        - "🔧 Support"
+        - "If you need help, you can contact the operator."
+    SIZES:
+        BYTES: "B"
+        KILOBYTES: "KB"
+        MEGABYTES: "MB"
+        GIGABYTES: "GB"
+        TERABYTES: "TB"
+        PETABYTES: "PB"
+        EXABYTES: "EB"
+        ZETTABYTES: "ZB"
+        YOTTABYTES: "YB"
+    TIME:
+        DAY: "d"
+        HOURS: "h"
+        MINUTES: "m"
 
 RU:
     MAIN_MENU_MESSAGE:
-        - Добро пожаловать, {user_name}! 🎉
-        -
-        - 3X-UI SHOP — ваш надежный помощник в мире свободного интернета.
-        - Мы предлагаем безопасное и быстрое подключение к любым интернет-сервисам с использованием протокола XRAY.
-        - Наш сервис работает даже в Китае, Иране и России.
-        -
-        - 🚀 ВЫСОКАЯ СКОРОСТЬ
-        - 🔒 БЕЗОПАСНОСТЬ
-        - 📱 ПОДДЕРЖКА ВСЕХ ПЛАТФОРМ
-        - ♾️ БЕЗЛИМИТ
-        - ✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД
+        - "Добро пожаловать, {user_name}! 🎉"
+        - ""
+        - "3X-UI SHOP — ваш надежный помощник в мире свободного интернета."
+        - "Мы предлагаем безопасное и быстрое подключение к любым интернет-сервисам с использованием протокола XRAY."
+        - "Наш сервис работает даже в Китае, Иране и России."
+        - ""
+        - "🚀 ВЫСОКАЯ СКОРОСТЬ"
+        - "🔒 БЕЗОПАСНОСТЬ"
+        - "📱 ПОДДЕРЖКА ВСЕХ ПЛАТФОРМ"
+        - "♾️ БЕЗЛИМИТ"
+        - "✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД"
     MAIN_MENU_KEYBOARD:
-        PROFILE: 👤 Профиль
-        SUBSCRIPTION: 💳 Подписка
-        REFERRAL: 👥 Реферальная программа
-        PROMOCODE: 🏷 Активировать промокод
-        DOWNLOAD: 📲 Скачать приложение
-        SUPPORT: 🆘 Поддержка
+        PROFILE: "👤 Профиль"
+        SUBSCRIPTION: "💳 Подписка"
+        REFERRAL: "👥 Реферальная программа"
+        PROMOCODE: "🏷 Активировать промокод"
+        DOWNLOAD: "📲 Скачать приложение"
+        SUPPORT: "🆘 Поддержка"
+    PROFILE_MESSAGE:
+        HEADER:
+            - "👤 Ваш профиль:"
+            - "Имя: {user_name}"
+            - "ID: {user_id}"
+        SUBSCRIPTION:
+            - "📅 Подписка:"
+            - "Тариф: {plan}"
+            - "Осталось: {remaining_traffic}"
+            - "Заканчивается через: {expiry_time}"
+        STATISTICS:
+            - "📊 Статистика:"
+            - "Общий трафик: {total}"
+            - "Отправлено: ↑ {up}"
+            - "Получено: ↓ {down}"
+        NO_SUBSCRIPTION:
+            - "У вас еще нет подписки, перейдите на страницу оформления, чтобы купить."
+    PROMOCODE_MESSAGE:
+        - "Введите ваш промокод."
+    REFERRAL_MESSAGE:
+        - "Пригласите друзей и получите бонусы!"
+    SUBSCRIPTION_MESSAGE:
+        - "Управляйте своей подпиской здесь."
+    SUPPORT_MESSAGE:
+        - "🔧 Поддержка"
+        - "Если вам нужна помощь, вы можете связаться с оператором."
+    SIZES:
+        BYTES: "Б"
+        KILOBYTES: "КБ"
+        MEGABYTES: "МБ"
+        GIGABYTES: "ГБ"
+        TERABYTES: "ТБ"
+        PETABYTES: "ПБ"
+        EXABYTES: "ЭБ"
+        ZETTABYTES: "ЗБ"
+        YOTTABYTES: "ЙБ"
+    TIME:
+        DAY: "д"
+        HOURS: "ч"
+        MINUTES: "м"

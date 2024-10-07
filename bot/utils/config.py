@@ -15,6 +15,9 @@ DEFAULT_LOG_ARCHIVE_DIR = "logs/archive"
 DEFAULT_LOC_LANG = "EN"
 DEFAULT_LOC_YAML_PATH = "bot/localization.yaml"
 
+# Default value for database configurations
+DEFAULT_DB_URL = "sqlite+aiosqlite:///./bot_database.db"
+
 
 def get_env_var(name: str, required: bool = True) -> str | None:
     """
@@ -160,6 +163,29 @@ class LocConfig:
 
 
 @dataclass(frozen=True)
+class DBConfig:
+    """
+    Configuration for the database.
+
+    Attributes:
+        url (str): Database connection string.
+    """
+
+    url: str
+
+    @staticmethod
+    def from_env() -> "DBConfig":
+        """
+        Creates an instance of DBConfig by reading environment variables.
+
+        Returns:
+            DBConfig: An instance of DBConfig with the database URL set.
+        """
+        db_url = get_env_var("DB_URL", required=False) or DEFAULT_DB_URL
+        return DBConfig(url=db_url)
+
+
+@dataclass(frozen=True)
 class Config:
     """
     Main configuration for the application.
@@ -168,13 +194,15 @@ class Config:
         bot (BotConfig): Configuration settings for the Telegram bot.
         xui (XUIConfig): Configuration settings for XUI.
         log (LogConfig): Configuration settings for logging.
-        localization (LocConfig): Configuration settings for localization.
+        loc (LocConfig): Configuration settings for localization.
+        db (DBConfig): Configuration settings for the database.
     """
 
     bot: BotConfig
     xui: XUIConfig
     log: LogConfig
     loc: LocConfig
+    db: DBConfig
 
     @staticmethod
     def load() -> "Config":
@@ -182,13 +210,14 @@ class Config:
         Load all configuration settings.
 
         Returns:
-            Config: Config object containing bot, xui, log, and localization configurations.
+            Config: Config object containing bot, xui, log, localization, and database configurations.
         """
         return Config(
             bot=BotConfig.from_env(),
             xui=XUIConfig.from_env(),
             log=LogConfig.from_env(),
             loc=LocConfig.from_env(),
+            db=DBConfig.from_env(),
         )
 
 
