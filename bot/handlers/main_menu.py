@@ -2,9 +2,9 @@ from aiogram import Dispatcher, F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 
-from bot.keyboards.main_menu_keyboard import get_main_menu_keyboard
-from bot.utils.localization import localization
-from bot.utils.logger import Logger
+from keyboards.main_menu_keyboard import get_main_menu_keyboard
+from utils.localization import localization
+from utils.logger import Logger
 
 logger = Logger(__name__).get_logger()
 router = Router(name="main_menu")

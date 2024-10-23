@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.utils.localization import localization
+from utils.localization import localization
 
 
 def get_main_menu_keyboard(lang: str) -> InlineKeyboardMarkup:

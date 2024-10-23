@@ -2,8 +2,8 @@ import os
 
 import yaml
 
-from bot.utils.config import config
-from bot.utils.logger import Logger
+from utils.config import config
+from utils.logger import Logger
 
 logger = Logger(__name__).get_logger()
 

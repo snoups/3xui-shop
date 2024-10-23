@@ -1,8 +1,8 @@
 import datetime
 import math
 
-from bot.utils.localization import localization
-from bot.utils.logger import Logger
+from utils.localization import localization
+from utils.logger import Logger
 
 logger: Logger = Logger(__name__)
 

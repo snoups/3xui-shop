@@ -3,7 +3,7 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import Message
 
-from bot.database import crud
+from database import crud
 
 
 class UserCheckMiddleware(BaseMiddleware):

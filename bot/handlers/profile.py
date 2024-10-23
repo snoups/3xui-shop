@@ -2,9 +2,9 @@ from aiogram import Dispatcher, F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 
-from bot.utils.api import api, get_client_data, reset_traffic
-from bot.utils.localization import localization
-from bot.utils.logger import Logger
+from utils.api import api, get_client_data, reset_traffic
+from utils.localization import localization
+from utils.logger import Logger
 
 logger = Logger(__name__).get_logger()
 router = Router(name="profile")

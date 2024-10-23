@@ -2,8 +2,8 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.future import select
 
-from bot.database.models import Subscription, User
-from bot.database.session import AsyncSessionLocal
+from database.models import Subscription, User
+from database.session import AsyncSessionLocal
 
 
 async def create_user(

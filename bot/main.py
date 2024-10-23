@@ -2,12 +2,12 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 
-from bot.database.session import init_db
-from bot.handlers import main_menu, profile
-from bot.middlewares.user_check import UserCheckMiddleware
-from bot.utils.api import api
-from bot.utils.config import config
-from bot.utils.logger import Logger
+from database.session import init_db
+from handlers import main_menu, profile
+from middlewares.user_check import UserCheckMiddleware
+from utils.api import api
+from utils.config import config
+from utils.logger import Logger
 
 logger: Logger = Logger("bot").get_logger()
 aiogram_logger: Logger = Logger("aiogram")

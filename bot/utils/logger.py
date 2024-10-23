@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from logging import Logger as BaseLogger
 from logging.handlers import TimedRotatingFileHandler
 
-from bot.utils.config import config
+from utils.config import config
 
 LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 

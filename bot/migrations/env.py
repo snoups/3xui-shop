@@ -4,8 +4,8 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from bot.database.models import Base
-from bot.utils.config import config
+from database.models import Base
+from utils.config import config
 
 config_alembic = context.config
 config_alembic.set_main_option("sqlalchemy.url", config.db.url)

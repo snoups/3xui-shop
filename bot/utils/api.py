@@ -1,12 +1,12 @@
 from py3xui import AsyncApi, Client
 
-from bot.utils.config import config
-from bot.utils.helpers import (
+from utils.config import config
+from utils.helpers import (
     calculate_remaining_traffic,
     convert_size,
     time_left_to_expiry,
 )
-from bot.utils.logger import Logger
+from utils.logger import Logger
 
 logger = Logger(__name__).get_logger()
 logger_xui: Logger = Logger("xui").get_logger()
