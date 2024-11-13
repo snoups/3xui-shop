@@ -18,8 +18,10 @@ def convert_size(size_bytes: int, user_lang: str) -> str:
     Returns:
         str: The size converted to the appropriate unit (KB, MB, GB, etc.).
     """
-    if size_bytes <= 0:
+    if size_bytes == 0:
         return f"0 {localization.get_text('SIZES.BYTES', user_lang)}"
+    elif size_bytes == -1:
+        return f"∞"
 
     size_units_keys = [
         "SIZES.BYTES",
@@ -44,7 +46,7 @@ def convert_size(size_bytes: int, user_lang: str) -> str:
     return f"{s} {size_unit}"
 
 
-def time_left_to_expiry(expiry_time: int, user_lang: str) -> str:
+def time_left_to_expiry(expiry_time: int, user_lang: str = "EN") -> str | int:
     """
     Calculates the time left until subscription expiry, using localized time units.
 
@@ -63,7 +65,7 @@ def time_left_to_expiry(expiry_time: int, user_lang: str) -> str:
 
     time_left = expiry_datetime - now
     if time_left.total_seconds() < 0:
-        return localization.get_text("EXPIRED", user_lang)
+        return -1
 
     days, remainder = divmod(time_left.total_seconds(), 86400)
     hours, remainder = divmod(remainder, 3600)
@@ -74,19 +76,3 @@ def time_left_to_expiry(expiry_time: int, user_lang: str) -> str:
     minutes_text = localization.get_text("TIME.MINUTES", user_lang)
 
     return f"{int(days)}{day_text}, {int(hours)}{hours_text}, {int(minutes)}{minutes_text}"
-
-
-def calculate_remaining_traffic(current_traffic: int, max_traffic: int, lang: str) -> str:
-    """
-    Calculates and returns the remaining traffic as a formatted string.
-
-    Args:
-        current_traffic (int): The amount of traffic already used, in bytes.
-        max_traffic (int): The maximum traffic allowed by the user's plan, in bytes.
-        lang (str): The user's language code for localization.
-
-    Returns:
-        str: The remaining traffic in a human-readable format (e.g., "13.4 GB").
-    """
-    remaining_traffic = max_traffic - current_traffic
-    return convert_size(remaining_traffic, lang)

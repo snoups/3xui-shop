@@ -1,0 +1,71 @@
+{
+    "plans": [
+        {
+            "plan": 25,
+            "callback": "sub_25",
+            "price": {
+                "EN": 0.25,
+                "RU": 25
+            }
+        },
+        {
+            "plan": 50,
+            "callback": "sub_50",
+            "price": {
+                "EN": 0.75,
+                "RU": 75
+            }
+        },
+        {
+            "plan": 100,
+            "callback": "sub_100",
+            "price": {
+                "EN": 1,
+                "RU": 100
+            }
+        },
+        {
+            "plan": 150,
+            "callback": "sub_150",
+            "price": {
+                "EN": 1.25,
+                "RU": 125
+            }
+        },
+        {
+            "plan": 200,
+            "callback": "sub_200",
+            "price": {
+                "EN": 1.5,
+                "RU": 150
+            }
+        },
+        {
+            "plan": 300,
+            "callback": "sub_300",
+            "price": {
+                "EN": 1.75,
+                "RU": 175
+            }
+        },
+        {
+            "plan": -1,
+            "callback": "sub_-1",
+            "price": {
+                "EN": 2,
+                "RU": 200
+            }
+        }
+    ],
+
+    "coefficients": {
+        "1": 0.1,
+        "7": 0.35,
+        "14": 0.55,
+        "30": 1,
+        "60": 1.75,
+        "90": 2.5,
+        "180": 4.5,
+        "365": 8
+    }
+}

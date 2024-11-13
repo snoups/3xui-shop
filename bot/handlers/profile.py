@@ -1,8 +1,9 @@
 from aiogram import Dispatcher, F, Router
 from aiogram.filters import Command
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, User
 
-from bot.utils.api import api, get_client_data, reset_traffic
+import bot.utils.api as api
+from bot.utils.helpers import convert_size, time_left_to_expiry
 from bot.utils.localization import localization
 from bot.utils.logger import Logger
 
@@ -10,13 +11,40 @@ logger = Logger(__name__).get_logger()
 router = Router(name="profile")
 
 
-@router.message(Command("test"))
-async def test(message: Message) -> None:
-    user = message.from_user
+async def profile_handler(user: User) -> str:
     lang = user.language_code
+    client_data = await api.get_client_data(user.id)
 
-    await reset_traffic(user.id)
-    await message.answer("ok")
+    header_text = localization.get_text("PROFILE_MESSAGE.HEADER", lang).format(
+        user_name=user.first_name,
+        user_id=user.id,
+    )
+
+    if client_data:
+        print(client_data)
+        if client_data["remaining_traffic"] < -1:
+            subscription_text = localization.get_text(
+                "PROFILE_MESSAGE.SUBSCRIPTION_TRAFFIC_EXPIRED", lang
+            ).format(plan=convert_size(client_data["plan"], lang))
+        elif time_left_to_expiry(client_data["expiry_time"]) < 0:
+            subscription_text = localization.get_text(
+                "PROFILE_MESSAGE.SUBSCRIPTION_TIME_EXPIRED", lang
+            ).format(plan=convert_size(client_data["plan"], lang))
+        else:
+            subscription_text = localization.get_text("PROFILE_MESSAGE.SUBSCRIPTION", lang).format(
+                plan=convert_size(client_data["plan"], lang),
+                remaining_traffic=convert_size(client_data["remaining_traffic"], lang),
+                expiry_time=time_left_to_expiry(client_data["expiry_time"], lang),
+            )
+        statistics_text = localization.get_text("PROFILE_MESSAGE.STATISTICS", lang).format(
+            total=convert_size(client_data["total"], lang),
+            up=convert_size(client_data["up"], lang),
+            down=convert_size(client_data["down"], lang),
+        )
+        return f"{header_text}\n\n{subscription_text}\n\n{statistics_text}"
+    else:
+        no_subscription_text = localization.get_text("PROFILE_MESSAGE.SUBSCRIPTION_NONE", lang)
+        return f"{header_text}\n\n{no_subscription_text}"
 
 
 @router.message(Command("profile"))
@@ -28,31 +56,8 @@ async def command_profile(message: Message) -> None:
         message (Message): The incoming message from the user.
     """
     user = message.from_user
-    lang = user.language_code
-
-    client_data = await get_client_data(user.id, lang)
-
-    header_text = localization.get_text("PROFILE_MESSAGE.HEADER", lang).format(
-        user_name=user.first_name,
-        user_id=user.id,
-    )
-    if client_data:
-        subscription_text = localization.get_text("PROFILE_MESSAGE.SUBSCRIPTION", lang).format(
-            plan=client_data["plan"],
-            remaining_traffic=client_data["remaining_traffic"],
-            expiry_time=client_data["expiry_time"],
-        )
-        statistics_text = localization.get_text("PROFILE_MESSAGE.STATISTICS", lang).format(
-            total=client_data["total"],
-            up=client_data["up"],
-            down=client_data["down"],
-        )
-        text = f"{header_text}\n\n{subscription_text}\n\n{statistics_text}"
-    else:
-        no_subscription_text = localization.get_text("PROFILE_MESSAGE.NO_SUBSCRIPTION", lang)
-        text = f"{header_text}\n\n{no_subscription_text}"
-
-    logger.debug(f"Sent profile to user {user.id} with language {lang}")
+    text = await profile_handler(user)
+    logger.debug(f"Sent profile to user {user.id}")
     await message.answer(text)
 
 
@@ -66,33 +71,9 @@ async def callback_profile(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query containing user interaction data.
     """
     user = callback.from_user
-    lang = user.language_code
-
     await callback.message.delete()
-
-    client_data = await get_client_data(user.id, lang)
-
-    header_text = localization.get_text("PROFILE_MESSAGE.HEADER", lang).format(
-        user_name=user.first_name,
-        user_id=user.id,
-    )
-    if client_data:
-        subscription_text = localization.get_text("PROFILE_MESSAGE.SUBSCRIPTION", lang).format(
-            plan=client_data["plan"],
-            remaining_traffic=client_data["remaining_traffic"],
-            expiry_time=client_data["expiry_time"],
-        )
-        statistics_text = localization.get_text("PROFILE_MESSAGE.STATISTICS", lang).format(
-            total=client_data["total"],
-            up=client_data["up"],
-            down=client_data["down"],
-        )
-        text = f"{header_text}\n\n{subscription_text}\n\n{statistics_text}"
-    else:
-        no_subscription_text = localization.get_text("PROFILE_MESSAGE.NO_SUBSCRIPTION", lang)
-        text = f"{header_text}\n\n{no_subscription_text}"
-
-    logger.debug(f"Handled callback for profile of user {user.id} with language {lang}")
+    text = await profile_handler(user)
+    logger.debug(f"Handled callback for profile of user {user.id}")
     await callback.message.answer(text)
 
 

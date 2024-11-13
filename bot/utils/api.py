@@ -1,11 +1,8 @@
 from py3xui import AsyncApi, Client
 
+from bot.database import crud
+from bot.database.models import User
 from bot.utils.config import config
-from bot.utils.helpers import (
-    calculate_remaining_traffic,
-    convert_size,
-    time_left_to_expiry,
-)
 from bot.utils.logger import Logger
 
 logger = Logger(__name__).get_logger()
@@ -21,43 +18,38 @@ api = AsyncApi(
 )
 
 
-async def get_client_data(user_id: int, lang: str) -> dict | None:
+async def get_client_data(telegram_id: int) -> dict | None:
     """
     Fetches client data from the XUI API by user ID and prepares it for display.
 
     Args:
         user_id (int): The ID of the user for which to retrieve the client data.
-        lang (str): The user's language code for localization purposes.
 
     Returns:
         dict: A dictionary containing client data such as total traffic, uploaded/downloaded traffic, and expiry time.
     """
     try:
-        client: Client = await api.client.get_by_email(user_id)
+        client: Client = await api.client.get_by_email(telegram_id)
 
         if client is None:
             return None
 
         logger.debug(client.model_dump())
 
-        remaining_traffic: str
-        plan: str
+        remaining_traffic: int
+        plan: int
 
         if client.total == 0:
-            remaining_traffic = "∞"
-            plan = "∞"
+            remaining_traffic = -1
+            plan = -1
         else:
-            remaining_traffic = calculate_remaining_traffic(
-                client.up + client.down,
-                client.total,
-                lang,
-            )
-            plan = convert_size(client.total, lang)
+            remaining_traffic = client.total - (client.up + client.down)
+            plan = client.total
 
-        total = convert_size(client.up + client.down, lang)
-        up = convert_size(client.up, lang)
-        down = convert_size(client.down, lang)
-        expiry_time = time_left_to_expiry(client.expiry_time, lang)
+        total = client.up + client.down
+        up = client.up
+        down = client.down
+        expiry_time = client.expiry_time
 
         return {
             "plan": plan,
@@ -68,10 +60,27 @@ async def get_client_data(user_id: int, lang: str) -> dict | None:
             "down": down,
         }
     except Exception as e:
-        logger.error(f"Error fetching client data for user {user_id}: {e}")
+        logger.error(f"Error fetching client data for user {telegram_id}: {e}")
         return {}
 
 
-async def reset_traffic(user_id):
-    client: Client = await api.client.get_by_email(user_id)
-    await api.client.reset_stats(client.inbound_id, user_id)
+async def reset_traffic(telegram_id):
+    client: Client = await api.client.get_by_email(telegram_id)
+    await api.client.reset_stats(client.inbound_id, telegram_id)
+
+
+async def add_client(telegram_id):
+    user: User = crud.get_user(telegram_id)
+    new_client = Client(id=user.id, email=str(telegram_id), enable=True)
+
+    await api.client.add(6, [new_client])
+    client = await api.client.get_by_email(telegram_id)
+
+    logger.debug(client.model_dump())
+
+
+async def set_traffic_limit() -> None:
+    client = await api.client.get_by_email(str("tes2t"))
+    client.id = "24d8083b-03bc-48c1-9668-bbd1063afb0a"
+    client.total_gb = 1024
+    await api.client.update("24d8083b-03bc-48c1-9668-bbd1063afb0a", client)

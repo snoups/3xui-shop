@@ -7,8 +7,8 @@ from .session import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True)
-    username = Column(String, unique=True)
+    id = Column(String, primary_key=True)
+    telegram_id = Column(Integer, unique=True)
     first_name = Column(String)
     last_name = Column(String)
     language_code = Column(String)
@@ -21,7 +21,7 @@ class Subscription(Base):
     __tablename__ = "subscriptions"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    telegram_id = Column(Integer, ForeignKey("users.telegram_id"))
     plan = Column(String)
     expiry_date = Column(DateTime)
     active = Column(Boolean, default=True)
