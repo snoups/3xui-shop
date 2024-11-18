@@ -1,7 +1,7 @@
 import logging
 import os
 import shutil
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from logging import Logger as BaseLogger
 from logging.handlers import TimedRotatingFileHandler
 
@@ -89,7 +89,7 @@ class ArchivingTimedRotatingFileHandler(TimedRotatingFileHandler):
             except Exception as e:
                 # Log any errors that occur during archiving
                 logging.getLogger(__name__).error(f"Failed to archive log file {rotated_log}: {e}")
-                self.handleError(None)  # Log the error using the standard mechanism
+                # self.handleError()  # Log the error using the standard mechanism
 
 
 class Logger:
@@ -133,7 +133,7 @@ class Logger:
             cls._set_handler_level(cls._stream_handler)
 
     @classmethod
-    def _get_log_filename(cls, today: datetime.date) -> str:
+    def _get_log_filename(cls, today: date) -> str:
         """
         Generates the log file name based on the current date.
 

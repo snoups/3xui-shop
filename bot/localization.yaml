@@ -19,21 +19,31 @@ EN:
         DOWNLOAD: "📲 Download App"
         SUPPORT: "🆘 Support"
     PROFILE_MESSAGE:
-        - "👤 Your Profile:"
-        - "Name: {user_name}"
-        - "ID: {user_id}"
-        - ""
-        - "📅 Subscription:"
-        - "Plan: {plan}"
-        - "Expires on: {expiry_time}"
-        - ""
-        - "📊 Statistics:"
-        - "Total Traffic: {total}"
-        - "Sent: ↑ {up}"
-        - "Received: ↓ {down}"
-    DOWNLOAD_MESSAGE:
-        - "📲 Download the app"
-        - "Choose your platform to get the app."
+        HEADER:
+            - "👤 Your Profile:"
+            - "Name: {user_name}"
+            - "ID: {user_id}"
+        SUBSCRIPTION:
+            - "📅 Subscription:"
+            - "Plan: {plan}"
+            - "Remaining Traffic: {remaining_traffic}"
+            - "Expires on: {expiry_time}"
+        STATISTICS:
+            - "📊 Statistics:"
+            - "Total Traffic: {total}"
+            - "Sent: ↑ {up}"
+            - "Received: ↓ {down}"
+        SUBSCRIPTION_NONE:
+            - "You haven't subscribed yet. Go to the subscription page to purchase one."
+        SUBSCRIPTION_TIME_EXPIRED:
+            - "📅 Subscription:"
+            - "Plan: {plan}"
+            - "Subscription period has expired."
+        SUBSCRIPTION_TRAFFIC_EXPIRED:
+            - "📅 Subscription:"
+            - "Plan: {plan}"
+            - "Traffic limit reached."
+
     PROMOCODE_MESSAGE:
         - "Please enter your promo code."
     REFERRAL_MESSAGE:

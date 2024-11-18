@@ -26,7 +26,7 @@ async def profile_handler(user: User) -> str:
             subscription_text = localization.get_text(
                 "PROFILE_MESSAGE.SUBSCRIPTION_TRAFFIC_EXPIRED", lang
             ).format(plan=convert_size(client_data["plan"], lang))
-        elif time_left_to_expiry(client_data["expiry_time"]) < 0:
+        elif client_data["expiry_time"] < 0:
             subscription_text = localization.get_text(
                 "PROFILE_MESSAGE.SUBSCRIPTION_TIME_EXPIRED", lang
             ).format(plan=convert_size(client_data["plan"], lang))

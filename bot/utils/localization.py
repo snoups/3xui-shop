@@ -45,7 +45,7 @@ class Localization:
             logger.error(f"Failed to load localization file {file_path}: {e}")
             return {}
 
-    def get_text(self, key: str, lang: str = None) -> str | dict:
+    def get_text(self, key: str, lang: str | None = None) -> str | dict:
         """
         Retrieves the translated text for the given key and language.
 

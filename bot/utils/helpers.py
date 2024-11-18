@@ -4,7 +4,7 @@ import math
 from bot.utils.localization import localization
 from bot.utils.logger import Logger
 
-logger: Logger = Logger(__name__)
+logger = Logger(__name__)
 
 
 def convert_size(size_bytes: int, user_lang: str) -> str:

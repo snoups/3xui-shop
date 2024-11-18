@@ -1,12 +1,12 @@
 from py3xui import AsyncApi, Client
 
-from bot.database import crud
+from bot.database import methods
 from bot.database.models import User
 from bot.utils.config import config
 from bot.utils.logger import Logger
 
 logger = Logger(__name__).get_logger()
-logger_xui: Logger = Logger("xui").get_logger()
+logger_xui = Logger("xui").get_logger()
 
 api = AsyncApi(
     host=config.xui.host,
@@ -70,7 +70,7 @@ async def reset_traffic(telegram_id):
 
 
 async def add_client(telegram_id):
-    user: User = crud.get_user(telegram_id)
+    user: User = methods.get_user(telegram_id)
     new_client = Client(id=user.id, email=str(telegram_id), enable=True)
 
     await api.client.add(6, [new_client])

@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from typing import Any
 
 from dotenv import load_dotenv
 
@@ -28,7 +29,7 @@ def get_env_var(name: str, required: bool = True) -> str | None:
         required (bool): Whether the environment variable is required. Defaults to True.
 
     Returns:
-        str | None: The value of the environment variable or None if not required and not set.
+        Any: The value of the environment variable or None if not required and not set.
 
     Raises:
         ValueError: If the environment variable is required but not set or empty.

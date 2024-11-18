@@ -2,8 +2,7 @@ from typing import Any, Awaitable, Callable, Dict
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message
-
-from bot.database import crud
+from database.methods import create_user
 
 
 class UserCheckMiddleware(BaseMiddleware):
@@ -23,13 +22,11 @@ class UserCheckMiddleware(BaseMiddleware):
         last_name = event.from_user.last_name
         language_code = event.from_user.language_code
 
-        user = await crud.get_user(telegram_id=user_id)
-        if not user:
-            await crud.create_user(
-                telegram_id=user_id,
-                first_name=first_name,
-                last_name=last_name,
-                language_code=language_code,
-            )
+        await create_user(
+            telegram_id=user_id,
+            first_name=first_name,
+            last_name=last_name,
+            language_code=language_code,
+        )
 
         return await handler(event, data)
