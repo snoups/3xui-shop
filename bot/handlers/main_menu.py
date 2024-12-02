@@ -7,7 +7,7 @@ from bot.utils.localization import localization
 from bot.utils.logger import Logger
 
 logger = Logger(__name__).get_logger()
-router = Router(name="main_menu")
+router = Router(name=__name__)
 
 
 @router.message(Command("start"))

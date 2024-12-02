@@ -2,7 +2,7 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 
-from bot.handlers import main_menu, profile
+from bot.handlers import main_menu, profile, subscription
 from bot.middlewares.user_check import UserCheckMiddleware
 from bot.utils.api import api
 from bot.utils.config import config
@@ -23,6 +23,7 @@ async def main() -> None:
     dp.message.middleware(UserCheckMiddleware())
     main_menu.register_handler(dp)
     profile.register_handler(dp)
+    subscription.register_handler(dp)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

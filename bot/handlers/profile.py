@@ -3,15 +3,25 @@ from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message, User
 
 import bot.utils.api as api
+from bot.keyboards.back_keyboard import get_back_keyboard
 from bot.utils.helpers import convert_size, time_left_to_expiry
 from bot.utils.localization import localization
 from bot.utils.logger import Logger
 
 logger = Logger(__name__).get_logger()
-router = Router(name="profile")
+router = Router(name=__name__)
 
 
 async def profile_handler(user: User) -> str:
+    """
+    Generates the user's profile information text based on their subscription and usage data.
+
+    Args:
+        user (User): The Telegram user object.
+
+    Returns:
+        str: The formatted profile information text.
+    """
     lang = user.language_code
     client_data = await api.get_client_data(user.id)
 
@@ -56,9 +66,10 @@ async def command_profile(message: Message) -> None:
         message (Message): The incoming message from the user.
     """
     user = message.from_user
+    lang = user.language_code
     text = await profile_handler(user)
     logger.debug(f"Sent profile to user {user.id}")
-    await message.answer(text)
+    await message.answer(text, reply_markup=get_back_keyboard(lang, "main_menu"))
 
 
 @router.callback_query(F.data == "profile")
@@ -71,10 +82,11 @@ async def callback_profile(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query containing user interaction data.
     """
     user = callback.from_user
+    lang = user.language_code
     await callback.message.delete()
     text = await profile_handler(user)
     logger.debug(f"Handled callback for profile of user {user.id}")
-    await callback.message.answer(text)
+    await callback.message.answer(text, reply_markup=get_back_keyboard(lang, "main_menu"))
 
 
 def register_handler(dp: Dispatcher) -> None:
