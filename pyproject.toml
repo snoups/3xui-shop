@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "3xui-shop"
+version = "0.2.0"
+description = "This is a Telegram bot for selling VPN subscriptions. It works with 3X-UI."
+authors = ["snoups"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.15.0"
+environs = "^11.2.1"
+sqlalchemy = "^2.0.36"
+cachetools = "^5.5.0"
+aiosqlite = "^0.20.0"
+greenlet = "^3.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to delete log directories.
+# Script to delete .log files in the specified directory.
 
 # Default log directory path
 DEFAULT_LOG_DIR="./logs"
@@ -9,16 +9,16 @@ LOG_DIR="${1:-$DEFAULT_LOG_DIR}"
 
 # Check if the specified directory exists
 if [ -d "$LOG_DIR" ]; then
-    echo "Deleting log directory: $LOG_DIR"
+    echo "Searching for .log files in directory: $LOG_DIR"
     
-    # Attempt to remove the directory and its contents recursively and forcefully
-    rm -rf "$LOG_DIR"
-    
+    # Find and delete .log files in the specified directory
+    find "$LOG_DIR" -type f -name "*.log" -exec rm -f {} +
+
     # Check if the deletion was successful
     if [ $? -eq 0 ]; then
-        echo "Log directory successfully deleted."
+        echo "All .log files successfully deleted in directory: $LOG_DIR"
     else
-        echo "Error: Failed to delete the log directory." >&2
+        echo "Error: Failed to delete .log files in the directory." >&2
         exit 1
     fi
 else
