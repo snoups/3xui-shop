@@ -2,11 +2,18 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from environs import Env
+from marshmallow.validate import OneOf
 
 BASE_DIR = Path(__file__).resolve().parent
 
 # Default values for database
 DEFAULT_DB_NAME = "bot_database"
+
+# Default values for logging configurations
+DEFAULT_LOG_LEVEL = "INFO"
+DEFAULT_LOG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+DEFAULT_LOG_DIR = "./logs"
+DEFAULT_LOG_ARCHIVE_FORMAT = "zip"
 
 
 @dataclass
@@ -17,7 +24,6 @@ class BotConfig:
     Attributes:
         TOKEN (str): The API token for the Telegram bot.
         DEV_ID (int): TODO
-
     """
 
     TOKEN: str
@@ -59,25 +65,45 @@ class DatabaseConfig:
 
 
 @dataclass
-class Config:
+class LoggingConfig:
     """
-    TODO
+    Configuration for logging.
 
     Attributes:
-        bot (BotConfig): TODO
-        database (DatabaseConfig): TODO
+        LEVEL (str): Logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).
+        FORMAT (str): Format string for log messages.
+        DIR (str): Directory where log files are stored.
+        ARCHIVE_FORMAT (str): TODO
+    """
+
+    LEVEL: str
+    FORMAT: str
+    DIR: str
+    ARCHIVE_FORMAT: str
+
+
+@dataclass
+class Config:
+    """
+    Main configuration class.
+
+    Attributes:
+        bot (BotConfig): Bot configuration.
+        database (DatabaseConfig): Database configuration.
+        logging (LoggingConfig): Logging configuration.
     """
 
     bot: BotConfig
     database: DatabaseConfig
+    logging: LoggingConfig
 
 
 def load_config() -> Config:
     """
-    TODO
+    Load configuration from environment variables.
 
     Returns:
-        TODO
+        Config: The application configuration.
     """
     env = Env()
     env.read_env()
@@ -93,5 +119,15 @@ def load_config() -> Config:
             USERNAME=env.str("DB_USERNAME", ""),
             PASSWORD=env.str("DB_PASSWORD", ""),
             NAME=env.str("DB_NAME", "bot_database"),
+        ),
+        logging=LoggingConfig(
+            LEVEL=env.str("LOG_LEVEL", DEFAULT_LOG_LEVEL),
+            FORMAT=env.str("LOG_FORMAT", DEFAULT_LOG_FORMAT),
+            DIR=env.str("LOG_DIR", DEFAULT_LOG_DIR),
+            ARCHIVE_FORMAT=env.str(
+                "LOG_ARCHIVE_FORMAT",
+                DEFAULT_LOG_ARCHIVE_FORMAT,
+                validate=OneOf(["zip", "gz"], error="LOG_ARCHIVE_FORMAT must be one of: {choices}"),
+            ),
         ),
     )

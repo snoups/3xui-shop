@@ -1,7 +1,5 @@
 import asyncio
 import logging
-from datetime import datetime
-from logging.handlers import TimedRotatingFileHandler
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -9,12 +7,16 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from app.bot import commands, middlewares, routes
 from app.config import Config, load_config
 from app.db.database import Database
+from app.logger import setup_logging
+
+logger = logging.getLogger(__name__)
 
 
 async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
     """
     Shutdown event handler. This runs when the bot shuts down.
     """
+    logger.info("Bot stopped")
     db: Database = dispatcher.get("db")
     config: Config = dispatcher.get("config")
     await bot.send_message(chat_id=config.bot.DEV_ID, text="#BotStopped")
@@ -28,6 +30,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
     """
     Startup event handler. This runs when the bot starts up.
     """
+    logger.info("Bot started")
     config: Config = dispatcher.get("config")
     await bot.send_message(chat_id=config.bot.DEV_ID, text="#BotStarted")
 
@@ -48,6 +51,9 @@ async def main() -> None:
         bot=bot,
         db=db,
     )
+
+    # Configure logging
+    setup_logging(config.logging)
 
     # Register startup handler
     dp.startup.register(on_startup)
@@ -70,24 +76,7 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    # Configure logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
-        handlers=[
-            TimedRotatingFileHandler(
-                filename=f"logs/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log",
-                when="midnight",
-                interval=1,
-                backupCount=1,
-            ),
-            logging.StreamHandler(),
-        ],
-    )
-
-    # Set logging level for aiogram to CRITICAL
-    aiogram_logger = logging.getLogger("aiogram.event")
-    aiogram_logger.setLevel(logging.CRITICAL)
-
-    # Run the bot
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logger.info("Bot stopped")

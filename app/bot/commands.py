@@ -22,6 +22,9 @@ async def setup(bot: Bot) -> None:
 async def delete(bot: Bot) -> None:
     """
     Delete bot commands.
+
+    Args:
+        bot (Bot): TODO
     """
     await bot.delete_my_commands(
         scope=BotCommandScopeAllPrivateChats(),
