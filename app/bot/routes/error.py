@@ -9,7 +9,8 @@ from aiogram.utils.markdown import hbold, hcode
 
 from app.config import Config
 
-router = Router()
+logger = logging.getLogger(__name__)
+router = Router(name=__name__)
 
 
 @router.errors(ExceptionTypeFilter(Exception))

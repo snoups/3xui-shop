@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-05 11:30+0500\n"
+"POT-Creation-Date: 2024-12-05 14:48+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,7 +18,46 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: app/bot/routes/private/command.py:19
-msgid "Hello from Bot!"
+#: app/bot/keyboards/main_menu.py:16
+msgid "👤 Profile"
 msgstr ""
+
+#: app/bot/keyboards/main_menu.py:17
+msgid "💳 Subscription"
+msgstr ""
+
+#: app/bot/keyboards/main_menu.py:20
+msgid "👥 Referral Program"
+msgstr ""
+
+#: app/bot/keyboards/main_menu.py:21
+msgid "🏷 Activate Promo Code"
+msgstr ""
+
+#: app/bot/keyboards/main_menu.py:22
+msgid "📲 Download App"
+msgstr ""
+
+#: app/bot/keyboards/main_menu.py:23
+msgid "🆘 Support"
+msgstr ""
+
+#: app/bot/routes/main_menu.py:25
+msgid ""
+"Welcome, {user_name}! 🎉\n"
+"\n"
+"3X-UI SHOP — your reliable assistant in the world of free internet.\n"
+"We offer safe and fast connections to any internet services using the "
+"XRAY protocol.\n"
+"Our service works even in China, Iran, and Russia.\n"
+"        \n"
+"🚀 HIGH SPEED\n"
+"🔒 SECURITY\n"
+"📱 SUPPORT FOR ALL PLATFORMS\n"
+"♾️ UNLIMITED\n"
+"✅ GUARANTEE AND TRIAL PERIOD"
+msgstr ""
+
+#~ msgid "Hello from Bot!"
+#~ msgstr ""
 

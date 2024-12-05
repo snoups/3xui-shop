@@ -1,6 +1,6 @@
 from aiogram import Dispatcher
 
-from . import error, inline, private
+from . import error, main_menu
 
 
 def include(dp: Dispatcher) -> None:
@@ -13,9 +13,7 @@ def include(dp: Dispatcher) -> None:
     dp.include_routers(
         *[
             error.router,
-            private.command.router,
-            private.callback.router,
-            inline.router,
+            main_menu.router,
         ]
     )
 
