@@ -23,7 +23,7 @@ class BotConfig:
 
     Attributes:
         TOKEN (str): The API token for the Telegram bot.
-        DEV_ID (int): TODO
+        DEV_ID (int): Developer ID (user_id) for notifications.
     """
 
     TOKEN: str
@@ -31,16 +31,16 @@ class BotConfig:
 
 
 @dataclass
-class DatabaseConfig:
+class DatabaseConfig:  # TODO: Add support for different drivers
     """
-    TODO
+    Configuration for the database.
 
     Attributes:
-        USERNAME (str): TODO
-        PASSWORD (str): TODO
-        NAME (str): TODO
-        HOST (str): TODO
-        PORT (int): TODO
+        USERNAME (str): Username for database authentication.
+        PASSWORD (str): Password for database authentication.
+        NAME (str): Name of the database to connect to.
+        HOST (str): Host address of the database server.
+        PORT (int): Port number for the database server.
     """
 
     USERNAME: str
@@ -73,7 +73,7 @@ class LoggingConfig:
         LEVEL (str): Logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).
         FORMAT (str): Format string for log messages.
         DIR (str): Directory where log files are stored.
-        ARCHIVE_FORMAT (str): TODO
+        ARCHIVE_FORMAT (str): Archive format for log archiving.
     """
 
     LEVEL: str

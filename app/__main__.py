@@ -3,6 +3,7 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.utils.i18n import I18n, SimpleI18nMiddleware
 
 from app.bot import commands, middlewares, routes
 from app.config import Config, load_config
@@ -51,6 +52,7 @@ async def main() -> None:
         bot=bot,
         db=db,
     )
+    i18n = I18n(path="app/locales", default_locale="en", domain="bot")
 
     # Configure logging
     setup_logging(config.logging)
@@ -61,6 +63,8 @@ async def main() -> None:
     dp.shutdown.register(on_shutdown)
     # Register middlewares
     middlewares.register(dp, config=config, session=db.session)
+    dp.message.outer_middleware(SimpleI18nMiddleware(i18n=i18n))
+
     # Include routes
     routes.include(dp)
 

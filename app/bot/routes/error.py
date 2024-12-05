@@ -18,9 +18,9 @@ async def errors_handler(event: ErrorEvent, bot: Bot, config: Config) -> bool:
     Handler for handling all errors.
 
     Args:
-        event: The ErrorEvent object containing the exception and update.
-        bot: The Bot instance for sending messages.
-        config: The Config instance containing bot configuration.
+        event (ErrorEvent): The ErrorEvent object containing the exception and update.
+        bot (Bot): The Bot instance for sending messages.
+        config (Config): The Config instance containing bot configuration.
 
     Returns:
         bool: True to stop further error handling, False to continue.

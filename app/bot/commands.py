@@ -7,7 +7,7 @@ async def setup(bot: Bot) -> None:
     Setup bot commands.
 
     Args:
-        bot (Bot): TODO
+        bot (Bot): The Bot instance for setup commands.
     """
     commands = [
         BotCommand(command="start", description="Restart bot"),
@@ -24,7 +24,7 @@ async def delete(bot: Bot) -> None:
     Delete bot commands.
 
     Args:
-        bot (Bot): TODO
+        bot (Bot): The Bot instance for deleting commands.
     """
     await bot.delete_my_commands(
         scope=BotCommandScopeAllPrivateChats(),

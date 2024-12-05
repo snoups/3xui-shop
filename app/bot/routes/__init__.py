@@ -8,7 +8,7 @@ def include(dp: Dispatcher) -> None:
     Include bot routers.
 
     Args:
-        dp (Dispatcher): TODO
+        dp (Dispatcher): Root router.
     """
     dp.include_routers(
         *[

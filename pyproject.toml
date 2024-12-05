@@ -14,6 +14,8 @@ cachetools = "^5.5.0"
 aiosqlite = "^0.20.0"
 greenlet = "^3.1.1"
 
+[tool.poetry.group.dev.dependencies]
+babel = "^2.16.0"
 
 [build-system]
 requires = ["poetry-core"]
