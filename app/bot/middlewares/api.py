@@ -3,25 +3,24 @@ from typing import Any, Awaitable, Callable
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-
-from app.config import Config
+from py3xui import AsyncApi
 
 logger = logging.getLogger(__name__)
 
 
-class ConfigMiddleware(BaseMiddleware):
+class ApiMiddleware(BaseMiddleware):
     """
-    Middleware for injecting a Config instance into handler data.
+    Middleware for injecting an AsyncApi instance into handler data.
     """
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, api: AsyncApi) -> None:
         """
-        Initialize the ConfigMiddleware.
+        Initialize the ApiMiddleware.
 
         Args:
-            config (Config): The Config instance to be injected.
+            api (AsyncApi): API instance to be injected.
         """
-        self.config = config
+        self.api = api
 
     async def __call__(
         self,
@@ -40,5 +39,5 @@ class ConfigMiddleware(BaseMiddleware):
         Returns:
             Any: The result of the next handler.
         """
-        data["config"] = self.config
+        data["api"] = self.api
         return await handler(event, data)

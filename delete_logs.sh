@@ -1,27 +1,27 @@
 #!/bin/bash
-# Script to delete .log files in the specified directory.
+# Script to delete .log files in a specified directory.
 
-# Default log directory path
+# Default directory for logs
 DEFAULT_LOG_DIR="./logs"
 
-# If a directory path is provided as an argument, use it; otherwise, use the default
+# Use the provided directory path or default to the predefined one
 LOG_DIR="${1:-$DEFAULT_LOG_DIR}"
 
-# Check if the specified directory exists
+# Check if the directory exists
 if [ -d "$LOG_DIR" ]; then
-    echo "Searching for .log files in directory: $LOG_DIR"
+    echo "Looking for .log files in: $LOG_DIR"
     
-    # Find and delete .log files in the specified directory
+    # Find and delete all .log files
     find "$LOG_DIR" -type f -name "*.log" -exec rm -f {} +
 
-    # Check if the deletion was successful
+    # Verify if deletion succeeded
     if [ $? -eq 0 ]; then
-        echo "All .log files successfully deleted in directory: $LOG_DIR"
+        echo "All .log files were successfully deleted from: $LOG_DIR"
     else
-        echo "Error: Failed to delete .log files in the directory." >&2
+        echo "Error: Failed to delete some .log files." >&2
         exit 1
     fi
 else
-    echo "Log directory '$LOG_DIR' does not exist."
+    echo "Error: Directory '$LOG_DIR' does not exist." >&2
     exit 1
 fi

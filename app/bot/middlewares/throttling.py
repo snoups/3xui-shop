@@ -8,7 +8,7 @@ from cachetools import TTLCache
 
 class ThrottlingMiddleware(BaseMiddleware):
     """
-    Middleware for handling throttling.
+    Middleware for managing throttling of user requests.
     """
 
     def __init__(
@@ -19,12 +19,12 @@ class ThrottlingMiddleware(BaseMiddleware):
         **ttl_map: float,
     ) -> None:
         """
-        Initialize the ThrottlingMiddleware.
+        Initializes the ThrottlingMiddleware.
 
         Args:
-            default_key (Optional[str]): The default key for throttling.
+            default_key (Optional[str]): The default key used for throttling.
             default_ttl (float): The default time-to-live (TTL) in seconds for the default key.
-            ttl_map (float): Mapping of keys to corresponding TTL values.
+            ttl_map (float): A mapping of throttling keys to their corresponding TTL values.
         """
         if default_key:
             ttl_map[default_key] = default_ttl
@@ -42,12 +42,15 @@ class ThrottlingMiddleware(BaseMiddleware):
         data: dict[str, Any],
     ) -> Optional[Any]:
         """
-        Call the middleware.
+        Invokes the middleware for handling throttling logic.
 
         Args:
-            handler (Callable): The handler function.
-            event (TelegramObject): The Telegram event.
-            data (dict): Additional data.
+            handler (Callable): The handler function to process the event.
+            event (TelegramObject): The Telegram event being processed.
+            data (dict): Additional data passed to the handler.
+
+        Returns:
+            Optional[Any]: The result of the handler or None if the request is throttled.
         """
         user: Optional[User] = data.get("event_from_user", None)
 

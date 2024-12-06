@@ -6,30 +6,32 @@ from . import models
 
 class Database:
     """
-    Database manager for handling database connections and operations.
+    Manages database connections and operations.
     """
 
     def __init__(self, config: DatabaseConfig) -> None:
         """
-        Initialize the Database manager.
+        Initialize the database manager.
 
         Args:
-            config (DatabaseConfig): The database configuration object.
+            config (DatabaseConfig): Configuration object for the database.
         """
         self.engine = create_async_engine(
             url=config.url(),
             pool_pre_ping=True,
         )
         self.session = async_sessionmaker(
-            bind=self.engine, class_=AsyncSession, expire_on_commit=False
+            bind=self.engine,
+            class_=AsyncSession,
+            expire_on_commit=False,
         )
 
     async def init(self) -> "Database":
         """
-        Initialize the database.
+        Set up the database schema.
 
         Returns:
-            Database: The initialized Database instance.
+            Database: The initialized database instance.
         """
         async with self.engine.begin() as connection:
             await connection.run_sync(models.Base.metadata.create_all)
@@ -37,6 +39,6 @@ class Database:
 
     async def close(self) -> None:
         """
-        Close the database connection.
+        Dispose of the database engine and release resources.
         """
         await self.engine.dispose()

@@ -10,15 +10,15 @@ from app.db.models import User
 
 class DBSessionMiddleware(BaseMiddleware):
     """
-    Middleware for handling database sessions.
+    Middleware for managing database sessions in handlers.
     """
 
     def __init__(self, session: async_sessionmaker) -> None:
         """
-        Initialize the DBSessionMiddleware.
+        Initialize the database session middleware.
 
         Args:
-            session (async_sessionmaker): The async sessionmaker object for creating database sessions.
+            session (async_sessionmaker): Factory for creating asynchronous database sessions.
         """
         super().__init__()
         self.session = session
@@ -30,12 +30,12 @@ class DBSessionMiddleware(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         """
-        Call the middleware.
+        Process the incoming Telegram event and inject a database session.
 
         Args:
-            handler (Callable): The handler function.
-            event (TelegramObject): The Telegram event.
-            data (dict): Additional data.
+            handler (Callable): The handler function to process the event.
+            event (TelegramObject): The incoming Telegram event.
+            data (dict): Contextual data passed to the handler.
         """
         session: AsyncSession
         async with self.session() as session:

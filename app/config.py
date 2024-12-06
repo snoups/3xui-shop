@@ -22,12 +22,30 @@ class BotConfig:
     Configuration for the Telegram bot.
 
     Attributes:
-        TOKEN (str): The API token for the Telegram bot.
-        DEV_ID (int): Developer ID (user_id) for notifications.
+        TOKEN (str): API token for the Telegram bot.
+        DEV_ID (int): Developer ID (user ID) for notifications.
     """
 
     TOKEN: str
-    DEV_ID: int
+    DEV_ID: int  # TODO: Set Optional
+
+
+@dataclass
+class XUIConfig:
+    """
+    Configuration for XUI.
+
+    Attributes:
+        HOST (str): Host URL for the XUI service.
+        USERNAME (str): Username for XUI authentication.
+        PASSWORD (str): Password for XUI authentication.
+        TOKEN (str | None): API token for XUI.
+    """
+
+    HOST: str
+    USERNAME: str
+    PASSWORD: str
+    TOKEN: str | None
 
 
 @dataclass
@@ -36,28 +54,29 @@ class DatabaseConfig:  # TODO: Add support for different drivers
     Configuration for the database.
 
     Attributes:
-        USERNAME (str): Username for database authentication.
-        PASSWORD (str): Password for database authentication.
+        HOST (str | None): Host address of the database server.
+        PORT (int | None): Port number for the database server.
+        USERNAME (str | None): Username for database authentication.
+        PASSWORD (str | None): Password for database authentication.
         NAME (str): Name of the database to connect to.
-        HOST (str): Host address of the database server.
-        PORT (int): Port number for the database server.
     """
 
-    USERNAME: str
-    PASSWORD: str
+    HOST: str | None
+    PORT: int | None
+    USERNAME: str | None
+    PASSWORD: str | None
     NAME: str
-    HOST: str
-    PORT: int
 
     def url(self, driver: str = "sqlite+aiosqlite") -> str:
         """
         Generates a database connection URL using the provided driver,
-        username, password, host, port, and database.
+        username, password, host, port, and database name.
 
         Args:
-            driver (str): The driver to use for the connection. Defaults to "sqlite+aiosqlite".
+            driver (str): Driver to use for the connection. Defaults to "sqlite+aiosqlite".
+
         Returns:
-            The generated connection URL.
+            str: Generated connection URL.
         """
         if driver.startswith("sqlite"):
             return f"{driver}:///./{self.NAME}.db"
@@ -89,11 +108,13 @@ class Config:
 
     Attributes:
         bot (BotConfig): Bot configuration.
+        xui (XUIConfig): XUI configuration.
         database (DatabaseConfig): Database configuration.
         logging (LoggingConfig): Logging configuration.
     """
 
     bot: BotConfig
+    xui: XUIConfig
     database: DatabaseConfig
     logging: LoggingConfig
 
@@ -103,7 +124,7 @@ def load_config() -> Config:
     Load configuration from environment variables.
 
     Returns:
-        Config: The application configuration.
+        Config: Application configuration.
     """
     env = Env()
     env.read_env()
@@ -113,12 +134,18 @@ def load_config() -> Config:
             TOKEN=env.str("BOT_TOKEN"),
             DEV_ID=env.int("BOT_DEV_ID"),
         ),
+        xui=XUIConfig(
+            HOST=env.str("XUI_HOST"),
+            USERNAME=env.str("XUI_USERNAME"),
+            PASSWORD=env.str("XUI_PASSWORD"),
+            TOKEN=env.str("XUI_TOKEN", None),
+        ),
         database=DatabaseConfig(
-            HOST=env.str("DB_HOST", ""),
-            PORT=env.int("DB_PORT", 0),
-            USERNAME=env.str("DB_USERNAME", ""),
-            PASSWORD=env.str("DB_PASSWORD", ""),
-            NAME=env.str("DB_NAME", "bot_database"),
+            HOST=env.str("DB_HOST", None),
+            PORT=env.int("DB_PORT", None),
+            USERNAME=env.str("DB_USERNAME", None),
+            PASSWORD=env.str("DB_PASSWORD", None),
+            NAME=env.str("DB_NAME", DEFAULT_DB_NAME),
         ),
         logging=LoggingConfig(
             LEVEL=env.str("LOG_LEVEL", DEFAULT_LOG_LEVEL),

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-05 14:48+0500\n"
+"POT-Creation-Date: 2024-12-06 21:07+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -17,6 +17,58 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
+
+#: app/helpers.py:71 app/helpers.py:76
+msgid "B"
+msgstr ""
+
+#: app/helpers.py:77
+msgid "KB"
+msgstr ""
+
+#: app/helpers.py:78
+msgid "MB"
+msgstr ""
+
+#: app/helpers.py:79
+msgid "GB"
+msgstr ""
+
+#: app/helpers.py:80
+msgid "TB"
+msgstr ""
+
+#: app/helpers.py:81
+msgid "PB"
+msgstr ""
+
+#: app/helpers.py:82
+msgid "EB"
+msgstr ""
+
+#: app/helpers.py:83
+msgid "ZB"
+msgstr ""
+
+#: app/helpers.py:84
+msgid "YB"
+msgstr ""
+
+#: app/helpers.py:123
+msgid "d"
+msgstr ""
+
+#: app/helpers.py:123
+msgid "h"
+msgstr ""
+
+#: app/helpers.py:123
+msgid "m"
+msgstr ""
+
+#: app/bot/keyboards/back.py:15
+msgid "Back"
+msgstr ""
 
 #: app/bot/keyboards/main_menu.py:16
 msgid "👤 Profile"
@@ -42,15 +94,15 @@ msgstr ""
 msgid "🆘 Support"
 msgstr ""
 
-#: app/bot/routes/main_menu.py:25
+#: app/bot/routes/main_menu.py:28
 msgid ""
-"Welcome, {user_name}! 🎉\n"
+"Welcome, {name}! 🎉\n"
 "\n"
 "3X-UI SHOP — your reliable assistant in the world of free internet.\n"
 "We offer safe and fast connections to any internet services using the "
 "XRAY protocol.\n"
 "Our service works even in China, Iran, and Russia.\n"
-"        \n"
+"\n"
 "🚀 HIGH SPEED\n"
 "🔒 SECURITY\n"
 "📱 SUPPORT FOR ALL PLATFORMS\n"
@@ -58,6 +110,80 @@ msgid ""
 "✅ GUARANTEE AND TRIAL PERIOD"
 msgstr ""
 
+#: app/bot/routes/profile.py:35
+msgid ""
+"👤 Your Profile:\n"
+"Name: {name}\n"
+"ID: {id}"
+msgstr ""
+
+#: app/bot/routes/profile.py:42
+msgid ""
+"📅 Subscription:\n"
+"Plan: {plan}\n"
+msgstr ""
+
+#: app/bot/routes/profile.py:46
+msgid "Traffic limit reached."
+msgstr ""
+
+#: app/bot/routes/profile.py:48
+msgid "Subscription period has expired."
+msgstr ""
+
+#: app/bot/routes/profile.py:50
+msgid ""
+"Remaining Traffic: {remaining_traffic}\n"
+"Expires on: {expiry_time}"
+msgstr ""
+
+#: app/bot/routes/profile.py:56
+msgid ""
+"📊 Statistics:\n"
+"Total Traffic: {total}\n"
+"Sent: ↑ {up}\n"
+"Received: ↓ {down}"
+msgstr ""
+
+#: app/bot/routes/profile.py:65
+msgid "You haven't subscribed yet. Go to the subscription page to purchase one."
+msgstr ""
+
 #~ msgid "Hello from Bot!"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Welcome, {user_name}! 🎉\n"
+#~ "\n"
+#~ "3X-UI SHOP — your reliable assistant in the world of free internet.\n"
+#~ "We offer safe and fast connections "
+#~ "to any internet services using the "
+#~ "XRAY protocol.\n"
+#~ "Our service works even in China, Iran, and Russia.\n"
+#~ "        \n"
+#~ "🚀 HIGH SPEED\n"
+#~ "🔒 SECURITY\n"
+#~ "📱 SUPPORT FOR ALL PLATFORMS\n"
+#~ "♾️ UNLIMITED\n"
+#~ "✅ GUARANTEE AND TRIAL PERIOD"
+#~ msgstr ""
+
+#~ msgid "👤 Your Profile:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Welcome, {name}! 🎉\n"
+#~ "\n"
+#~ "3X-UI SHOP — your reliable assistant in the world of free internet.\n"
+#~ "We offer safe and fast connections "
+#~ "to any internet services using the "
+#~ "XRAY protocol.\n"
+#~ "Our service works even in China, Iran, and Russia.\n"
+#~ "        \n"
+#~ "🚀 HIGH SPEED\n"
+#~ "🔒 SECURITY\n"
+#~ "📱 SUPPORT FOR ALL PLATFORMS\n"
+#~ "♾️ UNLIMITED\n"
+#~ "✅ GUARANTEE AND TRIAL PERIOD"
 #~ msgstr ""
 

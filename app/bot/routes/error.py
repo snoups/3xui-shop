@@ -13,20 +13,41 @@ logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-@router.errors(ExceptionTypeFilter(Exception))
-async def errors_handler(event: ErrorEvent, bot: Bot, config: Config) -> bool:
+def split_text(text: str, chunk_size: int = 4096) -> list[str]:
     """
-    Handler for handling all errors.
+    Splits a string into smaller chunks.
 
     Args:
-        event (ErrorEvent): The ErrorEvent object containing the exception and update.
-        bot (Bot): The Bot instance for sending messages.
-        config (Config): The Config instance containing bot configuration.
+        text (str): The string to split.
+        chunk_size (int): The maximum size of each chunk.
+
+    Returns:
+        list[str]: A list of string chunks.
+    """
+    return [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
+
+
+@router.errors(ExceptionTypeFilter(Exception))
+async def errors_handler(
+    event: ErrorEvent,
+    bot: Bot,
+    config: Config,
+) -> bool:
+    """
+    Handles all uncaught exceptions during bot operation.
+
+    Args:
+        event (ErrorEvent): The event containing the exception and update details.
+        bot (Bot): The bot instance.
+        config (Config): Configuration object for the bot.
 
     Returns:
         bool: True to stop further error handling, False to continue.
     """
-    logging.exception(f"Update: {event.update}\nException: {event.exception}")
+    logger.exception(f"Update: {event.update}\nException: {event.exception}")
+
+    if not config.bot.DEV_ID:
+        return True
 
     try:
         document_message = await bot.send_document(
@@ -39,10 +60,12 @@ async def errors_handler(event: ErrorEvent, bot: Bot, config: Config) -> bool:
         )
 
         update_json = event.update.model_dump_json(indent=2, exclude_none=True)
-        chunks = [update_json[i : i + 4096] for i in range(0, len(update_json), 4096)]
-        [await document_message.reply(text=hcode(chunk)) for chunk in chunks]
+        for chunk in split_text(update_json):
+            await document_message.reply(text=hcode(chunk))
 
-    except TelegramBadRequest:
-        pass
+    except TelegramBadRequest as e:
+        logger.warning(f"Failed to send error details: {e}")
+    except Exception as e:
+        logger.error(f"Unexpected error in error handler: {e}")
 
     return True

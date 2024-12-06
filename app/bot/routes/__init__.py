@@ -1,6 +1,6 @@
 from aiogram import Dispatcher
 
-from . import error, main_menu
+from . import error, main_menu, profile
 
 
 def include(dp: Dispatcher) -> None:
@@ -14,6 +14,7 @@ def include(dp: Dispatcher) -> None:
         *[
             error.router,
             main_menu.router,
+            profile.router,
         ]
     )
 

@@ -4,10 +4,10 @@ from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 
 async def setup(bot: Bot) -> None:
     """
-    Setup bot commands.
+    Configure bot commands for private chats.
 
     Args:
-        bot (Bot): The Bot instance for setup commands.
+        bot (Bot): The bot instance to configure commands for.
     """
     commands = [
         BotCommand(command="start", description="Restart bot"),
@@ -21,10 +21,10 @@ async def setup(bot: Bot) -> None:
 
 async def delete(bot: Bot) -> None:
     """
-    Delete bot commands.
+    Remove bot commands from private chats.
 
     Args:
-        bot (Bot): The Bot instance for deleting commands.
+        bot (Bot): The bot instance to remove commands from.
     """
     await bot.delete_my_commands(
         scope=BotCommandScopeAllPrivateChats(),

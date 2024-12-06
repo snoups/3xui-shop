@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-05 14:48+0500\n"
+"POT-Creation-Date: 2024-12-06 21:07+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -18,6 +18,58 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
+
+#: app/helpers.py:71 app/helpers.py:76
+msgid "B"
+msgstr "Б"
+
+#: app/helpers.py:77
+msgid "KB"
+msgstr "КБ"
+
+#: app/helpers.py:78
+msgid "MB"
+msgstr "МБ"
+
+#: app/helpers.py:79
+msgid "GB"
+msgstr "ГБ"
+
+#: app/helpers.py:80
+msgid "TB"
+msgstr "ТБ"
+
+#: app/helpers.py:81
+msgid "PB"
+msgstr "ПБ"
+
+#: app/helpers.py:82
+msgid "EB"
+msgstr "ЭБ"
+
+#: app/helpers.py:83
+msgid "ZB"
+msgstr "ЗБ"
+
+#: app/helpers.py:84
+msgid "YB"
+msgstr "ЙБ"
+
+#: app/helpers.py:123
+msgid "d"
+msgstr "д"
+
+#: app/helpers.py:123
+msgid "h"
+msgstr "ч"
+
+#: app/helpers.py:123
+msgid "m"
+msgstr "м"
+
+#: app/bot/keyboards/back.py:15
+msgid "Back"
+msgstr "Назад"
 
 #: app/bot/keyboards/main_menu.py:16
 msgid "👤 Profile"
@@ -43,31 +95,83 @@ msgstr "📲 Скачать приложение"
 msgid "🆘 Support"
 msgstr "🆘 Поддержка"
 
-#: app/bot/routes/main_menu.py:25
+#: app/bot/routes/main_menu.py:28
 msgid ""
-"Welcome, {user_name}! 🎉\n"
+"Welcome, {name}! 🎉\n"
 "\n"
 "3X-UI SHOP — your reliable assistant in the world of free internet.\n"
 "We offer safe and fast connections to any internet services using the "
 "XRAY protocol.\n"
 "Our service works even in China, Iran, and Russia.\n"
-"        \n"
+"\n"
 "🚀 HIGH SPEED\n"
 "🔒 SECURITY\n"
 "📱 SUPPORT FOR ALL PLATFORMS\n"
 "♾️ UNLIMITED\n"
 "✅ GUARANTEE AND TRIAL PERIOD"
 msgstr ""
-"Добро пожаловать, {user_name}! 🎉\n"
+"Добро пожаловать, {name}! 🎉\n"
 "\n"
 "3X-UI SHOP — ваш надежный помощник в мире свободного интернета.\n"
 "Мы предлагаем безопасное и быстрое подключение к любым интернет-сервисам "
 "с использованием протокола XRAY.\n"
 "Наш сервис работает даже в Китае, Иране и России.\n"
-"        \n"
+"\n"
 "🚀 ВЫСОКАЯ СКОРОСТЬ\n"
 "🔒 БЕЗОПАСНОСТЬ\n"
 "📱 ПОДДЕРЖКА ВСЕХ ПЛАТФОРМ\n"
 "♾️ БЕЗЛИМИТ\n"
 "✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД\n"
+
+#: app/bot/routes/profile.py:35
+msgid ""
+"👤 Your Profile:\n"
+"Name: {name}\n"
+"ID: {id}"
+msgstr ""
+"👤 Ваш профиль:\n"
+"Имя: {name}\n"
+"ID: {id}"
+
+#: app/bot/routes/profile.py:42
+msgid ""
+"📅 Subscription:\n"
+"Plan: {plan}\n"
+msgstr ""
+"📅 Подписка:\n"
+"Тариф: {plan}\n"
+
+#: app/bot/routes/profile.py:46
+msgid "Traffic limit reached."
+msgstr "Достигнут лимит трафика."
+
+#: app/bot/routes/profile.py:48
+msgid "Subscription period has expired."
+msgstr "Время подписки истекло."
+
+#: app/bot/routes/profile.py:50
+msgid ""
+"Remaining Traffic: {remaining_traffic}\n"
+"Expires on: {expiry_time}"
+msgstr ""
+"Осталось: {remaining_traffic}\n"
+"Заканчивается через: {expiry_time}"
+
+#: app/bot/routes/profile.py:56
+msgid ""
+"📊 Statistics:\n"
+"Total Traffic: {total}\n"
+"Sent: ↑ {up}\n"
+"Received: ↓ {down}"
+msgstr ""
+"📊 Статистика:\n"
+"Общий трафик: {total}\n"
+"Отправлено: ↑ {up}\n"
+"Получено: ↓ {down}"
+
+#: app/bot/routes/profile.py:65
+msgid "You haven't subscribed yet. Go to the subscription page to purchase one."
+msgstr ""
+"У вас еще не было подписки, перейдите на страницу оформления, чтобы "
+"купить."
 
