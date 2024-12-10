@@ -12,7 +12,7 @@ class IsPrivate(BaseFilter):
         """
         Call the filter.
 
-        Args:
+        Arguments:
             event (TelegramObject): The event object (e.g., Message) to check.
             event_chat (Chat): The chat object associated with the event.
         Returns:

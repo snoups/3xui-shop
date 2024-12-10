@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import *
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import Mapped, mapped_column
@@ -29,7 +28,7 @@ class User(Base):
         """
         Get a user from the database based on the specified filters.
 
-        Args:
+        Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
             kwargs (dict): The filters for selecting the user.
 
@@ -45,7 +44,7 @@ class User(Base):
         """
         Get a user from the database or create a new one if not found.
 
-        Args:
+        Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
             user_id (int): The Telegram user ID.
             kwargs (dict): Additional attributes for a new user.
@@ -72,7 +71,7 @@ class User(Base):
         """
         Update a user in the database.
 
-        Args:
+        Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
             user_id (int): The ID of the user to be updated.
             kwargs (dict): Attributes to be updated.
@@ -84,7 +83,7 @@ class User(Base):
         """
         Check if a user exists in the database.
 
-        Args:
+        Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
             kwargs (dict): The filters for checking the user.
 

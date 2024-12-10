@@ -1,13 +1,13 @@
 from aiogram import Dispatcher
 
-from . import error, main_menu, profile
+from . import error, main_menu, profile, subscription
 
 
 def include(dp: Dispatcher) -> None:
     """
     Include bot routers.
 
-    Args:
+    Arguments:
         dp (Dispatcher): Root router.
     """
     dp.include_routers(
@@ -15,6 +15,7 @@ def include(dp: Dispatcher) -> None:
             error.router,
             main_menu.router,
             profile.router,
+            subscription.router,
         ]
     )
 

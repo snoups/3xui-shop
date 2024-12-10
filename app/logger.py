@@ -32,7 +32,7 @@ class CompressingFileHandler(TimedRotatingFileHandler):
         """
         Initialize the file handler with archiving capabilities.
 
-        Args:
+        Arguments:
             filename (str): Name of the log file.
             when (str): Rotation interval ("S", "M", "H", "D", "midnight").
             interval (int): Frequency of rotation.
@@ -88,7 +88,7 @@ def setup_logging(config: LoggingConfig) -> None:
     Sets up a logging system with a file handler for rotating logs and compressing them
     into the specified archive format. Also configures a stream handler for console output.
 
-    Args:
+    Arguments:
         config (LoggingConfig): Logging configuration object.
     """
     log_dir = config.DIR

@@ -17,7 +17,7 @@ class DBSessionMiddleware(BaseMiddleware):
         """
         Initialize the database session middleware.
 
-        Args:
+        Arguments:
             session (async_sessionmaker): Factory for creating asynchronous database sessions.
         """
         super().__init__()
@@ -32,7 +32,7 @@ class DBSessionMiddleware(BaseMiddleware):
         """
         Process the incoming Telegram event and inject a database session.
 
-        Args:
+        Arguments:
             handler (Callable): The handler function to process the event.
             event (TelegramObject): The incoming Telegram event.
             data (dict): Contextual data passed to the handler.

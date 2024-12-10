@@ -1,16 +1,18 @@
 from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 
+from app.bot.navigation import NavigationAction
+
 
 async def setup(bot: Bot) -> None:
     """
     Configure bot commands for private chats.
 
-    Args:
+    Arguments:
         bot (Bot): The bot instance to configure commands for.
     """
     commands = [
-        BotCommand(command="start", description="Restart bot"),
+        BotCommand(command=NavigationAction.START, description="Открыть главное меню"),
     ]
 
     await bot.set_my_commands(
@@ -23,7 +25,7 @@ async def delete(bot: Bot) -> None:
     """
     Remove bot commands from private chats.
 
-    Args:
+    Arguments:
         bot (Bot): The bot instance to remove commands from.
     """
     await bot.delete_my_commands(

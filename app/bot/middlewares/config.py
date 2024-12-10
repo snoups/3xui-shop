@@ -18,7 +18,7 @@ class ConfigMiddleware(BaseMiddleware):
         """
         Initialize the ConfigMiddleware.
 
-        Args:
+        Arguments:
             config (Config): The Config instance to be injected.
         """
         self.config = config
@@ -32,7 +32,7 @@ class ConfigMiddleware(BaseMiddleware):
         """
         Middleware handler.
 
-        Args:
+        Arguments:
             handler (Callable): The next handler in the middleware chain.
             event (TelegramObject): The incoming Telegram event.
             data (dict): The context data passed to the handler.

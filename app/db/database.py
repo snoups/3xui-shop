@@ -13,7 +13,7 @@ class Database:
         """
         Initialize the database manager.
 
-        Args:
+        Arguments:
             config (DatabaseConfig): Configuration object for the database.
         """
         self.engine = create_async_engine(

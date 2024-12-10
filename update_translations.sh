@@ -19,6 +19,9 @@ INPUT_DIR="."                               # Input directory for extracting mes
 echo "Extracting messages..."
 pybabel extract \
     -o "$MESSAGES_POT" \
+    -k _:1,1t \
+    -k _:1,2 \
+    -k __ \
     --copyright-holder="$COPYRIGHT_HOLDER" \
     --project="$PROJECT_NAME" \
     --version="$VERSION" \

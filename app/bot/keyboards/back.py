@@ -4,25 +4,25 @@ from aiogram.utils.i18n import gettext as _
 
 def back_button(callback: str) -> InlineKeyboardButton:
     """
-    Creates a "Back" button.
+    Creates a back button for navigation.
 
-    Args:
-        callback (str): The callback data for the button.
+    Arguments:
+        callback (str): Callback data for handling the back button press.
 
     Returns:
-        InlineKeyboardButton: The "Back" button.
+        InlineKeyboardButton: Inline keyboard button for the back action.
     """
-    return InlineKeyboardButton(text=_("Back"), callback_data=callback)
+    return InlineKeyboardButton(text=_("← Back"), callback_data=callback)
 
 
 def back_keyboard(callback: str) -> InlineKeyboardMarkup:
     """
-    Creates a keyboard containing only a single "Back" button.
+    Generates an inline keyboard with a single back button.
 
-    Args:
-        callback (str): The callback data for the "Back" button.
+    Arguments:
+        callback (str): Callback data for handling the back button press.
 
     Returns:
-        InlineKeyboardMarkup: The inline keyboard markup with the "Back" button.
+        InlineKeyboardMarkup: Inline keyboard markup containing the back button.
     """
     return InlineKeyboardMarkup(inline_keyboard=[[back_button(callback)]])

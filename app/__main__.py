@@ -18,7 +18,7 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
     """
     Handles bot shutdown events.
 
-    Args:
+    Arguments:
         dispatcher (Dispatcher): The dispatcher instance.
         bot (Bot): The bot instance.
     """
@@ -26,8 +26,9 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
     db: Database = dispatcher.get("db")
     config: Config = dispatcher.get("config")
 
-    # Notify developer about bot stop #TODO: Set Optional
-    await bot.send_message(chat_id=config.bot.DEV_ID, text="#BotStopped")
+    # Notify developer about bot stop
+    if config.bot.DEV_ID:
+        await bot.send_message(chat_id=config.bot.DEV_ID, text="#BotStopped")
 
     # Cleanup resources
     await commands.delete(bot)
@@ -40,15 +41,16 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
     """
     Handles bot startup events.
 
-    Args:
+    Arguments:
         dispatcher (Dispatcher): The dispatcher instance.
         bot (Bot): The bot instance.
     """
     logger.info("Bot started")
     config: Config = dispatcher.get("config")
 
-    # Notify developer about bot start #TODO: Set Optional
-    await bot.send_message(chat_id=config.bot.DEV_ID, text="#BotStarted")
+    # Notify developer about bot start
+    if config.bot.DEV_ID:
+        await bot.send_message(chat_id=config.bot.DEV_ID, text="#BotStarted")
 
 
 async def main() -> None:
@@ -60,7 +62,7 @@ async def main() -> None:
 
     # Initialize components
     db = Database(config.database)
-    storage = MemoryStorage()
+    storage = MemoryStorage()  # TODO: REDIS
     bot = Bot(token=config.bot.TOKEN)
     dp = Dispatcher(storage=storage, config=config, bot=bot, db=db)
 

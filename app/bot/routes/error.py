@@ -17,7 +17,7 @@ def split_text(text: str, chunk_size: int = 4096) -> list[str]:
     """
     Splits a string into smaller chunks.
 
-    Args:
+    Arguments:
         text (str): The string to split.
         chunk_size (int): The maximum size of each chunk.
 
@@ -36,7 +36,7 @@ async def errors_handler(
     """
     Handles all uncaught exceptions during bot operation.
 
-    Args:
+    Arguments:
         event (ErrorEvent): The event containing the exception and update details.
         bot (Bot): The bot instance.
         config (Config): Configuration object for the bot.
@@ -63,9 +63,9 @@ async def errors_handler(
         for chunk in split_text(update_json):
             await document_message.reply(text=hcode(chunk))
 
-    except TelegramBadRequest as e:
-        logger.warning(f"Failed to send error details: {e}")
-    except Exception as e:
-        logger.error(f"Unexpected error in error handler: {e}")
+    except TelegramBadRequest as exception:
+        logger.warning(f"Failed to send error details: {exception}")
+    except Exception as exception:
+        logger.error(f"Unexpected error in error handler: {exception}")
 
     return True

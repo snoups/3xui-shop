@@ -1,107 +1,87 @@
 import logging
 
 from aiogram import F, Router
-from aiogram.filters import Command
-from aiogram.types import CallbackQuery, Message, User
+from aiogram.types import CallbackQuery, User
 from aiogram.utils.i18n import gettext as _
-from py3xui import AsyncApi, Client
+from py3xui import AsyncApi
 
 from app.bot.filters import IsPrivate
 from app.bot.keyboards.back import back_keyboard
-from app.helpers import convert_size, parse_client_data, time_left_to_expiry
+from app.bot.keyboards.profile import profile_keyboard
+from app.bot.navigation import NavigationAction
+from app.bot.services.profile import ProfileService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-async def send_profile(
-    user: User,
-    api: AsyncApi,
-    message: Message = None,
-    callback: CallbackQuery = None,
-) -> None:
+async def prepare_message(user: User, profile_service: ProfileService) -> str:
     """
-    Generates the user's profile information text based on their subscription and usage data.
+    Prepares a profile message for the user, including subscription and statistics details.
 
-    Args:
-        user (User): The Telegram user object.
+    Arguments:
+        user (User): The user for whom the profile message is being prepared.
+        api (AsyncApi): The API instance to retrieve client data.
 
     Returns:
-        str: The formatted profile information text.
+        str: A formatted message containing the user's profile, subscription, and statistics.
     """
-    client: Client = await api.client.get_by_email(user.id)
-    client_data = parse_client_data(client)
-
-    header_text = _("👤 Your Profile:\nName: {name}\nID: {id}").format(
+    header_text = _("👤 Your Profile:\n" "Name: {name}\n" "ID: {id}\n\n").format(
         name=user.first_name,
         id=user.id,
     )
 
-    if client_data:
-        print(client_data)
-        subscription_text = _("📅 Subscription:\nPlan: {plan}\n").format(
-            plan=convert_size(client_data["plan"])
-        )
-        if client_data["remaining_traffic"] < -1:
-            subscription_text += _("Traffic limit reached.")
-        elif client_data["expiry_time"] < 0:
-            subscription_text += _("Subscription period has expired.")
-        else:
-            subscription_text += _(
-                "Remaining Traffic: {remaining_traffic}\nExpires on: {expiry_time}"
-            ).format(
-                remaining_traffic=convert_size(client_data["remaining_traffic"]),
-                expiry_time=time_left_to_expiry(client_data["expiry_time"]),
-            )
-        statistics_text = _(
-            "📊 Statistics:\nTotal Traffic: {total}\nSent: ↑ {up}\nReceived: ↓ {down}"
-        ).format(
-            total=convert_size(client_data["total"]),
-            up=convert_size(client_data["up"]),
-            down=convert_size(client_data["down"]),
-        )
-        text = f"{header_text}\n\n{subscription_text}\n\n{statistics_text}"
-    else:
+    if not profile_service.has_valid_data():
         no_subscription_text = _(
-            "You haven't subscribed yet. Go to the subscription page to purchase one."
+            "You don't have a subscription purchased yet, go to the subscription page "
+            "to purchase or click the button below."
         )
-        return f"{header_text}\n\n{no_subscription_text}"
+        return header_text + no_subscription_text
 
-    if callback:
-        await callback.message.delete()
-        await callback.message.answer(text, reply_markup=back_keyboard("main_menu"))
-    elif message:
-        await message.answer(text, reply_markup=back_keyboard("main_menu"))
+    subscription_text = _("📅 Subscription:\nPlan: {plan}\n").format(plan=profile_service.plan)
 
-    logger.debug(f"Sent profile to user {user.id}")
+    if profile_service.has_traffic_expired():
+        subscription_text += _("Traffic limit reached.\n")
+    if profile_service.has_subscription_expired():
+        subscription_text += _("Subscription period has expired.\n")
+    if not profile_service.has_traffic_expired() and not profile_service.has_subscription_expired():
+        subscription_text += _(
+            "Remaining Traffic: {remaining_traffic}\nExpires on: {expiry_time}\n\n"
+        ).format(
+            remaining_traffic=profile_service.remaining_traffic,
+            expiry_time=profile_service.expiry_time,
+        )
+    else:
+        subscription_text += "\n"
+
+    statistics_text = _(
+        "📊 Statistics:\nTotal Traffic: {total}\nSent: ↑ {up}\nReceived: ↓ {down}"
+    ).format(total=profile_service.total, up=profile_service.up, down=profile_service.down)
+
+    return header_text + subscription_text + statistics_text
 
 
-@router.message(Command("profile"), IsPrivate())
-async def command_profile(message: Message, api: AsyncApi) -> None:
-    """
-    Handles the /profile command and sends the user's profile information.
-
-    Args:
-        message (Message): Incoming message from the user.
-    """
-    await send_profile(
-        user=message.from_user,
-        api=api,
-        message=message,
-    )
-
-
-@router.callback_query(F.data == "profile", IsPrivate())
+@router.callback_query(F.data == NavigationAction.PROFILE, IsPrivate())
 async def callback_profile(callback: CallbackQuery, api: AsyncApi) -> None:
     """
-    Handles the callback query for the profile button, deletes the old message,
-    and sends a new profile message.
+    Handles the callback query to display the user's profile with subscription and statistics.
 
-    Args:
-        callback (CallbackQuery): Callback query containing user interaction data.
+    Arguments:
+        callback (CallbackQuery): The callback query received from the user.
+        api (AsyncApi): The API instance to retrieve client data.
     """
-    await send_profile(
-        user=callback.from_user,
-        api=api,
-        callback=callback,
+    await callback.message.delete()
+
+    client = await api.client.get_by_email(callback.from_user.id)
+    profile_service = ProfileService(client)
+
+    if profile_service.has_valid_data():
+        reply_markup = back_keyboard(NavigationAction.MAIN_MENU)
+    else:
+        reply_markup = profile_keyboard()
+
+    await callback.message.answer(
+        await prepare_message(callback.from_user, profile_service),
+        reply_markup=reply_markup,
     )
+    logger.info(f"User {callback.from_user.id} open profile.")

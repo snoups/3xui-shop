@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-06 21:07+0500\n"
+"POT-Creation-Date: 2024-12-11 00:33+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,83 +18,51 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: app/helpers.py:71 app/helpers.py:76
-msgid "B"
-msgstr ""
-
-#: app/helpers.py:77
-msgid "KB"
-msgstr ""
-
-#: app/helpers.py:78
-msgid "MB"
-msgstr ""
-
-#: app/helpers.py:79
-msgid "GB"
-msgstr ""
-
-#: app/helpers.py:80
-msgid "TB"
-msgstr ""
-
-#: app/helpers.py:81
-msgid "PB"
-msgstr ""
-
-#: app/helpers.py:82
-msgid "EB"
-msgstr ""
-
-#: app/helpers.py:83
-msgid "ZB"
-msgstr ""
-
-#: app/helpers.py:84
-msgid "YB"
-msgstr ""
-
-#: app/helpers.py:123
-msgid "d"
-msgstr ""
-
-#: app/helpers.py:123
-msgid "h"
-msgstr ""
-
-#: app/helpers.py:123
-msgid "m"
-msgstr ""
-
 #: app/bot/keyboards/back.py:15
-msgid "Back"
+msgid "← Back"
 msgstr ""
 
-#: app/bot/keyboards/main_menu.py:16
+#: app/bot/keyboards/main_menu.py:19
 msgid "👤 Profile"
 msgstr ""
 
-#: app/bot/keyboards/main_menu.py:17
+#: app/bot/keyboards/main_menu.py:23
 msgid "💳 Subscription"
 msgstr ""
 
-#: app/bot/keyboards/main_menu.py:20
+#: app/bot/keyboards/main_menu.py:30
 msgid "👥 Referral Program"
 msgstr ""
 
-#: app/bot/keyboards/main_menu.py:21
+#: app/bot/keyboards/main_menu.py:36
 msgid "🏷 Activate Promo Code"
 msgstr ""
 
-#: app/bot/keyboards/main_menu.py:22
+#: app/bot/keyboards/main_menu.py:42
 msgid "📲 Download App"
 msgstr ""
 
-#: app/bot/keyboards/main_menu.py:23
+#: app/bot/keyboards/main_menu.py:48
 msgid "🆘 Support"
 msgstr ""
 
-#: app/bot/routes/main_menu.py:28
+#: app/bot/keyboards/pay.py:21
+msgid "Pay 💸"
+msgstr ""
+
+#: app/bot/keyboards/payment_method.py:35
+msgid "YooKassa | {price} ₽"
+msgstr ""
+
+#: app/bot/keyboards/profile.py:20
+msgid "Buy subscription"
+msgstr ""
+
+#: app/bot/keyboards/subscription.py:23 app/bot/services/profile.py:157
+msgid "GB"
+msgstr ""
+
+#: app/bot/routes/main_menu.py:27
 msgid ""
 "Welcome, {name}! 🎉\n"
 "\n"
@@ -107,37 +75,45 @@ msgid ""
 "🔒 SECURITY\n"
 "📱 SUPPORT FOR ALL PLATFORMS\n"
 "♾️ UNLIMITED\n"
-"✅ GUARANTEE AND TRIAL PERIOD"
+"✅ GUARANTEE AND TRIAL PERIOD\n"
+msgstr ""
+
+#: app/bot/routes/profile.py:29
+msgid ""
+"👤 Your Profile:\n"
+"Name: {name}\n"
+"ID: {id}\n"
+"\n"
 msgstr ""
 
 #: app/bot/routes/profile.py:35
 msgid ""
-"👤 Your Profile:\n"
-"Name: {name}\n"
-"ID: {id}"
+"You don't have a subscription purchased yet, go to the subscription page "
+"to purchase or click the button below."
 msgstr ""
 
-#: app/bot/routes/profile.py:42
+#: app/bot/routes/profile.py:41
 msgid ""
 "📅 Subscription:\n"
 "Plan: {plan}\n"
 msgstr ""
 
+#: app/bot/routes/profile.py:44
+msgid "Traffic limit reached.\n"
+msgstr ""
+
 #: app/bot/routes/profile.py:46
-msgid "Traffic limit reached."
+msgid "Subscription period has expired.\n"
 msgstr ""
 
 #: app/bot/routes/profile.py:48
-msgid "Subscription period has expired."
-msgstr ""
-
-#: app/bot/routes/profile.py:50
 msgid ""
 "Remaining Traffic: {remaining_traffic}\n"
-"Expires on: {expiry_time}"
+"Expires on: {expiry_time}\n"
+"\n"
 msgstr ""
 
-#: app/bot/routes/profile.py:56
+#: app/bot/routes/profile.py:57
 msgid ""
 "📊 Statistics:\n"
 "Total Traffic: {total}\n"
@@ -145,45 +121,111 @@ msgid ""
 "Received: ↓ {down}"
 msgstr ""
 
-#: app/bot/routes/profile.py:65
-msgid "You haven't subscribed yet. Go to the subscription page to purchase one."
+#: app/bot/routes/subscription.py:46
+msgid "🌐 Select the traffic volume:"
 msgstr ""
 
-#~ msgid "Hello from Bot!"
+#: app/bot/routes/subscription.py:75
+msgid "⏳ Specify the duration:"
+msgstr ""
+
+#: app/bot/routes/subscription.py:103
+msgid "💳 Choose a payment method:"
+msgstr ""
+
+#: app/bot/routes/subscription.py:154
+msgid ""
+"✅ You selected:\n"
+"\n"
+"Plan: {plan} GB\n"
+"Duration: {duration}\n"
+"Price: {price} {currency}\n"
+"\n"
+"After payment, a unique key will be generated for you, to connect to the "
+"VPN."
+msgstr ""
+
+#: app/bot/services/profile.py:149 app/bot/services/profile.py:154
+msgid "B"
+msgstr ""
+
+#: app/bot/services/profile.py:155
+msgid "KB"
+msgstr ""
+
+#: app/bot/services/profile.py:156
+msgid "MB"
+msgstr ""
+
+#: app/bot/services/profile.py:158
+msgid "TB"
+msgstr ""
+
+#: app/bot/services/profile.py:159
+msgid "PB"
+msgstr ""
+
+#: app/bot/services/profile.py:160
+msgid "EB"
+msgstr ""
+
+#: app/bot/services/profile.py:161
+msgid "ZB"
+msgstr ""
+
+#: app/bot/services/profile.py:162
+msgid "YB"
+msgstr ""
+
+#: app/bot/services/profile.py:195
+msgid "d"
+msgstr ""
+
+#: app/bot/services/profile.py:195
+msgid "h"
+msgstr ""
+
+#: app/bot/services/profile.py:195
+msgid "m"
+msgstr ""
+
+#: app/bot/services/subscription.py:177
+#, fuzzy
+msgid "1 year"
+msgid_plural "{} years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/bot/services/subscription.py:181
+#, fuzzy
+msgid "1 month"
+msgid_plural "{} months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/bot/services/subscription.py:183
+#, fuzzy
+msgid "1 day"
+msgid_plural "{} days"
+msgstr[0] ""
+msgstr[1] ""
+
+#~ msgid ""
+#~ "You don't have a purchased subscription"
+#~ " yet,go to the subscription page to"
+#~ " purchase or click the button below."
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Welcome, {user_name}! 🎉\n"
-#~ "\n"
-#~ "3X-UI SHOP — your reliable assistant in the world of free internet.\n"
-#~ "We offer safe and fast connections "
-#~ "to any internet services using the "
-#~ "XRAY protocol.\n"
-#~ "Our service works even in China, Iran, and Russia.\n"
-#~ "        \n"
-#~ "🚀 HIGH SPEED\n"
-#~ "🔒 SECURITY\n"
-#~ "📱 SUPPORT FOR ALL PLATFORMS\n"
-#~ "♾️ UNLIMITED\n"
-#~ "✅ GUARANTEE AND TRIAL PERIOD"
-#~ msgstr ""
-
-#~ msgid "👤 Your Profile:"
+#~ "You don't have a purchased subscription"
+#~ " yet, go to the subscription pageto"
+#~ " purchase or click the button below."
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Welcome, {name}! 🎉\n"
-#~ "\n"
-#~ "3X-UI SHOP — your reliable assistant in the world of free internet.\n"
-#~ "We offer safe and fast connections "
-#~ "to any internet services using the "
-#~ "XRAY protocol.\n"
-#~ "Our service works even in China, Iran, and Russia.\n"
-#~ "        \n"
-#~ "🚀 HIGH SPEED\n"
-#~ "🔒 SECURITY\n"
-#~ "📱 SUPPORT FOR ALL PLATFORMS\n"
-#~ "♾️ UNLIMITED\n"
-#~ "✅ GUARANTEE AND TRIAL PERIOD"
+#~ "You don't have a purchased subscription"
+#~ " yet, go to the subscription page "
+#~ "to purchase or click the button "
+#~ "below."
 #~ msgstr ""
 

@@ -17,7 +17,7 @@ class ApiMiddleware(BaseMiddleware):
         """
         Initialize the ApiMiddleware.
 
-        Args:
+        Arguments:
             api (AsyncApi): API instance to be injected.
         """
         self.api = api
@@ -31,7 +31,7 @@ class ApiMiddleware(BaseMiddleware):
         """
         Middleware handler.
 
-        Args:
+        Arguments:
             handler (Callable): The next handler in the middleware chain.
             event (TelegramObject): The incoming Telegram event.
             data (dict): The context data passed to the handler.

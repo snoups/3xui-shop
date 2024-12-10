@@ -11,7 +11,7 @@ def register(dp: Dispatcher, **kwargs) -> None:
     """
     Register bot middlewares.
 
-    Args:
+    Arguments:
         dp (Dispatcher): Root router.
         kwargs (Any): Arbitrary keyword arguments.
     """

@@ -1,0 +1,63 @@
+{
+    "plans": [
+        {
+            "traffic": "50",
+            "callback": "traffic_50",
+            "price": {
+                "USD": 0.75,
+                "RUB": 75,
+                "XTR": 38
+            }
+        },
+        {
+            "traffic": "150",
+            "callback": "traffic_150",
+            "price": {
+                "USD": 1.25,
+                "RUB": 125,
+                "XTR": 63
+            }
+        },
+        {
+            "traffic": "300",
+            "callback": "traffic_300",
+            "price": {
+                "USD": 1.75,
+                "RUB": 175,
+                "XTR": 105
+            }
+        },
+        {
+            "traffic": "∞",
+            "callback": "traffic_-1",
+            "price": {
+                "USD": 2,
+                "RUB": 200,
+                "XTR": 100
+            }
+        }
+    ],
+
+    "durations": [
+        {
+            "duration": 30,
+            "coefficient": 1,
+            "callback": "duration_30"
+        },
+        {
+            "duration": 60,
+            "coefficient": 2,
+            "callback": "duration_60"
+        },
+        {
+            "duration": 180,
+            "coefficient": 4.5,
+            "callback": "duration_180"
+        },
+        {
+            "duration": 365,
+            "coefficient": 8,
+            "callback": "duration_365"
+        }
+    ]
+}

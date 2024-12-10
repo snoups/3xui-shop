@@ -21,7 +21,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         """
         Initializes the ThrottlingMiddleware.
 
-        Args:
+        Arguments:
             default_key (Optional[str]): The default key used for throttling.
             default_ttl (float): The default time-to-live (TTL) in seconds for the default key.
             ttl_map (float): A mapping of throttling keys to their corresponding TTL values.
@@ -44,7 +44,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         """
         Invokes the middleware for handling throttling logic.
 
-        Args:
+        Arguments:
             handler (Callable): The handler function to process the event.
             event (TelegramObject): The Telegram event being processed.
             data (dict): Additional data passed to the handler.

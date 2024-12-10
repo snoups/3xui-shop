@@ -23,11 +23,11 @@ class BotConfig:
 
     Attributes:
         TOKEN (str): API token for the Telegram bot.
-        DEV_ID (int): Developer ID (user ID) for notifications.
+        DEV_ID (int | None): Developer ID (user ID) for notifications.
     """
 
     TOKEN: str
-    DEV_ID: int  # TODO: Set Optional
+    DEV_ID: int | None
 
 
 @dataclass
@@ -132,7 +132,7 @@ def load_config() -> Config:
     return Config(
         bot=BotConfig(
             TOKEN=env.str("BOT_TOKEN"),
-            DEV_ID=env.int("BOT_DEV_ID"),
+            DEV_ID=env.int("BOT_DEV_ID", None),
         ),
         xui=XUIConfig(
             HOST=env.str("XUI_HOST"),
