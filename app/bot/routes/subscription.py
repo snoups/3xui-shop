@@ -1,7 +1,6 @@
 import logging
 
 from aiogram import F, Router
-from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import gettext as _
@@ -17,103 +16,124 @@ logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-class SubscriptionForm(StatesGroup):
+async def show_choosing_traffic(callback: CallbackQuery) -> None:
     """
-    States for managing the subscription flow.
-
-    Attributes:
-        choosing_plan (State): The state where the user selects a traffic plan.
-        choosing_duration (State): The state where the user selects the subscription duration.
-        choosing_payment_method (State): The state where the user selects a payment method.
-    """
-
-    choosing_plan = State()
-    choosing_duration = State()
-    choosing_payment_method = State()
-
-
-@router.callback_query(F.data == NavigationAction.SUBSCRIPTION, IsPrivate())
-async def callback_subscription(callback: CallbackQuery, state: FSMContext) -> None:
-    """
-    Starts the subscription process by showing available traffic plans.
+    Sends a message prompting the user to select the traffic volume for the subscription.
 
     Arguments:
         callback (CallbackQuery): The callback query received from the user.
-        state (FSMContext): The state of the Finite State Machine (FSM) for the user.
     """
-    await callback.message.delete()
-
     text = _("🌐 Select the traffic volume:")
-    logger.info(f"User {callback.from_user.id} started subscription process.")
-
     await callback.message.answer(text, reply_markup=traffic_keyboard())
-    await state.set_state(SubscriptionForm.choosing_plan)
 
 
-# TODO: BUG is accounted for by any callback
-@router.callback_query(SubscriptionForm.choosing_plan, IsPrivate())
-@router.callback_query(F.data == NavigationAction.BACK_TO_DURATION, IsPrivate())
-async def callback_choosing_plan(callback: CallbackQuery, state: FSMContext) -> None:
+async def show_choosing_duration(callback: CallbackQuery, state: FSMContext) -> None:
     """
-    Handles traffic plan selection and moves to duration selection.
+    Sends a message prompting the user to select the subscription duration based on their plan.
 
     Arguments:
         callback (CallbackQuery): The callback query received from the user.
         state (FSMContext): The state of the Finite State Machine (FSM) for the user.
     """
-    await callback.message.delete()
-
-    if callback.data != NavigationAction.BACK_TO_DURATION:
-        await subscription_service.set_selected_plan(state, callback.data)
-        logger.info(f"User {callback.from_user.id} selected plan: {callback.data}")
-    else:
-        logger.info(f"User {callback.from_user.id} returned to choosing duration.")
-
     selected_plan = await subscription_service.get_selected_plan(state)
-
     await callback.message.answer(
         _("⏳ Specify the duration:"),
         reply_markup=duration_keyboard(selected_plan["price"]["RUB"]),
     )
-    await state.set_state(SubscriptionForm.choosing_duration)
 
 
-@router.callback_query(SubscriptionForm.choosing_duration, IsPrivate())
-@router.callback_query(F.data == NavigationAction.BACK_TO_PAYMENT, IsPrivate())
-async def callback_choosing_duration(callback: CallbackQuery, state: FSMContext) -> None:
+async def show_choosing_payment_method(callback: CallbackQuery, state: FSMContext) -> None:
     """
-    Handles duration selection and moves to payment method selection.
+    Sends a message prompting the user to choose a payment method for their subscription.
+
+    Arguments:
+        callback (CallbackQuery): The callback query received from the user.
+        state (FSMContext): The state of the Finite State Machine (FSM) for the user.
+    """
+    selected_plan = await subscription_service.get_selected_plan(state)
+    selected_duration = await subscription_service.get_selected_duration(state)
+    await callback.message.answer(
+        _("💳 Choose a payment method:"),
+        reply_markup=payment_method_keyboard(selected_plan, selected_duration["coefficient"]),
+    )
+
+
+@router.callback_query(F.data == NavigationAction.SUBSCRIPTION, IsPrivate())
+async def callback_subscription(callback: CallbackQuery) -> None:
+    """
+    Handles the subscription initiation by sending the traffic selection prompt.
+
+    Arguments:
+        callback (CallbackQuery): The callback query received from the user.
+        state (FSMContext): The state of the Finite State Machine (FSM) for the user.
+    """
+    logger.info(f"User {callback.from_user.id} started subscription process.")
+    await callback.message.delete()
+    await show_choosing_traffic(callback)
+
+
+@router.callback_query(F.data.startswith(NavigationAction.TRAFFIC), IsPrivate())
+async def callback_choosing_plan(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Handles the selection of a traffic plan and proceeds to duration selection.
 
     Arguments:
         callback (CallbackQuery): The callback query received from the user.
         state (FSMContext): The state of the Finite State Machine (FSM) for the user.
     """
     await callback.message.delete()
-
-    if callback.data != NavigationAction.BACK_TO_PAYMENT:
-        await subscription_service.set_selected_duration(state, callback.data)
-        logger.info(f"User {callback.from_user.id} selected duration: {callback.data}")
-    else:
-        logger.info(f"User {callback.from_user.id} returned to choosing payment method.")
-
-    selected_plan = await subscription_service.get_selected_plan(state)
-    selected_duration = await subscription_service.get_selected_duration(state)
-
-    await callback.message.answer(
-        _("💳 Choose a payment method:"),
-        reply_markup=payment_method_keyboard(selected_plan, selected_duration["coefficient"]),
-    )
-    await state.set_state(SubscriptionForm.choosing_payment_method)
+    logger.info(f"User {callback.from_user.id} selected plan: {callback.data}")
+    await subscription_service.set_selected_plan(state, callback.data)
+    await show_choosing_duration(callback, state)
 
 
-@router.callback_query(
-    SubscriptionForm.choosing_payment_method,
-    F.data.startswith(NavigationAction.PAY),
-    IsPrivate(),
-)
+@router.callback_query(F.data == NavigationAction.BACK_TO_DURATION, IsPrivate())
+async def callback_back_to_duration(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Handles the case where the user returns to the duration selection step.
+
+    Arguments:
+        callback (CallbackQuery): The callback query received from the user.
+        state (FSMContext): The state of the Finite State Machine (FSM) for the user.
+    """
+    await callback.message.delete()
+    logger.info(f"User {callback.from_user.id} returned to choosing duration.")
+    await show_choosing_duration(callback, state)
+
+
+@router.callback_query(F.data.startswith(NavigationAction.DURATION), IsPrivate())
+async def callback_choosing_duration(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Handles the selection of subscription duration and proceeds to payment method selection.
+
+    Arguments:
+        callback (CallbackQuery): The callback query received from the user.
+        state (FSMContext): The state of the Finite State Machine (FSM) for the user.
+    """
+    await callback.message.delete()
+    logger.info(f"User {callback.from_user.id} selected duration: {callback.data}")
+    await subscription_service.set_selected_duration(state, callback.data)
+    await show_choosing_payment_method(callback, state)
+
+
+@router.callback_query(F.data == NavigationAction.BACK_TO_PAYMENT, IsPrivate())
+async def callback_back_to_payment(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Handles the case where the user returns to the payment method selection step.
+
+    Arguments:
+        callback (CallbackQuery): The callback query received from the user.
+        state (FSMContext): The state of the Finite State Machine (FSM) for the user.
+    """
+    await callback.message.delete()
+    logger.info(f"User {callback.from_user.id} returned to choosing payment method.")
+    await show_choosing_payment_method(callback, state)
+
+
+@router.callback_query(F.data.startswith(NavigationAction.PAY), IsPrivate())
 async def callback_choosing_payment_method(callback: CallbackQuery, state: FSMContext) -> None:
     """
-    Handles payment method selection and shows subscription details.
+    Handles the payment method selection and displays payment information to the user.
 
     Arguments:
         callback (CallbackQuery): The callback query received from the user.

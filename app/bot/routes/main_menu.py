@@ -2,7 +2,6 @@ import logging
 
 from aiogram import F, Router
 from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, User
 from aiogram.utils.i18n import gettext as _
 
