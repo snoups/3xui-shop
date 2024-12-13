@@ -2,7 +2,7 @@ import logging
 import traceback
 
 from aiogram import Bot, Router
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 from aiogram.filters import ExceptionTypeFilter
 from aiogram.types import BufferedInputFile, ErrorEvent
 from aiogram.utils.markdown import hbold, hcode
@@ -44,6 +44,10 @@ async def errors_handler(
     Returns:
         bool: True to stop further error handling, False to continue.
     """
+    if isinstance(event.exception, TelegramForbiddenError):
+        logger.info(f"User {event.update.message.from_user.id} blocked the bot.")
+        return True
+
     logger.exception(f"Update: {event.update}\nException: {event.exception}")
 
     if not config.bot.DEV_ID:

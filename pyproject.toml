@@ -14,7 +14,6 @@ cachetools = "^5.5.0"
 aiosqlite = "^0.20.0"
 greenlet = "^3.1.1"
 py3xui = "^0.3.2"
-python-dateutil = "^2.9.0.post0"
 
 [tool.poetry.group.dev.dependencies]
 babel = "^2.16.0"

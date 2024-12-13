@@ -7,7 +7,7 @@ from app.bot.navigation import NavigationAction
 from app.bot.services import subscription_service
 
 
-def payment_method_keyboard(plan: dict, coefficient: int) -> InlineKeyboardMarkup:
+def payment_method_keyboard(prices: dict, duration: int) -> InlineKeyboardMarkup:
     """
     Generates an inline keyboard for selecting a payment method based on the subscription plan.
 
@@ -26,7 +26,7 @@ def payment_method_keyboard(plan: dict, coefficient: int) -> InlineKeyboardMarku
     cryptomus = True
 
     if yookassa:
-        price = subscription_service.calculate_price(plan["price"]["RUB"], coefficient)
+        price = subscription_service.get_price_for_duration(prices, duration, "RUB")
         builder.row(
             InlineKeyboardButton(
                 text=_("YooKassa | {price} ₽").format(price=price),
@@ -35,7 +35,7 @@ def payment_method_keyboard(plan: dict, coefficient: int) -> InlineKeyboardMarku
         )
 
     if telegram_stars:
-        price = subscription_service.calculate_price(plan["price"]["XTR"], coefficient)
+        price = subscription_service.get_price_for_duration(prices, duration, "XTR")
         builder.row(
             InlineKeyboardButton(
                 text="TelegramStars | {price} ★".format(price=price),
@@ -44,7 +44,7 @@ def payment_method_keyboard(plan: dict, coefficient: int) -> InlineKeyboardMarku
         )
 
     if cryptomus:
-        price = subscription_service.calculate_price(plan["price"]["USD"], coefficient)
+        price = subscription_service.get_price_for_duration(prices, duration, "USD")
         builder.row(
             InlineKeyboardButton(
                 text="Cryptomus | {price} $".format(price=price),

@@ -1,36 +1,64 @@
 {
+    // List of available subscription durations in days.
+    // Each value represents a selectable subscription period.
+    "durations": [30, 60, 180, 365],
+
+    // List of available subscription plans.
     "plans": [
         {
-            "traffic": "50", // Amount of traffic (aka plan name) (in GB).
-            "callback": "traffic_50", // Unique identifier for callback.
-            "price": {
-                // Price per month.
-                "USD": 1, // Price in American Dollars (USD).
-                "RUB": 100, // Price in Russian Rubles (RUB).
-                "XTR": 50 // Price in Telegram Stars (XTR).
-            }
-        },
-        {
-            "traffic": "∞",
-            "callback": "traffic_-1", // Unique identifier for unlimited traffic plan.
-            "price": {
-                "USD": 2,
-                "RUB": 200,
-                "XTR": 100
-            }
-        }
-    ],
+            // Traffic limit in gigabytes (GB) provided by the plan.
+            // A value of -1 indicates unlimited traffic.
+            "traffic": 50,
 
-    "durations": [
-        {
-            "duration": 30, // Duration of subscription (in days).
-            "coefficient": 1, // Coefficient for price calculation (price * coefficient).
-            "callback": "duration_30" // Unique identifier for callback.
+            // Plan prices based on currency and subscription duration.
+            "prices": {
+                // Prices in USD for each subscription period.
+                "USD": {
+                    "30": 0.7, // Price for 30 days.
+                    "60": 1.2, // Price for 60 days.
+                    "180": 3, // Price for 180 days.
+                    "365": 6 // Price for 365 days.
+                },
+                // Prices in RUB for each subscription period.
+                "RUB": {
+                    "30": 70,
+                    "60": 120,
+                    "180": 300,
+                    "365": 600
+                },
+                // Prices in XTR for each subscription period.
+                "XTR": {
+                    "30": 60,
+                    "60": 100,
+                    "180": 250,
+                    "365": 500
+                }
+            }
         },
         {
-            "duration": -1, // Unlimited duration of subscription.
-            "coefficient": 2,
-            "callback": "duration_-1"
+            // Plan with unlimited traffic.
+            "traffic": -1,
+
+            "prices": {
+                "USD": {
+                    "30": 2,
+                    "60": 3.5,
+                    "180": 8.8,
+                    "365": 17.5
+                },
+                "RUB": {
+                    "30": 200,
+                    "60": 350,
+                    "180": 880,
+                    "365": 1750
+                },
+                "XTR": {
+                    "30": 160,
+                    "60": 280,
+                    "180": 700,
+                    "365": 1400
+                }
+            }
         }
     ]
 }

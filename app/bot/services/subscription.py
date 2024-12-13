@@ -4,6 +4,8 @@ import logging
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.i18n import gettext as _
 
+from app.bot.navigation import NavigationAction
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,7 +20,31 @@ class SubscriptionService:
         with open("plans.json", "r") as f:
             self.data = json.load(f)
         self.plans: list[dict] = self.data["plans"]
-        self.durations: list[dict] = self.data["durations"]
+        self.durations: list[int] = self.data["durations"]
+
+    def generate_plan_callback(self, traffic: int) -> str:
+        """
+        Generates a callback string for the plan based on traffic.
+
+        Arguments:
+            traffic (int): The traffic value in GB.
+
+        Returns:
+            str: A callback string for the plan, such as 'traffic_50'.
+        """
+        return NavigationAction.TRAFFIC + f"_{traffic}"
+
+    def generate_duration_callback(self, duration: int) -> str:
+        """
+        Generates a callback string for the duration.
+
+        Arguments:
+            duration (int): The duration in days.
+
+        Returns:
+            str: A callback string for the duration, such as 'duration_30'.
+        """
+        return NavigationAction.DURATION + f"_{duration}"
 
     def get_plan(self, callback: str) -> dict | None:
         """
@@ -31,12 +57,12 @@ class SubscriptionService:
             dict | None: The plan as a dictionary if found, otherwise None.
         """
         for plan in self.plans:
-            if plan["callback"] == callback:
+            if callback == self.generate_plan_callback(plan["traffic"]):
                 return plan
         logger.warning(f"Plan with callback '{callback}' not found.")
         return None
 
-    def get_duration(self, callback: str) -> dict | None:
+    def get_duration(self, callback: str) -> int | None:
         """
         Retrieves a duration based on the provided callback.
 
@@ -44,10 +70,10 @@ class SubscriptionService:
             callback (str): The callback associated with the duration.
 
         Returns:
-            dict | None: The duration as a dictionary if found, otherwise None.
+            int | None: The duration if found, otherwise None.
         """
         for duration in self.durations:
-            if duration["callback"] == callback:
+            if self.generate_duration_callback(duration) == callback:
                 return duration
         logger.warning(f"Duration with callback '{callback}' not found.")
         return None
@@ -96,7 +122,7 @@ class SubscriptionService:
             raise ValueError(f"Plan with callback '{plan_callback}' not found.")
         return plan
 
-    async def get_selected_duration(self, state: FSMContext) -> dict:
+    async def get_selected_duration(self, state: FSMContext) -> int:
         """
         Retrieves the selected duration from the FSM context.
 
@@ -104,7 +130,7 @@ class SubscriptionService:
             state (FSMContext): The finite state machine context to retrieve data from.
 
         Returns:
-            dict: The selected duration.
+            int: The selected duration.
 
         Raises:
             ValueError: If the duration callback is missing or the duration is not found.
@@ -115,51 +141,45 @@ class SubscriptionService:
             logger.error("Duration callback is missing in state data.")
             raise ValueError("Duration callback is missing in state data.")
         duration = self.get_duration(duration_callback)
-        if not duration:
+        if duration is None:
             logger.error(
                 f"Duration with callback '{duration_callback}' not found in available durations."
             )
             raise ValueError(f"Duration with callback '{duration_callback}' not found.")
         return duration
 
-    def calculate_price(self, base_price: int, coefficient: float) -> int:
+    def get_price_for_duration(self, prices: dict, duration: int, currency: str = "RUB") -> int:
         """
-        Calculates the total price based on the base price and coefficient.
+        Retrieves the price for a given duration and currency.
 
         Arguments:
-            base_price (int): The base price for the plan.
-            coefficient (float): The duration coefficient.
+            prices (dict): Dictionary with prices for different durations and currencies.
+            duration (int): Duration in days for which the price is needed.
+            currency (str): Currency code (default is 'RUB').
 
         Returns:
-            int: The calculated total price.
-
-        Raises:
-            ValueError: If either the coefficient or base price is less than or equal to zero.
+            int: Price for the specified duration and currency.
         """
-        if coefficient <= 0 or base_price <= 0:
-            raise ValueError("Both coefficient and base price must be positive integers.")
+        return prices[currency][str(duration)]
 
-        total_price = base_price * coefficient
-        return int(total_price)
-
-    def format_currency(self, currency: str) -> str:
+    def convert_traffic_to_title(self, traffic: int) -> str:
         """
-        Formats the currency symbol based on the provided currency code.
+        Converts the given traffic value to a human-readable title.
+
+        If the traffic is -1, it returns the symbol for infinity (∞), otherwise
+        it returns the traffic value with the unit "GB".
 
         Arguments:
-            currency (str): The currency code (e.g., "RUB", "XTR", "USD").
+            traffic (int): The traffic value in GB.
+                Use -1 to represent infinite traffic.
 
         Returns:
-            str: The formatted currency symbol (e.g., "₽", "★", "$").
-                  If the currency code is unknown, it is returned unchanged.
+            str: A string representation of traffic, such as "10 GB" or "∞" for infinite traffic.
         """
-        if currency == "RUB":
-            return "₽"
-        elif currency == "XTR":
-            return "★"
-        elif currency == "USD":
-            return "$"
-        return currency
+        if traffic == -1:
+            return "∞"
+        else:
+            return str(traffic) + " " + _("GB")
 
     def convert_days_to_period(self, days: int) -> str:
         """

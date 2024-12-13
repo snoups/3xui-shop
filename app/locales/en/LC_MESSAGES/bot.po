@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-11 21:15+0500\n"
+"POT-Creation-Date: 2024-12-12 22:54+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -56,10 +56,6 @@ msgstr ""
 
 #: app/bot/keyboards/profile.py:20
 msgid "Buy subscription"
-msgstr ""
-
-#: app/bot/keyboards/subscription.py:23 app/bot/services/profile.py:157
-msgid "GB"
 msgstr ""
 
 #: app/bot/routes/main_menu.py:26
@@ -121,23 +117,23 @@ msgid ""
 "Received: ↓ {down}"
 msgstr ""
 
-#: app/bot/routes/subscription.py:21
+#: app/bot/routes/subscription.py:27
 msgid "🌐 Select the traffic volume:"
 msgstr ""
 
-#: app/bot/routes/subscription.py:28
+#: app/bot/routes/subscription.py:41
 msgid "⏳ Specify the duration:"
 msgstr ""
 
-#: app/bot/routes/subscription.py:37
+#: app/bot/routes/subscription.py:57
 msgid "💳 Choose a payment method:"
 msgstr ""
 
-#: app/bot/routes/subscription.py:119
+#: app/bot/routes/subscription.py:163
 msgid ""
 "✅ You selected:\n"
 "\n"
-"Plan: {plan} GB\n"
+"Plan: {plan}\n"
 "Duration: {duration}\n"
 "Price: {price} {currency}\n"
 "\n"
@@ -155,6 +151,10 @@ msgstr ""
 
 #: app/bot/services/profile.py:156
 msgid "MB"
+msgstr ""
+
+#: app/bot/services/profile.py:157 app/bot/services/subscription.py:182
+msgid "GB"
 msgstr ""
 
 #: app/bot/services/profile.py:158
@@ -189,21 +189,21 @@ msgstr ""
 msgid "m"
 msgstr ""
 
-#: app/bot/services/subscription.py:182
+#: app/bot/services/subscription.py:202
 #, fuzzy
 msgid "1 year"
 msgid_plural "{} years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/services/subscription.py:186
+#: app/bot/services/subscription.py:206
 #, fuzzy
 msgid "1 month"
 msgid_plural "{} months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/services/subscription.py:188
+#: app/bot/services/subscription.py:208
 #, fuzzy
 msgid "1 day"
 msgid_plural "{} days"
@@ -227,5 +227,17 @@ msgstr[1] ""
 #~ " yet, go to the subscription page "
 #~ "to purchase or click the button "
 #~ "below."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "✅ You selected:\n"
+#~ "\n"
+#~ "Plan: {plan} GB\n"
+#~ "Duration: {duration}\n"
+#~ "Price: {price} {currency}\n"
+#~ "\n"
+#~ "After payment, a unique key will "
+#~ "be generated for you, to connect "
+#~ "to the VPN."
 #~ msgstr ""
 

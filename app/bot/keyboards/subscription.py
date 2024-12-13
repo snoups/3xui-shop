@@ -18,10 +18,12 @@ def traffic_keyboard() -> InlineKeyboardMarkup:
     plans = subscription_service.plans
 
     for plan in plans:
+        traffic = subscription_service.convert_traffic_to_title(plan["traffic"])
+        callback_data = subscription_service.generate_plan_callback(plan["traffic"])
         builder.row(
             InlineKeyboardButton(
-                text=plan["traffic"] + " " + _("GB"),
-                callback_data=plan["callback"],
+                text=traffic,
+                callback_data=callback_data,
             )
         )
 
@@ -30,7 +32,7 @@ def traffic_keyboard() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-def duration_keyboard(price: float) -> InlineKeyboardMarkup:
+def duration_keyboard(prices: dict) -> InlineKeyboardMarkup:
     """
     Generates an inline keyboard for selecting subscription duration with calculated prices.
 
@@ -44,12 +46,13 @@ def duration_keyboard(price: float) -> InlineKeyboardMarkup:
     durations = subscription_service.durations
 
     for duration in durations:
-        period = subscription_service.convert_days_to_period(duration["duration"])
-        total_price = subscription_service.calculate_price(price, duration["coefficient"])
+        period = subscription_service.convert_days_to_period(duration)
+        price = subscription_service.get_price_for_duration(prices, duration)
+        callback_data = subscription_service.generate_duration_callback(duration)
         builder.row(
             InlineKeyboardButton(
-                text=f"{period} | {total_price} ₽",
-                callback_data=duration["callback"],
+                text=f"{period} | {price} ₽",
+                callback_data=callback_data,
             )
         )
 

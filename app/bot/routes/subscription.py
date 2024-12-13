@@ -11,6 +11,7 @@ from app.bot.keyboards.payment_method import payment_method_keyboard
 from app.bot.keyboards.subscription import duration_keyboard, traffic_keyboard
 from app.bot.navigation import NavigationAction
 from app.bot.services import subscription_service
+from app.bot.services.payment import PaymentMethod
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -38,7 +39,7 @@ async def show_choosing_duration(callback: CallbackQuery, state: FSMContext) -> 
     selected_plan = await subscription_service.get_selected_plan(state)
     await callback.message.answer(
         _("⏳ Specify the duration:"),
-        reply_markup=duration_keyboard(selected_plan["price"]["RUB"]),
+        reply_markup=duration_keyboard(selected_plan["prices"]),
     )
 
 
@@ -54,7 +55,7 @@ async def show_choosing_payment_method(callback: CallbackQuery, state: FSMContex
     selected_duration = await subscription_service.get_selected_duration(state)
     await callback.message.answer(
         _("💳 Choose a payment method:"),
-        reply_markup=payment_method_keyboard(selected_plan, selected_duration["coefficient"]),
+        reply_markup=payment_method_keyboard(selected_plan["prices"], selected_duration),
     )
 
 
@@ -143,48 +144,33 @@ async def callback_choosing_payment_method(callback: CallbackQuery, state: FSMCo
 
     selected_plan = await subscription_service.get_selected_plan(state)
     selected_duration = await subscription_service.get_selected_duration(state)
-    duration = subscription_service.convert_days_to_period(selected_duration["duration"])
-
     logger.info(f"User {callback.from_user.id} selected payment method: {callback.data}")
     logger.info(f"User {callback.from_user.id} selected plan: {selected_plan} {selected_duration}")
 
-    if callback.data == NavigationAction.PAY_YOOKASSA:
-        currency = "₽"
-        price = subscription_service.calculate_price(
-            selected_plan["price"]["RUB"],
-            selected_duration["coefficient"],
-        )
-    elif callback.data == NavigationAction.PAY_TELEGRAM_STARS:
-        currency = "★"
-        price = subscription_service.calculate_price(
-            selected_plan["price"]["XTR"],
-            selected_duration["coefficient"],
-        )
-    elif callback.data == NavigationAction.PAY_CRYPTOMUS:
-        currency = "$"
-        price = subscription_service.calculate_price(
-            selected_plan["price"]["USD"],
-            selected_duration["coefficient"],
-        )
-    else:
-        currency = "NONE"
-        price = "NONE"
+    plan = subscription_service.convert_traffic_to_title(selected_plan["traffic"])
+    duration = subscription_service.convert_days_to_period(selected_duration)
+    payment_method = PaymentMethod.get_by_callback_data(callback.data)
+    currency_symbol = payment_method.symbol
+    price = subscription_service.get_price_for_duration(
+        selected_plan["prices"],
+        selected_duration,
+        payment_method.code,
+    )
 
     await callback.message.answer(
         _(
             "✅ You selected:\n"
             "\n"
-            "Plan: {plan} GB\n"
+            "Plan: {plan}\n"
             "Duration: {duration}\n"
             "Price: {price} {currency}\n"
             "\n"
             "After payment, a unique key will be generated for you, to connect to the VPN."
         ).format(
-            plan=selected_plan["traffic"],
+            plan=plan,
             duration=duration,
             price=price,
-            currency=currency,
+            currency=currency_symbol,
         ),
         reply_markup=pay_keyboard("https://telegram.org/"),
     )
-    await callback.answer()
