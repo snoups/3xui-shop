@@ -1,3 +1,5 @@
+import hashlib
+import logging
 from typing import Any, Awaitable, Callable, Optional
 
 from aiogram import BaseMiddleware
@@ -6,6 +8,8 @@ from aiogram.types import User as TelegramUser
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.db.models import User
+
+logger = logging.getLogger(__name__)
 
 
 class DBSessionMiddleware(BaseMiddleware):
@@ -40,10 +44,14 @@ class DBSessionMiddleware(BaseMiddleware):
         session: AsyncSession
         async with self.session() as session:
             user: Optional[TelegramUser] = data.get("event_from_user", None)
-
+            hash = hashlib.md5(str(user.id).encode()).hexdigest()
             if user is not None:
                 user = await User.get_or_create(
-                    session, user_id=user.id, first_name=user.first_name, username=user.username
+                    session,
+                    vpn_id=hash,
+                    user_id=user.id,
+                    first_name=user.first_name,
+                    username=user.username,
                 )
             data["user"] = user
             data["session"] = session

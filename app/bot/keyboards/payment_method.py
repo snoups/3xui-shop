@@ -12,8 +12,8 @@ def payment_method_keyboard(prices: dict, duration: int) -> InlineKeyboardMarkup
     Generates an inline keyboard for selecting a payment method based on the subscription plan.
 
     Arguments:
-        plan (dict): Subscription plan details, including prices for various payment methods.
-        coefficient (int): Price adjustment coefficient for the subscription plan.
+        prices (dict): Prices for various payment methods.
+        duration (int): Duration for the subscription plan.
 
     Returns:
         InlineKeyboardMarkup: Inline keyboard markup with payment method options and a back button.

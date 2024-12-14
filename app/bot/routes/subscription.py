@@ -1,17 +1,19 @@
+import json
 import logging
 
-from aiogram import F, Router
+from aiogram import Bot, F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message, PreCheckoutQuery
 from aiogram.utils.i18n import gettext as _
+from py3xui import AsyncApi
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.filters.is_private import IsPrivate
 from app.bot.keyboards.pay import pay_keyboard
 from app.bot.keyboards.payment_method import payment_method_keyboard
 from app.bot.keyboards.subscription import duration_keyboard, traffic_keyboard
 from app.bot.navigation import NavigationAction
-from app.bot.services import subscription_service
-from app.bot.services.payment import PaymentMethod
+from app.bot.services import payment_service, subscription_service
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -132,7 +134,9 @@ async def callback_back_to_payment(callback: CallbackQuery, state: FSMContext) -
 
 
 @router.callback_query(F.data.startswith(NavigationAction.PAY), IsPrivate())
-async def callback_choosing_payment_method(callback: CallbackQuery, state: FSMContext) -> None:
+async def callback_choosing_payment_method(
+    callback: CallbackQuery, state: FSMContext, bot: Bot
+) -> None:
     """
     Handles the payment method selection and displays payment information to the user.
 
@@ -149,13 +153,21 @@ async def callback_choosing_payment_method(callback: CallbackQuery, state: FSMCo
 
     plan = subscription_service.convert_traffic_to_title(selected_plan["traffic"])
     duration = subscription_service.convert_days_to_period(selected_duration)
-    payment_method = PaymentMethod.get_by_callback_data(callback.data)
-    currency_symbol = payment_method.symbol
+    payment_method = payment_service.get_payment_method(callback.data)
     price = subscription_service.get_price_for_duration(
         selected_plan["prices"],
         selected_duration,
         payment_method.code,
     )
+
+    data = {
+        "user_id": callback.from_user.id,
+        "traffic": selected_plan["traffic"],
+        "duration": selected_duration,
+        "price": price,
+    }
+
+    link = await payment_service.create_payment(payment_method, data, bot)
 
     await callback.message.answer(
         _(
@@ -170,7 +182,34 @@ async def callback_choosing_payment_method(callback: CallbackQuery, state: FSMCo
             plan=plan,
             duration=duration,
             price=price,
-            currency=currency_symbol,
+            currency=payment_method.symbol,
         ),
-        reply_markup=pay_keyboard("https://telegram.org/"),
+        reply_markup=pay_keyboard(link),
     )
+
+
+@router.pre_checkout_query()
+async def pre_checkout_handler(
+    pre_checkout_query: PreCheckoutQuery, bot: Bot, api: AsyncApi, session: AsyncSession
+) -> None:
+    logger.info("pre_checkout_handler")
+    data = json.loads(pre_checkout_query.invoice_payload)
+    print(data)
+    await subscription_service.create_subscription(session, api, data)
+    await pre_checkout_query.answer(ok=True)
+
+
+@router.message(F.successful_payment)
+async def successful_payment(
+    message: Message, bot: Bot, api: AsyncApi, session: AsyncSession
+) -> None:
+    logger.info("successful_payment")
+
+    await bot.refund_star_payment(
+        user_id=message.from_user.id,
+        telegram_payment_charge_id=message.successful_payment.telegram_payment_charge_id,
+    )
+    await message.answer(
+        f"Your transaction id: {message.successful_payment.telegram_payment_charge_id}"
+    )
+    # await subscription_service.create_subscription(session, api, message.from_user.id)

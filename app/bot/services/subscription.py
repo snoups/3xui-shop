@@ -1,15 +1,23 @@
 import json
 import logging
+from datetime import datetime, timedelta, timezone
 
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.i18n import gettext as _
+from py3xui import AsyncApi, Client
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.navigation import NavigationAction
+from app.db.models.user import User
 
 logger = logging.getLogger(__name__)
 
 
 class SubscriptionService:
+    """
+    Service for managing subscription plans and durations.
+    """
+
     def __init__(self) -> None:
         """
         Initializes the SubscriptionService object.
@@ -206,3 +214,46 @@ class SubscriptionService:
             return _("1 month", "{} months", months).format(months)
 
         return _("1 day", "{} days", days).format(days)
+
+    def gb_to_bytes(self, traffic_gb: int) -> int:
+        """
+        Convert traffic volume from gigabytes (GB) to bytes.
+
+        Arguments:
+            traffic_gb (float): The traffic volume in gigabytes.
+
+        Returns:
+            int: The traffic volume in bytes.
+        """
+        bytes_in_gb = 1024**3  # 1 GB = 1024^3 bytes
+        return int(traffic_gb * bytes_in_gb)
+
+    def days_to_unix_milliseconds(self, days: int) -> int:
+        """
+        Convert a number of days to a Unix timestamp in milliseconds.
+
+        Arguments:
+            days (int): Number of days to convert.
+
+        Returns:
+            int: Unix timestamp in milliseconds.
+        """
+        now = datetime.now(timezone.utc)
+        target_time = now + timedelta(days=days)
+        unix_timestamp_seconds = int(target_time.timestamp())
+        unix_timestamp_milliseconds = unix_timestamp_seconds * 1000
+        return unix_timestamp_milliseconds
+
+    async def create_subscription(self, session: AsyncSession, api: AsyncApi, data: dict) -> None:
+        user: User = await User.get(session, user_id=data["user_id"])
+        new_client = Client(
+            id=user.vpn_id,
+            email=str(user.user_id),
+            enable=True,
+            limitIp=3,
+            totalGB=self.gb_to_bytes(data["traffic"]),
+            expiryTime=self.days_to_unix_milliseconds(data["duration"]),
+            flow="xtls-rprx-vision",
+        )
+        inbound_id = 7
+        await api.client.add(inbound_id, [new_client])

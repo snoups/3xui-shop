@@ -37,7 +37,7 @@ def duration_keyboard(prices: dict) -> InlineKeyboardMarkup:
     Generates an inline keyboard for selecting subscription duration with calculated prices.
 
     Arguments:
-        price (float): Base price of the subscription.
+        prices (dict): Prices of the subscription.
 
     Returns:
         InlineKeyboardMarkup: Inline keyboard markup with duration options and a back button.

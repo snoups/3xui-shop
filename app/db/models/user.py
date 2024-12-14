@@ -1,10 +1,6 @@
-from datetime import datetime
-from typing import Optional
-
 from sqlalchemy import *
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import Mapped, mapped_column
 
 from ._base import Base
 
@@ -16,15 +12,37 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    state: Mapped[str] = mapped_column(String(length=6), nullable=False, default="guest")
-    user_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
-    first_name: Mapped[str] = mapped_column(String(length=128), nullable=False)
-    username: Mapped[Optional[str]] = mapped_column(String(length=64), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), nullable=False)
+    id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    vpn_id = Column(
+        String(length=32),
+        unique=True,
+        nullable=False,
+    )
+    user_id = Column(
+        BigInteger,
+        unique=True,
+        nullable=False,
+    )
+    first_name = Column(
+        String(length=128),
+        nullable=False,
+    )
+    username = Column(
+        String(length=64),
+        nullable=True,
+    )
+    created_at = Column(
+        DateTime,
+        default=func.now(),
+        nullable=False,
+    )
 
     @classmethod
-    async def get(cls, session: AsyncSession, **kwargs) -> Optional["User"]:
+    async def get(cls, session: AsyncSession, **kwargs) -> "User | None":
         """
         Get a user from the database based on the specified filters.
 
@@ -35,8 +53,8 @@ class User(Base):
         Returns:
             Optional[User]: The user object or None if not found.
         """
-        filters = [getattr(cls, key) == value for key, value in kwargs.items()]
-        query = await session.execute(select(cls).filter(*filters))
+        filters = [*[getattr(User, key) == value for key, value in kwargs.items()]]
+        query = await session.execute(select(User).where(*filters))
         return query.scalar()
 
     @classmethod
@@ -52,22 +70,22 @@ class User(Base):
         Returns:
             User: The user object.
         """
-        filters = [cls.user_id == user_id]
-        query = await session.execute(select(cls).filter(*filters))
-        user = query.scalar()
+        filters = [User.user_id == user_id]
+        result = await session.execute(select(User).filter(*filters))
 
-        if user is None:
-            user = cls(user_id=user_id, **kwargs)
-            session.add(user)
-
-        else:
+        try:
+            user = result.scalar_one()
             for key, value in kwargs.items():
                 setattr(user, key, value)
+        except NoResultFound:
+            user = User(user_id=user_id, **kwargs)
+            session.add(user)
 
+        await session.commit()
         return user
 
     @classmethod
-    async def update(cls, session: AsyncSession, user_id: int, **kwargs) -> None:
+    async def update(session: AsyncSession, user_id: int, **kwargs) -> None:
         """
         Update a user in the database.
 
@@ -76,10 +94,12 @@ class User(Base):
             user_id (int): The ID of the user to be updated.
             kwargs (dict): Attributes to be updated.
         """
-        await session.execute(update(cls).where(cls.user_id == user_id).values(**kwargs))
+        filters = [User.user_id == user_id]
+        await session.execute(update(User).filter(*filters).values(**kwargs))
+        await session.commit()
 
     @classmethod
-    async def exists(cls, session: AsyncSession, **kwargs) -> bool:
+    async def exists(session: AsyncSession, **kwargs) -> bool:
         """
         Check if a user exists in the database.
 
@@ -90,6 +110,6 @@ class User(Base):
         Returns:
             bool: True if the user exists, otherwise False.
         """
-        filters = [getattr(cls, key) == value for key, value in kwargs.items()]
-        query = await session.execute(select(cls).filter(*filters).limit(1))
-        return query.scalar() is not None
+        filters = [*[getattr(User, key) == value for key, value in kwargs.items()]]
+        query = await session.execute(select(User).filter(*filters))
+        return query.scalar()

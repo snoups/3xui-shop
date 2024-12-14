@@ -1,9 +1,12 @@
+import logging
 from typing import Any, Awaitable, Callable, MutableMapping, Optional
 
 from aiogram import BaseMiddleware
 from aiogram.dispatcher.flags import get_flag
-from aiogram.types import TelegramObject, User
+from aiogram.types import Message, PreCheckoutQuery, TelegramObject, User
 from cachetools import TTLCache
+
+logger = logging.getLogger(__name__)
 
 
 class ThrottlingMiddleware(BaseMiddleware):
@@ -52,6 +55,15 @@ class ThrottlingMiddleware(BaseMiddleware):
         Returns:
             Optional[Any]: The result of the handler or None if the request is throttled.
         """
+        if hasattr(event, "pre_checkout_query"):
+            if getattr(event, "pre_checkout_query"):
+                return await handler(event, data)
+
+        if hasattr(event, "message"):
+            if hasattr(event, "successful_payment"):
+                if getattr(event, "successful_payment"):
+                    return await handler(event, data)
+
         user: Optional[User] = data.get("event_from_user", None)
 
         if user is not None:
