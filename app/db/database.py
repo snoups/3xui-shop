@@ -26,7 +26,7 @@ class Database:
             expire_on_commit=False,
         )
 
-    async def init(self) -> "Database":
+    async def initialize(self) -> "Database":
         """
         Set up the database schema.
 

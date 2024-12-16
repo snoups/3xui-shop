@@ -4,27 +4,25 @@ from typing import Any, Awaitable, Callable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from app.config import Config
-
 logger = logging.getLogger(__name__)
 
 
-class ConfigMiddleware(BaseMiddleware):
+class ServicesMiddleware(BaseMiddleware):
     """
-    Middleware for injecting a Config instance into handler data.
+    Middleware for injecting service instances into handler data.
 
-    This middleware injects a `Config` instance into the handler's data dictionary, making
-    configuration settings accessible in every handler.
+    This middleware allows for injecting various service instances (such as VPNService)
+    into handler data, making them accessible within handlers.
     """
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, **services) -> None:
         """
-        Initializes the ConfigMiddleware with a Config instance.
+        Initializes the ServicesMiddleware with a list of services to inject.
 
         Arguments:
-            config (Config): The `Config` instance that will be injected into handler data.
+            services (dict[str, Any]): Any additional services to be injected.
         """
-        self.config = config
+        self.services = services
 
     async def __call__(
         self,
@@ -33,7 +31,7 @@ class ConfigMiddleware(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         """
-        Middleware handler to inject the config into handler data.
+        Middleware handler to inject services into handler data.
 
         Arguments:
             handler (Callable): The handler function to process the event.
@@ -41,7 +39,7 @@ class ConfigMiddleware(BaseMiddleware):
             data (dict): Context data passed to the handler.
 
         Returns:
-            Any: The result of the next handler with injected config.
+            Any: The result of the next handler with injected services.
         """
-        data["config"] = self.config
+        data.update(self.services)
         return await handler(event, data)

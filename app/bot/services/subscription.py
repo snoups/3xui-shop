@@ -1,13 +1,14 @@
 import json
 import logging
+import os
 from datetime import datetime, timedelta, timezone
 
-from aiogram.fsm.context import FSMContext
 from aiogram.utils.i18n import gettext as _
 from py3xui import AsyncApi, Client
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.navigation import NavigationAction
+from app.bot.services.vpn import VPNService
 from app.db.models.user import User
 
 logger = logging.getLogger(__name__)
@@ -15,7 +16,16 @@ logger = logging.getLogger(__name__)
 
 class SubscriptionService:
     """
-    Service for managing subscription plans and durations.
+    Service for managing subscription plans, durations, and traffic.
+
+    This service provides methods for handling subscription plans, durations,
+    traffic conversion, and creating new subscriptions. It reads subscription plans
+    and durations from a JSON file ('plans.json') and offers utility methods to
+    generate callbacks, calculate prices, and convert data to human-readable formats.
+
+    Attributes:
+        plans (list[dict]): List of subscription plans.
+        durations (list[int]): List of available subscription durations.
     """
 
     def __init__(self) -> None:
@@ -25,8 +35,24 @@ class SubscriptionService:
         Loads plans and durations from the 'plans.json' file. The file must exist and contain
         properly structured data with "plans" and "durations" keys.
         """
-        with open("plans.json", "r") as f:
-            self.data = json.load(f)
+        file_path = "plans.json"
+
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError(f"The file '{file_path}' does not exist.")
+
+        try:
+            with open(file_path, "r") as f:
+                self.data = json.load(f)
+        except json.JSONDecodeError:
+            raise ValueError(f"The file '{file_path}' is not a valid JSON file.")
+
+        # Validate the file structure
+        if "plans" not in self.data or not isinstance(self.data["plans"], list):
+            raise ValueError(f"The 'plans' key is missing or not a list in '{file_path}'.")
+
+        if "durations" not in self.data or not isinstance(self.data["durations"], list):
+            raise ValueError(f"The 'durations' key is missing or not a list in '{file_path}'.")
+
         self.plans: list[dict] = self.data["plans"]
         self.durations: list[int] = self.data["durations"]
 
@@ -85,76 +111,6 @@ class SubscriptionService:
                 return duration
         logger.warning(f"Duration with callback '{callback}' not found.")
         return None
-
-    async def set_selected_plan(self, state: FSMContext, plan_callback: str) -> None:
-        """
-        Saves the selected plan callback to the FSM context.
-
-        Arguments:
-            state (FSMContext): The finite state machine context to store data.
-            plan_callback (str): The callback of the selected plan.
-        """
-        await state.update_data(plan_callback=plan_callback)
-
-    async def set_selected_duration(self, state: FSMContext, duration_callback: str) -> None:
-        """
-        Saves the selected duration callback to the FSM context.
-
-        Arguments:
-            state (FSMContext): The finite state machine context to store data.
-            duration_callback (str): The callback of the selected duration.
-        """
-        await state.update_data(duration_callback=duration_callback)
-
-    async def get_selected_plan(self, state: FSMContext) -> dict:
-        """
-        Retrieves the selected plan from the FSM context.
-
-        Arguments:
-            state (FSMContext): The finite state machine context to retrieve data from.
-
-        Returns:
-            dict: The selected plan.
-
-        Raises:
-            ValueError: If the plan callback is missing or the plan is not found.
-        """
-        user_data = await state.get_data()
-        plan_callback = user_data.get("plan_callback")
-        if not plan_callback:
-            logger.error("Plan callback is missing in state data.")
-            raise ValueError("Plan callback is missing in state data.")
-        plan = self.get_plan(plan_callback)
-        if not plan:
-            logger.error(f"Plan with callback '{plan_callback}' not found in available plans.")
-            raise ValueError(f"Plan with callback '{plan_callback}' not found.")
-        return plan
-
-    async def get_selected_duration(self, state: FSMContext) -> int:
-        """
-        Retrieves the selected duration from the FSM context.
-
-        Arguments:
-            state (FSMContext): The finite state machine context to retrieve data from.
-
-        Returns:
-            int: The selected duration.
-
-        Raises:
-            ValueError: If the duration callback is missing or the duration is not found.
-        """
-        user_data = await state.get_data()
-        duration_callback = user_data.get("duration_callback")
-        if not duration_callback:
-            logger.error("Duration callback is missing in state data.")
-            raise ValueError("Duration callback is missing in state data.")
-        duration = self.get_duration(duration_callback)
-        if duration is None:
-            logger.error(
-                f"Duration with callback '{duration_callback}' not found in available durations."
-            )
-            raise ValueError(f"Duration with callback '{duration_callback}' not found.")
-        return duration
 
     def get_price_for_duration(self, prices: dict, duration: int, currency: str = "RUB") -> int:
         """
@@ -215,45 +171,24 @@ class SubscriptionService:
 
         return _("1 day", "{} days", days).format(days)
 
-    def gb_to_bytes(self, traffic_gb: int) -> int:
+    async def create_subscription(
+        self,
+        vpn: VPNService,
+        user: User,
+        traffic: int,
+        duration: int,
+    ) -> None:
         """
-        Convert traffic volume from gigabytes (GB) to bytes.
+        Creates a new subscription for the user.
 
         Arguments:
-            traffic_gb (float): The traffic volume in gigabytes.
-
-        Returns:
-            int: The traffic volume in bytes.
+            vpn (VPNService): The VPNService instance used to interact with the VPN service.
+            user (User): The user for whom the subscription is created.
+            traffic (int): The amount of traffic for the user in GB.
+            duration (int): The duration of the subscription in days.
         """
-        bytes_in_gb = 1024**3  # 1 GB = 1024^3 bytes
-        return int(traffic_gb * bytes_in_gb)
-
-    def days_to_unix_milliseconds(self, days: int) -> int:
-        """
-        Convert a number of days to a Unix timestamp in milliseconds.
-
-        Arguments:
-            days (int): Number of days to convert.
-
-        Returns:
-            int: Unix timestamp in milliseconds.
-        """
-        now = datetime.now(timezone.utc)
-        target_time = now + timedelta(days=days)
-        unix_timestamp_seconds = int(target_time.timestamp())
-        unix_timestamp_milliseconds = unix_timestamp_seconds * 1000
-        return unix_timestamp_milliseconds
-
-    async def create_subscription(self, session: AsyncSession, api: AsyncApi, data: dict) -> None:
-        user: User = await User.get(session, user_id=data["user_id"])
-        new_client = Client(
-            id=user.vpn_id,
-            email=str(user.user_id),
-            enable=True,
-            limitIp=3,
-            totalGB=self.gb_to_bytes(data["traffic"]),
-            expiryTime=self.days_to_unix_milliseconds(data["duration"]),
-            flow="xtls-rprx-vision",
-        )
-        inbound_id = 7
-        await api.client.add(inbound_id, [new_client])
+        # TODO: make receiving a subscription link
+        if await vpn.is_client_exists(user.user_id):
+            await vpn.update_client(user, traffic, duration)
+        else:
+            await vpn.create_client(user, traffic, duration)

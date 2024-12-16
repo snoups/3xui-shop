@@ -15,14 +15,17 @@ logger = logging.getLogger(__name__)
 class DBSessionMiddleware(BaseMiddleware):
     """
     Middleware for managing database sessions in handlers.
+
+    This middleware ensures that a database session is available for every handler,
+    allowing access to the database and handling user creation if necessary.
     """
 
     def __init__(self, session: async_sessionmaker) -> None:
         """
-        Initialize the database session middleware.
+        Initializes the DBSessionMiddleware with an async session factory.
 
         Arguments:
-            session (async_sessionmaker): Factory for creating asynchronous database sessions.
+            session (async_sessionmaker): A factory for creating asynchronous database sessions.
         """
         super().__init__()
         self.session = session
@@ -34,12 +37,15 @@ class DBSessionMiddleware(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         """
-        Process the incoming Telegram event and inject a database session.
+        Middleware handler to inject the database session into handler data.
 
         Arguments:
             handler (Callable): The handler function to process the event.
             event (TelegramObject): The incoming Telegram event.
-            data (dict): Contextual data passed to the handler.
+            data (dict): Context data passed to the handler.
+
+        Returns:
+            Any: The result of the handler with an injected database session and user.
         """
         session: AsyncSession
         async with self.session() as session:

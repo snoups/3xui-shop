@@ -21,7 +21,7 @@ def prepare_message(user: User) -> str:
         user (User): The user for whom the welcome message is being prepared.
 
     Returns:
-        str: A formatted welcome message with user details and service information.
+        str: A formatted welcome message with user name.
     """
     return _(
         "Welcome, {name}! 🎉\n"
@@ -50,7 +50,7 @@ async def command_main_menu(message: Message) -> None:
         text=prepare_message(message.from_user),
         reply_markup=main_menu_keyboard(),
     )
-    logger.info(f"User {message.from_user.id} open main menu.")
+    logger.info(f"User {message.from_user.id} opened main menu.")
 
 
 @router.callback_query(F.data == NavigationAction.MAIN_MENU, IsPrivate())

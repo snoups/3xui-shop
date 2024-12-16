@@ -4,9 +4,10 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.i18n import I18n
-from py3xui import AsyncApi
 
 from app.bot import commands, middlewares, routes
+from app.bot.services.subscription import SubscriptionService
+from app.bot.services.vpn import VPNService
 from app.config import Config, load_config
 from app.db.database import Database
 from app.logger import setup_logging
@@ -60,46 +61,43 @@ async def main() -> None:
     # Load configuration
     config = load_config()
 
+    # Setup logging
+    setup_logging(config.logging)
+
     # Initialize components
     db = Database(config.database)
     storage = MemoryStorage()  # TODO: REDIS
     bot = Bot(token=config.bot.TOKEN)
     dp = Dispatcher(storage=storage, config=config, bot=bot, db=db)
-
-    # Configure i18n
     i18n = I18n(path="app/locales", default_locale="en", domain="bot")
-
-    # Initialize XUI API
-    api = AsyncApi(
-        host=config.xui.HOST,
-        username=config.xui.USERNAME,
-        password=config.xui.PASSWORD,
-        token=config.xui.TOKEN,
-        use_tls_verify=False,
-        logger=logging.getLogger("xui"),
-    )
-
-    # Setup logging
-    setup_logging(config.logging)
+    vpn_service = VPNService(config)
+    subscription_service = SubscriptionService()
 
     # Register event handlers
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
 
     # Register middlewares
-    middlewares.register(dp, config=config, session=db.session, api=api, i18n=i18n)
+    middlewares.register(
+        dp,
+        config=config,
+        session=db.session,
+        i18n=i18n,
+        vpn=vpn_service,
+        subscription=subscription_service,
+    )
 
     # Include bot routes
     routes.include(dp)
 
     # Initialize database
-    await db.init()
+    await db.initialize()
+
+    # Initialize VPNService
+    await vpn_service.initialize()
 
     # Set up bot commands
     await commands.setup(bot)
-
-    # Authenticate for the XUI API
-    await api.login()
 
     # Start bot polling
     await bot.delete_webhook()

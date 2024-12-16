@@ -8,10 +8,14 @@ from app.bot.navigation import NavigationAction
 
 def profile_keyboard() -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for the profile menu.
+    Generates an inline keyboard for the user's profile menu.
+
+    This keyboard provides options for the user to buy a subscription and a back button
+    to return to the main menu.
 
     Returns:
-        InlineKeyboardMarkup: Inline keyboard markup for the profile menu.
+        InlineKeyboardMarkup: The inline keyboard markup for the profile menu with options
+        and a back button.
     """
     builder = InlineKeyboardBuilder()
 

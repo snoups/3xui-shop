@@ -4,22 +4,28 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
 from app.bot.navigation import NavigationAction
-from app.bot.services import subscription_service
+from app.bot.services.subscription import SubscriptionService
 
 
-def traffic_keyboard() -> InlineKeyboardMarkup:
+def traffic_keyboard(subscription: SubscriptionService) -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for selecting a subscription plan by traffic volume.
+    Generates an inline keyboard for selecting a subscription plan based on traffic volume.
+
+    This keyboard allows the user to choose a subscription plan based on traffic (in GB).
+    It generates callback data for each plan and includes a back button to return to the main menu.
+
+    Arguments:
+        subscription (SubscriptionService): The service used to fetch subscription plans.
 
     Returns:
-        InlineKeyboardMarkup: Inline keyboard markup with traffic options and a back button.
+        InlineKeyboardMarkup: The inline keyboard markup with traffic options and a back button.
     """
     builder = InlineKeyboardBuilder()
-    plans = subscription_service.plans
+    plans = subscription.plans
 
     for plan in plans:
-        traffic = subscription_service.convert_traffic_to_title(plan["traffic"])
-        callback_data = subscription_service.generate_plan_callback(plan["traffic"])
+        traffic = subscription.convert_traffic_to_title(plan["traffic"])
+        callback_data = subscription.generate_plan_callback(plan["traffic"])
         builder.row(
             InlineKeyboardButton(
                 text=traffic,
@@ -32,23 +38,28 @@ def traffic_keyboard() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-def duration_keyboard(prices: dict) -> InlineKeyboardMarkup:
+def duration_keyboard(prices: dict, subscription: SubscriptionService) -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for selecting subscription duration with calculated prices.
+    Generates an inline keyboard for selecting the subscription duration with calculated prices.
 
-    Arguments:
-        prices (dict): Prices of the subscription.
+    This keyboard displays the available subscription durations, along with the price for each
+    duration based on the selected traffic plan. It also includes a back button to return to
+    the subscription selection.
+
+    Args:
+        prices (dict): A dictionary containing the prices for various payment methods.
+        subscription (SubscriptionService): The service used to fetch subscription durations.
 
     Returns:
-        InlineKeyboardMarkup: Inline keyboard markup with duration options and a back button.
+        InlineKeyboardMarkup: The inline keyboard markup with duration options and a back button.
     """
     builder = InlineKeyboardBuilder()
-    durations = subscription_service.durations
+    durations = subscription.durations
 
     for duration in durations:
-        period = subscription_service.convert_days_to_period(duration)
-        price = subscription_service.get_price_for_duration(prices, duration)
-        callback_data = subscription_service.generate_duration_callback(duration)
+        period = subscription.convert_days_to_period(duration)
+        price = subscription.get_price_for_duration(prices, duration)
+        callback_data = subscription.generate_duration_callback(duration)
         builder.row(
             InlineKeyboardButton(
                 text=f"{period} | {price} ₽",

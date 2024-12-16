@@ -15,14 +15,14 @@ router = Router(name=__name__)
 
 def split_text(text: str, chunk_size: int = 4096) -> list[str]:
     """
-    Splits a string into smaller chunks.
+    Splits a string into smaller chunks of a specified size.
 
     Arguments:
         text (str): The string to split.
-        chunk_size (int): The maximum size of each chunk.
+        chunk_size (int): The maximum size of each chunk. Defaults to 4096.
 
     Returns:
-        list[str]: A list of string chunks.
+        list[str]: A list of string chunks, each with a size not exceeding `chunk_size`.
     """
     return [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
 
@@ -34,7 +34,7 @@ async def errors_handler(
     config: Config,
 ) -> bool:
     """
-    Handles all uncaught exceptions during bot operation.
+    Handles all uncaught exceptions during bot operation and sends error details to the developer.
 
     Arguments:
         event (ErrorEvent): The event containing the exception and update details.
