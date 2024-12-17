@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-16 22:17+0500\n"
+"POT-Creation-Date: 2024-12-17 21:54+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -87,7 +87,7 @@ msgstr ""
 "♾️ БЕЗЛИМИТ\n"
 "✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД\n"
 
-#: app/bot/routes/payment.py:68
+#: app/bot/routes/payment.py:65
 msgid ""
 "✅ You selected:\n"
 "\n"
@@ -136,13 +136,21 @@ msgstr ""
 
 #: app/bot/routes/profile.py:44
 msgid "Traffic limit reached.\n"
-msgstr "Достигнут лимит трафика."
+msgstr "Достигнут лимит трафика.\n"
 
 #: app/bot/routes/profile.py:46
-msgid "Subscription period has expired.\n"
-msgstr "Время подписки истекло."
+msgid "Expires on: {expiry_time}\n"
+msgstr "Заканчивается через: {expiry_time}\n"
 
-#: app/bot/routes/profile.py:48
+#: app/bot/routes/profile.py:51
+msgid "Remaining Traffic: {traffic}\n"
+msgstr "Осталось: {traffic}\n"
+
+#: app/bot/routes/profile.py:54
+msgid "Subscription period has expired.\n"
+msgstr "Время подписки истекло.\n"
+
+#: app/bot/routes/profile.py:57
 msgid ""
 "Remaining Traffic: {traffic}\n"
 "Expires on: {expiry_time}\n"
@@ -152,7 +160,7 @@ msgstr ""
 "Заканчивается через: {expiry_time}\n"
 "\n"
 
-#: app/bot/routes/profile.py:57
+#: app/bot/routes/profile.py:66
 msgid ""
 "📊 Statistics:\n"
 "Total Traffic: {total}\n"
@@ -188,7 +196,7 @@ msgstr "КБ"
 msgid "MB"
 msgstr "МБ"
 
-#: app/bot/services/client.py:151 app/bot/services/subscription.py:145
+#: app/bot/services/client.py:151 app/bot/services/subscription.py:146
 msgid "GB"
 msgstr "ГБ"
 
@@ -224,21 +232,21 @@ msgstr "ч"
 msgid "m"
 msgstr "м"
 
-#: app/bot/services/subscription.py:165
+#: app/bot/services/subscription.py:166
 msgid "1 year"
 msgid_plural "{} years"
 msgstr[0] "1 год"
 msgstr[1] "{} года"
 msgstr[2] "{} лет"
 
-#: app/bot/services/subscription.py:169
+#: app/bot/services/subscription.py:170
 msgid "1 month"
 msgid_plural "{} months"
 msgstr[0] "1 месяц"
 msgstr[1] "{} месяца"
 msgstr[2] "{} месяцев"
 
-#: app/bot/services/subscription.py:171
+#: app/bot/services/subscription.py:172
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] "1 день"

@@ -42,8 +42,17 @@ async def prepare_message(user: User, client: ClientService) -> str:
 
     if client.has_traffic_expired:
         subscription_text += _("Traffic limit reached.\n")
+        if not client.has_subscription_expired:
+            subscription_text += _("Expires on: {expiry_time}\n").format(
+                expiry_time=client.expiry_time,
+            )
     if client.has_subscription_expired:
+        if not client.has_traffic_expired:
+            subscription_text += _("Remaining Traffic: {traffic}\n").format(
+                traffic=client.traffic_remaining,
+            )
         subscription_text += _("Subscription period has expired.\n")
+
     if not client.has_traffic_expired and not client.has_subscription_expired:
         subscription_text += _(
             "Remaining Traffic: {traffic}\nExpires on: {expiry_time}\n\n"

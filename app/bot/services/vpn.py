@@ -77,7 +77,7 @@ class VPNService:
                 return None
 
             traffic_total = client.total
-            if traffic_total == 0:
+            if traffic_total <= 0:
                 traffic_remaining = -1
                 traffic_total = -1
             else:
@@ -88,7 +88,7 @@ class VPNService:
             traffic_used = client.up + client.down
 
             return {
-                "traffic_total": client.total,
+                "traffic_total": traffic_total,
                 "traffic_remaining": traffic_remaining,
                 "traffic_used": traffic_used,
                 "traffic_up": client.up,

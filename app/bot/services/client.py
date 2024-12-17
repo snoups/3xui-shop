@@ -109,7 +109,7 @@ class ClientService:
         Returns:
             bool: True if traffic expired, False otherwise.
         """
-        remaining_traffic = self.client_data.get("remaining_traffic", -1)
+        remaining_traffic = self.client_data.get("traffic_remaining", -1)
         if remaining_traffic == -1:
             return False  # Unlimited traffic
         return remaining_traffic <= 0
