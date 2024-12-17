@@ -1,22 +1,32 @@
 # 3X-UI Telegram Bot Shop (WIP 🚧)
+![3xui-shop](https://github.com/user-attachments/assets/d037594e-75d1-4394-a983-01e950dde278)
 
 ## Description
 
-This project is a Telegram bot for selling VPN subscriptions. It works with 3X-UI. Please note that this bot is **still under development** and **does not function properly at the moment**. If you encounter issues or bugs, don’t be surprised — work on the bot is ongoing, but progress is slow due to some challenges.
+This project is a Telegram bot for selling VPN subscriptions. It works with 3X-UI.
 
-### Current Challenges:
-- **The 3X-UI panel API is very unstable**, which makes integration difficult and slows down development.
-- **I have very limited time to dedicate to this project**, but it is not abandoned. New features and fixes will be added as time permits.
+### ⚠️ Attention!
+Currently, the bot is under development and not fully functional. Some features are still in progress.
 
-I appreciate your patience and support. If you'd like to help speed up development or support the project, your contributions are welcome.
+### 🚧 Current Tasks
+- [x] Profile page
+- [x] Subscription system
+- [x] Telegram Stars payment
+- [ ] Yookassa payment
+- [ ] Cryptomus payment
+- [ ] Promocode system
+- [ ] Referral system
+- [ ] Support page
+- [ ] Apps page
+- [ ] Admin panel
 
-## Support the Project 💰
+## 💸 Support the Project
 
 You can support me via the following methods:
 
-- **Bitcoin**: `17ofUYeSugq91hG2KLfhkzRqBRwnYTp4bu`
+- **Bitcoin**: `bc1ql53lcaukdv3thxcheh3cmgucwlwkr929gar0cy`
+- **Ethereum**: `0xe604a10258d26c085ada79cdea9a84a5b0894b91`
+- **USDT (Ethereum)**: `0xe604a10258d26c085ada79cdea9a84a5b0894b91`
 - **TON**: `UQDogBlLFgrxkVWvDJn6YniCwrJDro7hbk5AqDMoSzmBQ-KQ`
-- **USDT (TRC20)**: `TUqDQ4mdtVJZC76789kPYBMzaLFQBDdKhE`
-- **USDT (TON)**: `UQDogBlLFgrxkVWvDJn6YniCwrJDro7hbk5AqDMoSzmBQ-KQ`
 
 Any support will help me dedicate more time to development and accelerate the project!
