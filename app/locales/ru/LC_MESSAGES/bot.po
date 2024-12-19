@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-17 21:54+0500\n"
+"POT-Creation-Date: 2024-12-19 07:44+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,9 +19,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: app/bot/keyboards/back.py:18
+#: app/bot/keyboards/back.py:20
 msgid "← Back"
 msgstr "← Назад"
+
+#: app/bot/keyboards/download.py:62
+msgid "Download"
+msgstr "Скачать"
+
+#: app/bot/keyboards/download.py:63
+msgid "Connect"
+msgstr "Подключить"
 
 #: app/bot/keyboards/main_menu.py:22
 msgid "👤 Profile"
@@ -55,9 +63,33 @@ msgstr "Оплатить 💸"
 msgid "YooKassa | {price} ₽"
 msgstr "ЮKassa | {price} ₽"
 
-#: app/bot/keyboards/profile.py:24
+#: app/bot/keyboards/profile.py:23 app/bot/keyboards/support.py:69
 msgid "Buy subscription"
 msgstr "Купить подписку"
+
+#: app/bot/keyboards/support.py:23
+msgid "Contact the operator"
+msgstr "Связаться с оператором"
+
+#: app/bot/keyboards/support.py:41
+msgid "How to connect"
+msgstr "Как подключиться"
+
+#: app/bot/keyboards/support.py:46
+msgid "VPN not working"
+msgstr "VPN не работает"
+
+#: app/bot/keyboards/support.py:73
+msgid "Download app"
+msgstr "Скачать приложение"
+
+#: app/bot/routes/download.py:26
+msgid "📲 Choose your platform:"
+msgstr "📲 Выберите вашу платформу:"
+
+#: app/bot/routes/download.py:49
+msgid "To connect you need to install the app and enter your key."
+msgstr "Для подключения необходимо установить приложение и ввести свой ключ."
 
 #: app/bot/routes/main_menu.py:26
 msgid ""
@@ -87,7 +119,7 @@ msgstr ""
 "♾️ БЕЗЛИМИТ\n"
 "✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД\n"
 
-#: app/bot/routes/payment.py:65
+#: app/bot/routes/payment.py:69
 msgid ""
 "✅ You selected:\n"
 "\n"
@@ -173,80 +205,132 @@ msgstr ""
 "Получено: ↓ {down}"
 
 #: app/bot/routes/subscription.py:30
+msgid ""
+"⚠️ You already have an active subscription:\n"
+"\n"
+"Plan: {plan}\n"
+"Remaining Traffic: {traffic}\n"
+"Expires on: {expiry_time}"
+msgstr ""
+"⚠️ У вас уже есть активная подписка:\n"
+"\n"
+"Plan: {plan}\n"
+"Осталось: {traffic}\n"
+"Заканчивается через: {expiry_time}"
+
+#: app/bot/routes/subscription.py:52
 msgid "🌐 Select the traffic volume:"
 msgstr "🌐 Выберите объем трафика:"
 
-#: app/bot/routes/subscription.py:50
+#: app/bot/routes/subscription.py:72
 msgid "⏳ Specify the duration:"
 msgstr "⏳ Укажите срок действия:"
 
-#: app/bot/routes/subscription.py:73
+#: app/bot/routes/subscription.py:95
 msgid "💳 Choose a payment method:"
 msgstr "💳 Выберите способ оплаты:"
 
-#: app/bot/services/client.py:145 app/bot/services/client.py:148
+#: app/bot/routes/support.py:31
+msgid ""
+"🆘 For collaboration, improvements to functionality, and any other "
+"inquiries, please contact the operator."
+msgstr ""
+"🆘 По вопросам сотрудничества, улучшения функциональности и любым другим "
+"вопросам, пожалуйста, обращайтесь к оператору."
+
+#: app/bot/routes/support.py:51
+msgid ""
+"ℹ️ After subscribing, you will be given an access key that you can use to"
+" connect to our VPN. If you have a key, go to the application download "
+"page and connect the key."
+msgstr ""
+"ℹ️ После оформления подписки вам будет предоставлен ключ доступа, который"
+" вы сможете использовать для подключения к нашему VPN. Если у вас есть "
+"ключ, перейдите на страницу загрузки приложения и подключите ключ."
+
+#: app/bot/routes/support.py:72
+msgid ""
+"ℹ️ There could be several reasons why VPN is not working. Please check "
+"the following:\n"
+"\n"
+"- Ensure your internet connection is stable.\n"
+"- Make sure your subscription is active.\n"
+"- Try reconnecting or restarting the app.\n"
+"\n"
+"If the issue persists, please contact support."
+msgstr ""
+"ℹ️ Может быть несколько причин, по которым VPN не работает. Пожалуйста, "
+"проверьте следующее:\n"
+"\n"
+"- Убедитесь, что ваше интернет-соединение стабильно.\n"
+"- Убедитесь, что ваша подписка активна.\n"
+"- Попробуйте переподключиться или перезапустить приложение.\n"
+"\n"
+"Если проблема сохраняется, свяжитесь с оператором поддержки."
+
+#: app/bot/services/client.py:157 app/bot/services/client.py:160
 msgid "B"
 msgstr "Б"
 
-#: app/bot/services/client.py:149
+#: app/bot/services/client.py:161
 msgid "KB"
 msgstr "КБ"
 
-#: app/bot/services/client.py:150
+#: app/bot/services/client.py:162
 msgid "MB"
 msgstr "МБ"
 
-#: app/bot/services/client.py:151 app/bot/services/subscription.py:146
+#: app/bot/services/client.py:163 app/bot/services/subscription.py:144
 msgid "GB"
 msgstr "ГБ"
 
-#: app/bot/services/client.py:152
+#: app/bot/services/client.py:164
 msgid "TB"
 msgstr "ТБ"
 
-#: app/bot/services/client.py:153
+#: app/bot/services/client.py:165
 msgid "PB"
 msgstr "ПБ"
 
-#: app/bot/services/client.py:154
+#: app/bot/services/client.py:166
 msgid "EB"
 msgstr "ЭБ"
 
-#: app/bot/services/client.py:155
+#: app/bot/services/client.py:167
 msgid "ZB"
 msgstr "ЗБ"
 
-#: app/bot/services/client.py:156
+#: app/bot/services/client.py:168
 msgid "YB"
 msgstr "ЙБ"
 
-#: app/bot/services/client.py:188
+#: app/bot/services/client.py:200
 msgid "d"
 msgstr "д"
 
-#: app/bot/services/client.py:188
+#: app/bot/services/client.py:200
 msgid "h"
 msgstr "ч"
 
-#: app/bot/services/client.py:188
+#: app/bot/services/client.py:200
 msgid "m"
 msgstr "м"
 
-#: app/bot/services/subscription.py:166
+#: app/bot/services/subscription.py:164
 msgid "1 year"
 msgid_plural "{} years"
 msgstr[0] "1 год"
 msgstr[1] "{} года"
 msgstr[2] "{} лет"
 
-#: app/bot/services/subscription.py:170
+#: app/bot/services/subscription.py:168
 msgid "1 month"
 msgid_plural "{} months"
 msgstr[0] "1 месяц"
 msgstr[1] "{} месяца"
 msgstr[2] "{} месяцев"
 
-#: app/bot/services/subscription.py:172
+#: app/bot/services/subscription.py:170
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] "1 день"

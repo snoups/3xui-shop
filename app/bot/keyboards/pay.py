@@ -14,8 +14,7 @@ def pay_keyboard(pay_url) -> InlineKeyboardMarkup:
         pay_url (str): URL to redirect the user to the payment page.
 
     Returns:
-        InlineKeyboardMarkup: Inline keyboard markup with a "Pay" button and a "Back" button
-        to return to the previous step in the process.
+        InlineKeyboardMarkup: Inline keyboard with a "Pay" button and a back button.
     """
     builder = InlineKeyboardBuilder()
 

@@ -1,13 +1,11 @@
 import json
 import logging
 import os
-from datetime import datetime, timedelta, timezone
 
 from aiogram.utils.i18n import gettext as _
-from py3xui import AsyncApi, Client
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.navigation import NavigationAction
+from app.bot.services.client import UNLIMITED
 from app.bot.services.vpn import VPNService
 from app.db.models.user import User
 
@@ -141,7 +139,7 @@ class SubscriptionService:
             str: A string representation of traffic, such as "10 GB" or "∞" for infinite traffic.
         """
         if traffic == -1:
-            return "∞"
+            return UNLIMITED
         else:
             return str(traffic) + " " + _("GB")
 
@@ -159,7 +157,7 @@ class SubscriptionService:
                  Returns "∞" for infinite duration.
         """
         if days == -1:
-            return "∞"
+            return UNLIMITED
 
         if days % 365 == 0:
             years = days // 365

@@ -7,7 +7,7 @@ from aiogram.types import CallbackQuery, Message, PreCheckoutQuery
 from aiogram.utils.i18n import gettext as _
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.bot.filters.is_private import IsPrivate
+from app.bot.filters import IsPrivate
 from app.bot.keyboards.pay import pay_keyboard
 from app.bot.navigation import NavigationAction
 from app.bot.services.payment import PaymentService
@@ -31,18 +31,22 @@ async def callback_choosing_payment_method(
 
     Arguments:
         callback (CallbackQuery): The callback query received from the user.
-        state (FSMContext): The state of the Finite State Machine (FSM) for the user.
-        bot (Bot): The bot instance to send messages.
-        subscription (SubscriptionService): Subscription service to fetch plan details.
+        state (FSMContext): The user's FSM state.
+        bot (Bot): The bot instance.
+        subscription (SubscriptionService): The subscription service instance.
     """
+    logger.info(f"User {callback.from_user.id} selected payment method: {callback.data}")
     await callback.message.delete()
+
+    # extend = await state.get_value("extend")
+    # if extend:
+    #     pass
 
     plan_callback = await state.get_value("plan_callback")
     duration_callback = await state.get_value("duration_callback")
     plan = subscription.get_plan(plan_callback)
     duration = subscription.get_duration(duration_callback)
 
-    logger.info(f"User {callback.from_user.id} selected payment method: {callback.data}")
     logger.info(f"User {callback.from_user.id} selected plan: {plan} {duration}")
 
     payment_service = PaymentService(callback.data)
@@ -93,8 +97,8 @@ async def pre_checkout_handler(
     Arguments:
         pre_checkout_query (PreCheckoutQuery): The pre-checkout query from Telegram.
         session (AsyncSession): Database session for managing user data.
-        subscription (SubscriptionService): Service for managing subscriptions.
-        vpn (VPNService): Service for managing VPN-related operations.
+        subscription (SubscriptionService): The subscription service instance.
+        vpn (VPNService): The VPN service instance.
     """
     logger.info("pre_checkout_handler")
     data = json.loads(pre_checkout_query.invoice_payload)
@@ -112,7 +116,7 @@ async def successful_payment(message: Message, bot: Bot) -> None:
 
     Arguments:
         message (Message): The message containing payment details.
-        bot (Bot): The bot instance to process the payment and send a refund if necessary.
+        bot (Bot): The bot instance.
     """
     logger.info("successful_payment")
     await bot.refund_star_payment(

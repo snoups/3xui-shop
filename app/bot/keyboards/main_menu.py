@@ -9,11 +9,8 @@ def main_menu_keyboard() -> InlineKeyboardMarkup:
     """
     Generates an inline keyboard for the main menu with various user options.
 
-    The main menu includes options for viewing the profile, managing subscriptions,
-    accessing referral programs, promo codes, support, and downloading the app.
-
     Returns:
-        InlineKeyboardMarkup: Inline keyboard markup with buttons for main menu options.
+        InlineKeyboardMarkup: Inline keyboard with buttons for main menu options.
     """
     builder = InlineKeyboardBuilder()
 

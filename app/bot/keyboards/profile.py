@@ -6,16 +6,15 @@ from app.bot.keyboards.back import back_button
 from app.bot.navigation import NavigationAction
 
 
-def profile_keyboard() -> InlineKeyboardMarkup:
+def buy_subscription_keyboard() -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for the user's profile menu.
+    Generates an inline keyboard for the user profile menu.
 
-    This keyboard provides options for the user to buy a subscription and a back button
+    This keyboard includes an option to buy a subscription and a back button
     to return to the main menu.
 
     Returns:
-        InlineKeyboardMarkup: The inline keyboard markup for the profile menu with options
-        and a back button.
+        InlineKeyboardMarkup: The inline keyboard with the buy subscription option and back button.
     """
     builder = InlineKeyboardBuilder()
 

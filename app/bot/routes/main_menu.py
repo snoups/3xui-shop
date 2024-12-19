@@ -46,11 +46,11 @@ async def command_main_menu(message: Message) -> None:
     Arguments:
         message (Message): The incoming message with the `/start` command.
     """
+    logger.info(f"User {message.from_user.id} opened main menu.")
     await message.answer(
         text=prepare_message(message.from_user),
         reply_markup=main_menu_keyboard(),
     )
-    logger.info(f"User {message.from_user.id} opened main menu.")
 
 
 @router.callback_query(F.data == NavigationAction.MAIN_MENU, IsPrivate())
@@ -61,9 +61,9 @@ async def callback_main_menu(callback: CallbackQuery) -> None:
     Arguments:
         callback (CallbackQuery): The callback query received from the user.
     """
+    logger.info(f"User {callback.from_user.id} returned to main menu.")
     await callback.message.delete()
     await callback.message.answer(
         text=prepare_message(callback.from_user),
         reply_markup=main_menu_keyboard(),
     )
-    logger.info(f"User {callback.from_user.id} returned to main menu.")

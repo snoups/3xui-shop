@@ -6,7 +6,7 @@ from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsPrivate
 from app.bot.keyboards.back import back_keyboard
-from app.bot.keyboards.profile import profile_keyboard
+from app.bot.keyboards.profile import buy_subscription_keyboard
 from app.bot.navigation import NavigationAction
 from app.bot.services.client import ClientService
 from app.bot.services.vpn import VPNService
@@ -53,7 +53,7 @@ async def prepare_message(user: User, client: ClientService) -> str:
             )
         subscription_text += _("Subscription period has expired.\n")
 
-    if not client.has_traffic_expired and not client.has_subscription_expired:
+    if client.has_valid_subscription:
         subscription_text += _(
             "Remaining Traffic: {traffic}\nExpires on: {expiry_time}\n\n"
         ).format(
@@ -67,30 +67,35 @@ async def prepare_message(user: User, client: ClientService) -> str:
         "📊 Statistics:\nTotal Traffic: {total}\nSent: ↑ {up}\nReceived: ↓ {down}"
     ).format(total=client.traffic_used, up=client.traffic_up, down=client.traffic_down)
 
+    # TODO: add subscription key view
+
     return header_text + subscription_text + statistics_text
 
 
 @router.callback_query(F.data == NavigationAction.PROFILE, IsPrivate())
 async def callback_profile(callback: CallbackQuery, vpn: VPNService) -> None:
     """
-    Displays the user's profile with subscription and statistics.
+    Handles the user's profile view, displaying subscription status and statistics.
 
     Arguments:
         callback (CallbackQuery): The callback query received from the user.
-        vpn (VPNService): The VPN service to retrieve client data.
+        vpn (VPNService): The VPN service instance.
     """
+    logger.info(f"User {callback.from_user.id} opened profile.")
     await callback.message.delete()
 
     data = await vpn.get_client_data(callback.from_user.id)
     client = ClientService(data)
 
     if client:
-        reply_markup = back_keyboard(NavigationAction.MAIN_MENU)
+        if client.has_valid_subscription:
+            reply_markup = back_keyboard(NavigationAction.MAIN_MENU)
+        else:
+            reply_markup = buy_subscription_keyboard()
     else:
-        reply_markup = profile_keyboard()
+        reply_markup = buy_subscription_keyboard()
 
     await callback.message.answer(
         await prepare_message(callback.from_user, client),
         reply_markup=reply_markup,
     )
-    logger.info(f"User {callback.from_user.id} opened profile.")

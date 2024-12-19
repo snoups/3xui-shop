@@ -7,6 +7,28 @@ from app.bot.navigation import NavigationAction
 from app.bot.services.subscription import SubscriptionService
 
 
+def extend_keyboard() -> InlineKeyboardMarkup:
+    """
+    Generates an inline keyboard for extending a subscription.
+
+    This keyboard includes an option to extend the subscription and a back button
+    to return to the main menu.
+
+    Returns:
+        InlineKeyboardMarkup: The inline keyboard with the extend subscription option and back button.
+    """
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text="Extend subscription",
+            callback_data=NavigationAction.EXTEND,
+        )
+    )
+    builder.row(back_button(NavigationAction.MAIN_MENU))
+    return builder.as_markup()
+
+
 def traffic_keyboard(subscription: SubscriptionService) -> InlineKeyboardMarkup:
     """
     Generates an inline keyboard for selecting a subscription plan based on traffic volume.
@@ -46,7 +68,7 @@ def duration_keyboard(prices: dict, subscription: SubscriptionService) -> Inline
     duration based on the selected traffic plan. It also includes a back button to return to
     the subscription selection.
 
-    Args:
+    Arguments:
         prices (dict): A dictionary containing the prices for various payment methods.
         subscription (SubscriptionService): The service used to fetch subscription durations.
 

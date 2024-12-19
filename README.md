@@ -16,8 +16,8 @@ Currently, the bot is under development and not fully functional. Some features 
 - [ ] Cryptomus payment
 - [ ] Promocode system
 - [ ] Referral system
-- [ ] Support page
-- [ ] Apps page
+- [x] Support page
+- [x] Apps page
 - [ ] Admin panel
 
 ## 💸 Support the Project

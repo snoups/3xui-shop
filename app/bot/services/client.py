@@ -129,6 +129,18 @@ class ClientService:
         current_time = time.time() * 1000
         return current_time > expiry_time
 
+    @property
+    def has_valid_subscription(self) -> bool:
+        """
+        Checks if the client has a valid subscription.
+
+        Returns:
+            bool: True if the client has a valid subscription, False otherwise.
+        """
+        if self.has_traffic_expired or self.has_subscription_expired:
+            return False
+        return True
+
     def _convert_size(self, size_bytes: int) -> str:
         """
         Convert a size in bytes to a human-readable format.
