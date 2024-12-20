@@ -34,10 +34,6 @@ async def callback_choosing_payment_method(
     """
     logger.info(f"User {callback.from_user.id} selected payment method: {callback.data}")
 
-    # extend = await state.get_value("extend")
-    # if extend:
-    #     pass
-
     plan_callback = await state.get_value("plan_callback")
     duration_callback = await state.get_value("duration_callback")
     plan = subscription.get_plan(plan_callback)

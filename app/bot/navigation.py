@@ -11,9 +11,17 @@ class NavigationAction(str, Enum):
     PROFILE = "profile"  # Navigate to user profile.
     SHOW_KEY = "show_key"
 
+    # Navigation on Admin tools
+    ADMIN_TOOLS = "admin_tools"
+    STATISTICS = "statistics"
+    EDITOR_USER = "editor_user"
+    SEND_NOTIFICATION = "send_notification"
+    CREATE_BACKUP = "create_backup"
+    RESTART_BOT = "restart_bot"
+
     # Navigation on Subscribtion/Payment page
     SUBSCRIPTION = "subscription"
-    EXTEND = "extend"
+    PROCESS = "process"
     TRAFFIC = "traffic"
     DURATION = "duration"
     BACK_TO_DURATION = "back_to_duration"
@@ -23,7 +31,7 @@ class NavigationAction(str, Enum):
     PAY_TELEGRAM_STARS = f"{PAY}_telegram_stars"
     PAY_CRYPTOMUS = f"{PAY}_cryptomus"
 
-    REFERAL = "referal"  # Navigate to referral system.
+    REFERRAL = "referral"  # Navigate to referral system.
     PROMOCODE = "promocode"  # Navigate to activate promocode.
 
     # Navigation on Download page

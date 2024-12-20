@@ -2,10 +2,11 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from app.bot.keyboards.admin_tools import admin_tools_button
 from app.bot.navigation import NavigationAction
 
 
-def main_menu_keyboard() -> InlineKeyboardMarkup:
+def main_menu_keyboard(is_admin: bool) -> InlineKeyboardMarkup:
     """
     Generates an inline keyboard for the main menu with various user options.
 
@@ -24,30 +25,18 @@ def main_menu_keyboard() -> InlineKeyboardMarkup:
             callback_data=NavigationAction.SUBSCRIPTION,
         ),
     )
-
     builder.row(
         InlineKeyboardButton(
             text=_("👥 Referral Program"),
-            callback_data=NavigationAction.REFERAL,
-        )
-    )
-    builder.row(
-        InlineKeyboardButton(
-            text=_("🏷 Activate Promo Code"),
-            callback_data=NavigationAction.PROMOCODE,
-        )
-    )
-    builder.row(
-        InlineKeyboardButton(
-            text=_("📲 Download App"),
-            callback_data=NavigationAction.DOWNLOAD,
-        )
-    )
-    builder.row(
+            callback_data=NavigationAction.REFERRAL,
+        ),
         InlineKeyboardButton(
             text=_("🆘 Support"),
             callback_data=NavigationAction.SUPPORT,
-        )
+        ),
     )
+
+    if is_admin:
+        builder.row(admin_tools_button())
 
     return builder.as_markup()

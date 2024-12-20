@@ -48,7 +48,7 @@ async def callback_how_to_connect(callback: CallbackQuery, config: Config) -> No
     logger.info(f"User {callback.from_user.id} opened how to connect.")
     await callback.message.edit_text(
         text=_(
-            "ℹ️ *How to connect?*\n"
+            "ℹ️ *How to connect:*\n"
             "\n"
             "After subscribing, you will be given an access key "
             "that you can use to connect to our VPN. "
@@ -69,7 +69,7 @@ async def callback_vpn_not_working(callback: CallbackQuery, config: Config) -> N
     logger.info(f"User {callback.from_user.id} opened vpn_not_working.")
     await callback.message.edit_text(
         text=_(
-            "ℹ️ *VPN not working?*\n"
+            "ℹ️ *VPN not working:*\n"
             "\n"
             "There could be several reasons why VPN is not working. "
             "Please check the following:\n"

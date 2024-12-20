@@ -3,6 +3,7 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
+from app.bot.keyboards.subscription import buy_subscription_button
 from app.bot.navigation import NavigationAction
 
 
@@ -17,14 +18,7 @@ def buy_subscription_keyboard() -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: The inline keyboard with the buy subscription option and back button.
     """
     builder = InlineKeyboardBuilder()
-
-    builder.row(
-        InlineKeyboardButton(
-            text=_("Buy subscription"),
-            callback_data=NavigationAction.SUBSCRIPTION,
-        )
-    )
-
+    builder.row(buy_subscription_button())
     builder.row(back_button(NavigationAction.MAIN_MENU))
     return builder.as_markup()
 
@@ -43,7 +37,7 @@ def show_key_keyboard() -> InlineKeyboardMarkup:
 
     builder.row(
         InlineKeyboardButton(
-            text=_("Show key 🔑"),
+            text=_("🔑 Show key"),
             callback_data=NavigationAction.SHOW_KEY,
         )
     )

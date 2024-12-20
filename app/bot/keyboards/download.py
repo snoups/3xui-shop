@@ -16,9 +16,9 @@ def platforms_keyboard() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.row(
-        InlineKeyboardButton(text="IOS", callback_data=NavigationAction.PLATFORM_IOS),
-        InlineKeyboardButton(text="Android", callback_data=NavigationAction.PLATFORM_ANDROID),
-        InlineKeyboardButton(text="Windows", callback_data=NavigationAction.PLATFORM_WINDOWS),
+        InlineKeyboardButton(text="🍏 IOS", callback_data=NavigationAction.PLATFORM_IOS),
+        InlineKeyboardButton(text="🤖 Android", callback_data=NavigationAction.PLATFORM_ANDROID),
+        InlineKeyboardButton(text="💻 Windows", callback_data=NavigationAction.PLATFORM_WINDOWS),
     )
 
     builder.row(back_button(NavigationAction.MAIN_MENU))

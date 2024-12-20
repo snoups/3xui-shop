@@ -1,6 +1,15 @@
 from aiogram import Dispatcher
 
-from . import download, error, main_menu, payment, profile, subscription, support
+from . import (
+    admin_tools,
+    download,
+    error,
+    main_menu,
+    payment,
+    profile,
+    subscription,
+    support,
+)
 
 
 def include(dp: Dispatcher) -> None:
@@ -22,6 +31,7 @@ def include(dp: Dispatcher) -> None:
             payment.router,
             download.router,
             support.router,
+            admin_tools.router,
         ]
     )
 

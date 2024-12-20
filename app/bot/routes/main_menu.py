@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message, User
 from aiogram.utils.i18n import gettext as _
 
-from app.bot.filters import IsPrivate
+from app.bot.filters import IsAdmin, IsPrivate
 from app.bot.keyboards.main_menu import main_menu_keyboard
 from app.bot.navigation import NavigationAction
 
@@ -47,9 +47,10 @@ async def command_main_menu(message: Message) -> None:
         message (Message): The incoming message with the `/start` command.
     """
     logger.info(f"User {message.from_user.id} opened main menu.")
+    is_admin = await IsAdmin()(message)
     await message.answer(
         text=prepare_message(message.from_user),
-        reply_markup=main_menu_keyboard(),
+        reply_markup=main_menu_keyboard(is_admin),
     )
 
 
@@ -62,7 +63,8 @@ async def callback_main_menu(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query received from the user.
     """
     logger.info(f"User {callback.from_user.id} returned to main menu.")
+    is_admin = await IsAdmin()(callback)
     await callback.message.edit_text(
         text=prepare_message(callback.from_user),
-        reply_markup=main_menu_keyboard(),
+        reply_markup=main_menu_keyboard(is_admin),
     )

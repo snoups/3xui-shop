@@ -7,24 +7,32 @@ from app.bot.navigation import NavigationAction
 from app.bot.services.subscription import SubscriptionService
 
 
-def extend_keyboard() -> InlineKeyboardMarkup:
-    """
-    Generates an inline keyboard for extending a subscription.
+def buy_subscription_button() -> InlineKeyboardButton:
+    return InlineKeyboardButton(
+        text=_("💳 Buy subscription"), callback_data=NavigationAction.PROCESS
+    )
 
-    This keyboard includes an option to extend the subscription and a back button
-    to return to the main menu.
 
-    Returns:
-        InlineKeyboardMarkup: The inline keyboard with the extend subscription option and back button.
-    """
+def renew_subscription_button() -> InlineKeyboardButton:
+    return InlineKeyboardButton(
+        text=_("💳 Renew subscription"), callback_data=NavigationAction.PROCESS
+    )
+
+
+def subscription_keyboard(is_active: bool) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
+
+    if not is_active:
+        builder.row(buy_subscription_button())
+    else:
+        builder.row(renew_subscription_button())
 
     builder.row(
         InlineKeyboardButton(
-            text="Extend subscription",
-            callback_data=NavigationAction.EXTEND,
-        )
+            text=_("🎟️ Activate promocode"), callback_data=NavigationAction.PROMOCODE
+        ),
     )
+
     builder.row(back_button(NavigationAction.MAIN_MENU))
     return builder.as_markup()
 
@@ -56,7 +64,7 @@ def traffic_keyboard(subscription: SubscriptionService) -> InlineKeyboardMarkup:
         )
 
     builder.adjust(2)
-    builder.row(back_button(NavigationAction.MAIN_MENU))
+    builder.row(back_button(NavigationAction.SUBSCRIPTION))
     return builder.as_markup()
 
 

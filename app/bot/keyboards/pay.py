@@ -18,7 +18,7 @@ def pay_keyboard(pay_url) -> InlineKeyboardMarkup:
     """
     builder = InlineKeyboardBuilder()
 
-    builder.row(InlineKeyboardButton(text=_("Pay 💸"), url=pay_url))
+    builder.row(InlineKeyboardButton(text=_("💸 Pay"), url=pay_url))
     builder.row(back_button(NavigationAction.BACK_TO_PAYMENT))
 
     return builder.as_markup()

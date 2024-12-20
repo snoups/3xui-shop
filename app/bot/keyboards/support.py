@@ -3,6 +3,7 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
+from app.bot.keyboards.subscription import buy_subscription_button
 from app.bot.navigation import NavigationAction
 
 
@@ -16,7 +17,9 @@ def contact_button(support_id: int) -> InlineKeyboardButton:
     Returns:
         InlineKeyboardButton: Inline keyboard button with a URL to contact the operator.
     """
-    return InlineKeyboardButton(text=_("Contact the operator"), url=f"tg://user?id={support_id}")
+    return InlineKeyboardButton(
+        text=_("👨‍💻 Contact the operator"), url=f"tg://user?id={support_id}"
+    )
 
 
 def support_keyboard(support_id: int) -> InlineKeyboardMarkup:
@@ -36,12 +39,12 @@ def support_keyboard(support_id: int) -> InlineKeyboardMarkup:
 
     builder.row(
         InlineKeyboardButton(
-            text=_("How to connect"), callback_data=NavigationAction.HOW_TO_CONNECT
+            text=_("❓ How to connect"), callback_data=NavigationAction.HOW_TO_CONNECT
         )
     )
     builder.row(
         InlineKeyboardButton(
-            text=_("VPN not working"), callback_data=NavigationAction.VPN_NOT_WORKING
+            text=_("❓ VPN not working"), callback_data=NavigationAction.VPN_NOT_WORKING
         )
     )
     builder.row(contact_button(support_id))
@@ -65,13 +68,9 @@ def how_to_connect_keyboard(support_id: int) -> InlineKeyboardMarkup:
     """
     builder = InlineKeyboardBuilder()
 
+    builder.row(buy_subscription_button())
     builder.row(
-        InlineKeyboardButton(
-            text=_("Buy subscription"), callback_data=NavigationAction.SUBSCRIPTION
-        )
-    )
-    builder.row(
-        InlineKeyboardButton(text=_("Download app"), callback_data=NavigationAction.DOWNLOAD)
+        InlineKeyboardButton(text=_("📥 Download app"), callback_data=NavigationAction.DOWNLOAD)
     )
     builder.row(contact_button(support_id))
 

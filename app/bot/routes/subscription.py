@@ -6,9 +6,12 @@ from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsPrivate
-from app.bot.keyboards.back import back_keyboard
 from app.bot.keyboards.payment_method import payment_method_keyboard
-from app.bot.keyboards.subscription import duration_keyboard, traffic_keyboard
+from app.bot.keyboards.subscription import (
+    duration_keyboard,
+    subscription_keyboard,
+    traffic_keyboard,
+)
 from app.bot.navigation import NavigationAction
 from app.bot.services.client import ClientService
 from app.bot.services.subscription import SubscriptionService
@@ -26,19 +29,39 @@ async def show_subscription(callback: CallbackQuery, client: ClientService) -> N
         callback (CallbackQuery): The callback query received from the user.
         client (ClientService): The client service instance containing user data.
     """
-    text = _(
-        "⚠️ *You already have an active subscription:*\n"
-        "\n"
-        "Plan: {plan}\n"
-        "Remaining Traffic: {traffic}\n"
-        "Expires on: {expiry_time}"
-    ).format(
-        plan=client.traffic_total,
-        traffic=client.traffic_remaining,
-        expiry_time=client.expiry_time,
-    )
-    await callback.message.edit_text(text, reply_markup=back_keyboard(NavigationAction.MAIN_MENU))
-    # await callback.message.edit_text(text, reply_markup=extend_keyboard())
+    text = ""
+    if client:
+        if client.has_subscription_expired and client.has_traffic_expired:
+            text = _("⚠️ *Your subscription period and traffic have expired!*\n")
+        elif client.has_traffic_expired:
+            text = _("⚠️ *Traffic limit reached!*\n")
+        elif client.has_subscription_expired:
+            text = _("⚠️ *Subscription period has expired!*\n")
+        text += "\n" + _("Please renew your subscription to continue using our service.")
+
+        if client.has_valid_subscription:
+            text = _(
+                "✅ *You already have an active subscription:*\n"
+                "\n"
+                "Plan: {plan}\n"
+                "Remaining Traffic: {traffic}\n"
+                "Expires on: {expiry_time}"
+            ).format(
+                plan=client.traffic_total,
+                traffic=client.traffic_remaining,
+                expiry_time=client.expiry_time,
+            )
+    else:
+        text = _(
+            "⚠️ *You do not have an active subscription!*\n"
+            "\n"
+            "It seems that you haven't purchased a subscription yet. "
+            "Please buy a subscription to start using our service."
+        )
+
+    await callback.message.edit_text(
+        text, reply_markup=subscription_keyboard(client)
+    )  # TODO: extension & renewal
 
 
 async def show_choosing_traffic(callback: CallbackQuery, subscription: SubscriptionService) -> None:
@@ -75,9 +98,7 @@ async def show_choosing_duration(
 
 
 async def show_choosing_payment_method(
-    callback: CallbackQuery,
-    state: FSMContext,
-    subscription: SubscriptionService,
+    callback: CallbackQuery, state: FSMContext, subscription: SubscriptionService
 ) -> None:
     """
     Sends a message prompting the user to choose a payment method for their subscription.
@@ -98,11 +119,7 @@ async def show_choosing_payment_method(
 
 
 @router.callback_query(F.data == NavigationAction.SUBSCRIPTION, IsPrivate())
-async def callback_subscription(
-    callback: CallbackQuery,
-    subscription: SubscriptionService,
-    vpn: VPNService,
-) -> None:
+async def callback_subscription(callback: CallbackQuery, vpn: VPNService) -> None:
     """
     Handles the initiation of the subscription process by prompting the user to select traffic.
 
@@ -111,32 +128,15 @@ async def callback_subscription(
         subscription (SubscriptionService): The subscription service instance.
         vpn (VPNService): The VPN service instance.
     """
-    logger.info(f"User {callback.from_user.id} started subscription process.")
+    logger.info(f"User {callback.from_user.id} opened subscription.")
     data = await vpn.get_client_data(callback.from_user.id)
     client = ClientService(data)
-    if client:
-        if client.has_valid_subscription:
-            await show_subscription(callback, client)  # TODO: extension & renewal
-            return None
-    await show_choosing_traffic(callback, subscription)
+    await show_subscription(callback, client)
 
 
-@router.callback_query(F.data == NavigationAction.EXTEND, IsPrivate())
-async def callback_extend_subscription(
-    callback: CallbackQuery,
-    state: FSMContext,
-    subscription: SubscriptionService,
-):
-    """
-    Handles the user's request to extend their subscription.
-
-    Arguments:
-        callback (CallbackQuery): The callback query received from the user.
-        state (FSMContext): The user's FSM state.
-        subscription (SubscriptionService): The subscription service instance.
-    """
-    logger.info(f"User {callback.from_user.id} started extend subscription.")
-    await state.update_data(extend=True)
+@router.callback_query(F.data == NavigationAction.PROCESS, IsPrivate())
+async def callback_process(callback: CallbackQuery, subscription: SubscriptionService):
+    logger.info(f"User {callback.from_user.id} started subscription process.")
     await show_choosing_traffic(callback, subscription)
 
 

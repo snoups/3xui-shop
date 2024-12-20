@@ -27,8 +27,11 @@ async def prepare_message(user: TelegramUser, client: ClientService) -> str:
     Returns:
         str: A formatted message with the user's profile, subscription, and statistics.
     """
-    header_text = _("👤 *Your profile:*\n" "Name: {name}\n" "ID: {id}\n" "\n").format(
-        name=user.first_name, id=user.id
+    header_text = (
+        _("👤 *Your profile:*\n" "Name: {name}\n" "ID: {id}\n").format(
+            name=user.first_name, id=user.id
+        )
+        + "\n"
     )
 
     if not client:
@@ -54,11 +57,12 @@ async def prepare_message(user: TelegramUser, client: ClientService) -> str:
         subscription_text += _("_Subscription period has expired._\n")
 
     if client.has_valid_subscription:
-        subscription_text += _(
-            "Remaining Traffic: {traffic}\n" "Expires on: {expiry_time}\n" "\n"
-        ).format(
-            traffic=client.traffic_remaining,
-            expiry_time=client.expiry_time,
+        subscription_text += (
+            _("Remaining Traffic: {traffic}\n" "Expires on: {expiry_time}\n").format(
+                traffic=client.traffic_remaining,
+                expiry_time=client.expiry_time,
+            )
+            + "\n"
         )
     else:
         subscription_text += "\n"
@@ -98,10 +102,7 @@ async def callback_profile(callback: CallbackQuery, vpn: VPNService) -> None:
 
 
 @router.callback_query(F.data == NavigationAction.SHOW_KEY, IsPrivate())
-async def callback_show_key(
-    callback: CallbackQuery,
-    vpn: VPNService,
-) -> None:
+async def callback_show_key(callback: CallbackQuery, vpn: VPNService) -> None:
     """
     Sends the user's VPN key and deletes it after a short time.
 

@@ -14,7 +14,7 @@ def back_button(callback: str) -> InlineKeyboardButton:
     Returns:
         InlineKeyboardButton: Inline keyboard button for navigating back.
     """
-    return InlineKeyboardButton(text=_("← Back"), callback_data=callback)
+    return InlineKeyboardButton(text=_("◀️ Back"), callback_data=callback)
 
 
 def back_keyboard(callback: str) -> InlineKeyboardMarkup:

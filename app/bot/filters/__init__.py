@@ -14,7 +14,7 @@ def register_admins(admins: list[int]) -> None:
     Arguments:
         admins (list[int]): List of administrator IDs.
     """
-    IsAdmin.admins = admins
+    IsAdmin.set_admins(admins)
 
 
 __all__ = [
