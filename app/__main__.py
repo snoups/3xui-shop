@@ -6,7 +6,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.i18n import I18n
 
-from app.bot import commands, middlewares, routes
+from app.bot import commands, filters, middlewares, routes
 from app.bot.services.subscription import SubscriptionService
 from app.bot.services.vpn import VPNService
 from app.config import Config, load_config
@@ -77,6 +77,9 @@ async def main() -> None:
     # Register event handlers
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
+
+    # Register admins in IsAdmin filter
+    filters.register_admins(config.bot.ADMINS)
 
     # Register middlewares
     middlewares.register(

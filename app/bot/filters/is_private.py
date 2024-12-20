@@ -15,6 +15,7 @@ class IsPrivate(BaseFilter):
         Arguments:
             event (TelegramObject): The event object (e.g., Message) to check.
             event_chat (Chat): The chat object associated with the event.
+
         Returns:
             bool: True if the message is in a private chat, False otherwise.
         """
