@@ -154,22 +154,13 @@ class ClientService:
         if size_bytes == -1:
             return UNLIMITED
         elif size_bytes == 0:
-            return f"{size_bytes} {_('B')}"
+            return f"{size_bytes} {_('MB')}"
 
-        size_units_keys = [
-            _("B"),
-            _("KB"),
-            _("MB"),
-            _("GB"),
-            _("TB"),
-            _("PB"),
-            _("EB"),
-            _("ZB"),
-            _("YB"),
-        ]
-        i = min(int(math.floor(math.log(max(size_bytes, 1), 1024))), len(size_units_keys) - 1)
+        size_units_keys = [_("MB"), _("GB"), _("TB"), _("PB"), _("EB"), _("ZB"), _("YB")]
+        size_in_mb = max(size_bytes / 1024**2, 1)
+        i = min(int(math.floor(math.log(size_in_mb, 1024))), len(size_units_keys) - 1)
         p = math.pow(1024, i)
-        s = round(size_bytes / p, 2)
+        s = round(size_in_mb / p, 2)
 
         if s.is_integer():
             s = int(s)

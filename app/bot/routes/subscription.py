@@ -1,7 +1,6 @@
-import json
 import logging
 
-from aiogram import Bot, F, Router
+from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import gettext as _
@@ -28,7 +27,8 @@ async def show_subscription(callback: CallbackQuery, client: ClientService) -> N
         client (ClientService): The client service instance containing user data.
     """
     text = _(
-        "⚠️ You already have an active subscription:\n\n"
+        "⚠️ *You already have an active subscription:*\n"
+        "\n"
         "Plan: {plan}\n"
         "Remaining Traffic: {traffic}\n"
         "Expires on: {expiry_time}"
@@ -37,8 +37,8 @@ async def show_subscription(callback: CallbackQuery, client: ClientService) -> N
         traffic=client.traffic_remaining,
         expiry_time=client.expiry_time,
     )
-    await callback.message.answer(text, reply_markup=back_keyboard(NavigationAction.MAIN_MENU))
-    # await callback.message.answer(text, reply_markup=extend_keyboard())
+    await callback.message.edit_text(text, reply_markup=back_keyboard(NavigationAction.MAIN_MENU))
+    # await callback.message.edit_text(text, reply_markup=extend_keyboard())
 
 
 async def show_choosing_traffic(callback: CallbackQuery, subscription: SubscriptionService) -> None:
@@ -49,8 +49,8 @@ async def show_choosing_traffic(callback: CallbackQuery, subscription: Subscript
         callback (CallbackQuery): The callback query received from the user.
         subscription (SubscriptionService): The subscription service instance.
     """
-    text = _("🌐 Select the traffic volume:")
-    await callback.message.answer(text, reply_markup=traffic_keyboard(subscription))
+    text = _("🌐 *Select the traffic volume:*")
+    await callback.message.edit_text(text, reply_markup=traffic_keyboard(subscription))
 
 
 async def show_choosing_duration(
@@ -68,8 +68,8 @@ async def show_choosing_duration(
     """
     plan_callback = await state.get_value("plan_callback")
     plan = subscription.get_plan(plan_callback)
-    await callback.message.answer(
-        _("⏳ Specify the duration:"),
+    await callback.message.edit_text(
+        _("⏳ *Specify the duration:*"),
         reply_markup=duration_keyboard(plan["prices"], subscription),
     )
 
@@ -91,8 +91,8 @@ async def show_choosing_payment_method(
     duration_callback = await state.get_value("duration_callback")
     plan = subscription.get_plan(plan_callback)
     duration = subscription.get_duration(duration_callback)
-    await callback.message.answer(
-        _("💳 Choose a payment method:"),
+    await callback.message.edit_text(
+        _("💳 *Choose a payment method:*"),
         reply_markup=payment_method_keyboard(plan["prices"], duration, subscription),
     )
 
@@ -112,8 +112,6 @@ async def callback_subscription(
         vpn (VPNService): The VPN service instance.
     """
     logger.info(f"User {callback.from_user.id} started subscription process.")
-    await callback.message.delete()
-
     data = await vpn.get_client_data(callback.from_user.id)
     client = ClientService(data)
     if client:
@@ -138,7 +136,6 @@ async def callback_extend_subscription(
         subscription (SubscriptionService): The subscription service instance.
     """
     logger.info(f"User {callback.from_user.id} started extend subscription.")
-    await callback.message.delete()
     await state.update_data(extend=True)
     await show_choosing_traffic(callback, subscription)
 
@@ -158,7 +155,6 @@ async def callback_choosing_plan(
         subscription (SubscriptionService): The subscription service instance.
     """
     logger.info(f"User {callback.from_user.id} selected plan: {callback.data}")
-    await callback.message.delete()
     await state.update_data(plan_callback=callback.data)
     await show_choosing_duration(callback, state, subscription)
 
@@ -178,7 +174,6 @@ async def callback_back_to_duration(
         subscription (SubscriptionService): The subscription service instance.
     """
     logger.info(f"User {callback.from_user.id} returned to choosing duration.")
-    await callback.message.delete()
     await show_choosing_duration(callback, state, subscription)
 
 
@@ -197,7 +192,6 @@ async def callback_choosing_duration(
         subscription (SubscriptionService): The subscription service instance.
     """
     logger.info(f"User {callback.from_user.id} selected duration: {callback.data}")
-    await callback.message.delete()
     await state.update_data(duration_callback=callback.data)
     await show_choosing_payment_method(callback, state, subscription)
 
@@ -217,5 +211,4 @@ async def callback_back_to_payment(
         subscription (SubscriptionService): The subscription service instance.
     """
     logger.info(f"User {callback.from_user.id} returned to choosing payment method.")
-    await callback.message.delete()
     await show_choosing_payment_method(callback, state, subscription)

@@ -18,9 +18,16 @@ Currently, the bot is under development and not fully functional. Some features 
 - [ ] Referral system
 - [x] Support page
 - [x] Apps page
+- [ ] Trial subscription
+- [ ] Notification
 - [ ] Admin panel
+- [ ] Subscription balancer
 
 ## 💸 Support the Project
+
+A special thanks to the following individuals for their generous support:
+
+- Boto
 
 You can support me via the following methods:
 

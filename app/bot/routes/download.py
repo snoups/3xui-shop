@@ -21,9 +21,8 @@ async def callback_download(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query from the user.
     """
     logger.info(f"User {callback.from_user.id} opened download apps.")
-    await callback.message.delete()
-    await callback.message.answer(
-        text=_("📲 Choose your platform:"),
+    await callback.message.edit_text(
+        text=_("📲 *Choose your platform:*"),
         reply_markup=platforms_keyboard(),
     )
 
@@ -37,7 +36,6 @@ async def callback_platform(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query from the user.
     """
     logger.info(f"User {callback.from_user.id} selected platform: {callback.data}")
-    await callback.message.delete()
 
     if callback.data == NavigationAction.PLATFORM_IOS:
         icon = "🍏 "
@@ -45,7 +43,8 @@ async def callback_platform(callback: CallbackQuery) -> None:
         icon = "🤖 "
     else:
         icon = "💻 "
-    await callback.message.answer(
+
+    await callback.message.edit_text(
         text=icon + _("To connect you need to install the app and enter your key."),
-        reply_markup=connect_keyboard(callback.data),  # TODO: connect user key
+        reply_markup=connect_keyboard(callback.data),
     )

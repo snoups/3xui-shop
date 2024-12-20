@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import uuid
 from typing import Any, Awaitable, Callable, Optional
 
 from aiogram import BaseMiddleware
@@ -50,11 +51,11 @@ class DBSessionMiddleware(BaseMiddleware):
         session: AsyncSession
         async with self.session() as session:
             user: Optional[TelegramUser] = data.get("event_from_user", None)
-            hash = hashlib.md5(str(user.id).encode()).hexdigest()
             if user is not None:
+                vpn_id = str(uuid.uuid4())
                 user = await User.get_or_create(
                     session,
-                    vpn_id=hash,
+                    vpn_id=vpn_id,
                     user_id=user.id,
                     first_name=user.first_name,
                     username=user.username,

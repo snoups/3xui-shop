@@ -11,13 +11,14 @@ from app.bot.keyboards.support import (
     support_keyboard,
 )
 from app.bot.navigation import NavigationAction
+from app.config import Config
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
 @router.callback_query(F.data == NavigationAction.SUPPORT, IsPrivate())
-async def callback_support(callback: CallbackQuery) -> None:
+async def callback_support(callback: CallbackQuery, config: Config) -> None:
     """
     Handles the callback query to show the support page.
 
@@ -25,19 +26,19 @@ async def callback_support(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query received from the user.
     """
     logger.info(f"User {callback.from_user.id} opened support.")
-    await callback.message.delete()
-
-    await callback.message.answer(
+    await callback.message.edit_text(
         text=_(
-            "🆘 For collaboration, improvements to functionality, and any other inquiries, "
+            "🆘 *Support:*\n"
+            "\n"
+            "For collaboration, improvements to functionality, and any other inquiries, "
             "please contact the operator."
         ),
-        reply_markup=support_keyboard(),
+        reply_markup=support_keyboard(config.bot.SUPPORT_ID),
     )
 
 
 @router.callback_query(F.data == NavigationAction.HOW_TO_CONNECT, IsPrivate())
-async def callback_how_to_connect(callback: CallbackQuery) -> None:
+async def callback_how_to_connect(callback: CallbackQuery, config: Config) -> None:
     """
     Handles the callback query to show the instructions on how to connect to the VPN.
 
@@ -45,20 +46,20 @@ async def callback_how_to_connect(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query received from the user.
     """
     logger.info(f"User {callback.from_user.id} opened how to connect.")
-    await callback.message.delete()
-
-    await callback.message.answer(
+    await callback.message.edit_text(
         text=_(
-            "ℹ️ After subscribing, you will be given an access key "
+            "ℹ️ *How to connect?*\n"
+            "\n"
+            "After subscribing, you will be given an access key "
             "that you can use to connect to our VPN. "
             "If you have a key, go to the application download page and connect the key."
         ),
-        reply_markup=how_to_connect_keyboard(),
+        reply_markup=how_to_connect_keyboard(config.bot.SUPPORT_ID),
     )
 
 
 @router.callback_query(F.data == NavigationAction.VPN_NOT_WORKING, IsPrivate())
-async def callback_vpn_not_working(callback: CallbackQuery) -> None:
+async def callback_vpn_not_working(callback: CallbackQuery, config: Config) -> None:
     """
     Handles the callback query to display VPN troubleshooting information.
 
@@ -66,16 +67,18 @@ async def callback_vpn_not_working(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query received from the user.
     """
     logger.info(f"User {callback.from_user.id} opened vpn_not_working.")
-    await callback.message.delete()
-
-    await callback.message.answer(
+    await callback.message.edit_text(
         text=_(
-            "ℹ️ There could be several reasons why VPN is not working. "
-            "Please check the following:\n\n"
+            "ℹ️ *VPN not working?*\n"
+            "\n"
+            "There could be several reasons why VPN is not working. "
+            "Please check the following:\n"
+            "\n"
             "- Ensure your internet connection is stable.\n"
             "- Make sure your subscription is active.\n"
-            "- Try reconnecting or restarting the app.\n\n"
+            "- Try reconnecting or restarting the app.\n"
+            "\n"
             "If the issue persists, please contact support."
         ),
-        reply_markup=contact_keyboard(),
+        reply_markup=contact_keyboard(config.bot.SUPPORT_ID),
     )

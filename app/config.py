@@ -24,10 +24,12 @@ class BotConfig:
     Attributes:
         TOKEN (str): API token for the Telegram bot.
         DEV_ID (int | None): Developer ID (user ID) for notifications.
+        SUPPORT_ID (int): Support ID (user ID) for support.
     """
 
     TOKEN: str
     DEV_ID: int | None
+    SUPPORT_ID: int
 
 
 @dataclass
@@ -40,12 +42,14 @@ class XUIConfig:
         USERNAME (str): Username for XUI authentication.
         PASSWORD (str): Password for XUI authentication.
         TOKEN (str | None): API token for XUI.
+        SUBSCRIPTION (str): Base URL for XUI subscription.
     """
 
     HOST: str
     USERNAME: str
     PASSWORD: str
     TOKEN: str | None
+    SUBSCRIPTION: str
 
 
 @dataclass
@@ -133,12 +137,14 @@ def load_config() -> Config:
         bot=BotConfig(
             TOKEN=env.str("BOT_TOKEN"),
             DEV_ID=env.int("BOT_DEV_ID", None),
+            SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
         ),
         xui=XUIConfig(
             HOST=env.str("XUI_HOST"),
             USERNAME=env.str("XUI_USERNAME"),
             PASSWORD=env.str("XUI_PASSWORD"),
             TOKEN=env.str("XUI_TOKEN", None),
+            SUBSCRIPTION=env.str("XUI_SUBSCRIPTION"),
         ),
         database=DatabaseConfig(
             HOST=env.str("DB_HOST", None),

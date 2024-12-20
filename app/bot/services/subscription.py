@@ -3,6 +3,7 @@ import logging
 import os
 
 from aiogram.utils.i18n import gettext as _
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.navigation import NavigationAction
 from app.bot.services.client import UNLIMITED
@@ -26,13 +27,23 @@ class SubscriptionService:
         durations (list[int]): List of available subscription durations.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, session: AsyncSession, vpn: VPNService) -> None:
         """
         Initializes the SubscriptionService object.
 
         Loads plans and durations from the 'plans.json' file. The file must exist and contain
         properly structured data with "plans" and "durations" keys.
+
+        Arguments:
+            session (AsyncSession): The database session used for user operations.
+            vpn (VPNService): The VPN service instance used for interacting with the VPN.
+
+        Raises:
+            FileNotFoundError: If 'plans.json' file does not exist.
+            ValueError: If 'plans.json' file is not a valid JSON file or has an incorrect structure.
         """
+        self.session = session
+        self.vpn = vpn
         file_path = "plans.json"
 
         if not os.path.isfile(file_path):
@@ -171,8 +182,7 @@ class SubscriptionService:
 
     async def create_subscription(
         self,
-        vpn: VPNService,
-        user: User,
+        user_id: int,
         traffic: int,
         duration: int,
     ) -> None:
@@ -180,13 +190,14 @@ class SubscriptionService:
         Creates a new subscription for the user.
 
         Arguments:
-            vpn (VPNService): The VPNService instance used to interact with the VPN service.
-            user (User): The user for whom the subscription is created.
+            user_id (int): The user ID for whom the subscription is being created.
             traffic (int): The amount of traffic for the user in GB.
             duration (int): The duration of the subscription in days.
         """
+        async with self.session() as session:
+            user: User = await User.get(session, user_id=user_id)
         # TODO: make receiving a subscription link
-        if await vpn.is_client_exists(user.user_id):
-            await vpn.update_client(user, traffic, duration)
+        if await self.vpn.is_client_exists(user.user_id):
+            await self.vpn.update_client(user, traffic, duration)
         else:
-            await vpn.create_client(user, traffic, duration)
+            await self.vpn.create_client(user, traffic, duration)

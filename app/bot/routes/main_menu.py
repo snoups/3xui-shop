@@ -26,8 +26,8 @@ def prepare_message(user: User) -> str:
     return _(
         "Welcome, {name}! 🎉\n"
         "\n"
-        "3X-UI SHOP — your reliable assistant in the world of free internet.\n"
-        "We offer safe and fast connections to any internet services using the XRAY protocol.\n"
+        "3X-UI SHOP — your reliable assistant in the world of free internet. "
+        "We offer safe and fast connections to any internet services using the XRAY protocol. "
         "Our service works even in China, Iran, and Russia.\n"
         "\n"
         "🚀 HIGH SPEED\n"
@@ -62,8 +62,7 @@ async def callback_main_menu(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query received from the user.
     """
     logger.info(f"User {callback.from_user.id} returned to main menu.")
-    await callback.message.delete()
-    await callback.message.answer(
+    await callback.message.edit_text(
         text=prepare_message(callback.from_user),
         reply_markup=main_menu_keyboard(),
     )

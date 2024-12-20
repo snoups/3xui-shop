@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.i18n import I18n
 
@@ -67,11 +68,11 @@ async def main() -> None:
     # Initialize components
     db = Database(config.database)
     storage = MemoryStorage()  # TODO: REDIS
-    bot = Bot(token=config.bot.TOKEN)
+    bot = Bot(token=config.bot.TOKEN, default=DefaultBotProperties(parse_mode="MarkDown"))
     dp = Dispatcher(storage=storage, config=config, bot=bot, db=db)
     i18n = I18n(path="app/locales", default_locale="en", domain="bot")
-    vpn_service = VPNService(config)
-    subscription_service = SubscriptionService()
+    vpn_service = VPNService(db.session, config)
+    subscription_service = SubscriptionService(db.session, vpn_service)
 
     # Register event handlers
     dp.startup.register(on_startup)

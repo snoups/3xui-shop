@@ -9,6 +9,7 @@ class NavigationAction(str, Enum):
     START = "start"  # Command to start the bot.
     MAIN_MENU = "main_menu"  # Navigate to main menu.
     PROFILE = "profile"  # Navigate to user profile.
+    SHOW_KEY = "show_key"
 
     # Navigation on Subscribtion/Payment page
     SUBSCRIPTION = "subscription"

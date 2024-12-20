@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-19 07:44+0500\n"
+"POT-Creation-Date: 2024-12-20 18:50+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,43 +19,43 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: app/bot/keyboards/back.py:20
+#: app/bot/keyboards/back.py:17
 msgid "← Back"
 msgstr "← Назад"
 
-#: app/bot/keyboards/download.py:62
+#: app/bot/keyboards/download.py:55
 msgid "Download"
 msgstr "Скачать"
 
-#: app/bot/keyboards/download.py:63
+#: app/bot/keyboards/download.py:56
 msgid "Connect"
 msgstr "Подключить"
 
-#: app/bot/keyboards/main_menu.py:22
+#: app/bot/keyboards/main_menu.py:19
 msgid "👤 Profile"
 msgstr "👤 Профиль"
 
-#: app/bot/keyboards/main_menu.py:26
+#: app/bot/keyboards/main_menu.py:23
 msgid "💳 Subscription"
 msgstr "💳 Подписка"
 
-#: app/bot/keyboards/main_menu.py:33
+#: app/bot/keyboards/main_menu.py:30
 msgid "👥 Referral Program"
 msgstr "👥 Реферальная программа"
 
-#: app/bot/keyboards/main_menu.py:39
+#: app/bot/keyboards/main_menu.py:36
 msgid "🏷 Activate Promo Code"
 msgstr "🏷 Активировать промокод"
 
-#: app/bot/keyboards/main_menu.py:45
+#: app/bot/keyboards/main_menu.py:42
 msgid "📲 Download App"
 msgstr "📲 Скачать приложение"
 
-#: app/bot/keyboards/main_menu.py:51
+#: app/bot/keyboards/main_menu.py:48
 msgid "🆘 Support"
 msgstr "🆘 Поддержка"
 
-#: app/bot/keyboards/pay.py:22
+#: app/bot/keyboards/pay.py:21
 msgid "Pay 💸"
 msgstr "Оплатить 💸"
 
@@ -63,31 +63,35 @@ msgstr "Оплатить 💸"
 msgid "YooKassa | {price} ₽"
 msgstr "ЮKassa | {price} ₽"
 
-#: app/bot/keyboards/profile.py:23 app/bot/keyboards/support.py:69
+#: app/bot/keyboards/profile.py:23 app/bot/keyboards/support.py:70
 msgid "Buy subscription"
 msgstr "Купить подписку"
 
-#: app/bot/keyboards/support.py:23
+#: app/bot/keyboards/profile.py:46
+msgid "Show key 🔑"
+msgstr "Показать ключ 🔑"
+
+#: app/bot/keyboards/support.py:19
 msgid "Contact the operator"
 msgstr "Связаться с оператором"
 
-#: app/bot/keyboards/support.py:41
+#: app/bot/keyboards/support.py:39
 msgid "How to connect"
 msgstr "Как подключиться"
 
-#: app/bot/keyboards/support.py:46
+#: app/bot/keyboards/support.py:44
 msgid "VPN not working"
 msgstr "VPN не работает"
 
-#: app/bot/keyboards/support.py:73
+#: app/bot/keyboards/support.py:74
 msgid "Download app"
 msgstr "Скачать приложение"
 
-#: app/bot/routes/download.py:26
-msgid "📲 Choose your platform:"
-msgstr "📲 Выберите вашу платформу:"
+#: app/bot/routes/download.py:25
+msgid "📲 *Choose your platform:*"
+msgstr "📲 *Выберите вашу платформу:*"
 
-#: app/bot/routes/download.py:49
+#: app/bot/routes/download.py:48
 msgid "To connect you need to install the app and enter your key."
 msgstr "Для подключения необходимо установить приложение и ввести свой ключ."
 
@@ -95,10 +99,9 @@ msgstr "Для подключения необходимо установить 
 msgid ""
 "Welcome, {name}! 🎉\n"
 "\n"
-"3X-UI SHOP — your reliable assistant in the world of free internet.\n"
-"We offer safe and fast connections to any internet services using the "
-"XRAY protocol.\n"
-"Our service works even in China, Iran, and Russia.\n"
+"3X-UI SHOP — your reliable assistant in the world of free internet. We "
+"offer safe and fast connections to any internet services using the XRAY "
+"protocol. Our service works even in China, Iran, and Russia.\n"
 "\n"
 "🚀 HIGH SPEED\n"
 "🔒 SECURITY\n"
@@ -108,10 +111,10 @@ msgid ""
 msgstr ""
 "Добро пожаловать, {name}! 🎉\n"
 "\n"
-"3X-UI SHOP — ваш надежный помощник в мире свободного интернета.\n"
-"Мы предлагаем безопасное и быстрое подключение к любым интернет-сервисам "
-"с использованием протокола XRAY.\n"
-"Наш сервис работает даже в Китае, Иране и России.\n"
+"3X-UI SHOP — ваш надежный помощник в мире свободного интернета. Мы "
+"предлагаем безопасное и быстрое подключение к любым интернет-сервисам с "
+"использованием протокола XRAY. Наш сервис работает даже в Китае, Иране и "
+"России.\n"
 "\n"
 "🚀 ВЫСОКАЯ СКОРОСТЬ\n"
 "🔒 БЕЗОПАСНОСТЬ\n"
@@ -119,56 +122,57 @@ msgstr ""
 "♾️ БЕЗЛИМИТ\n"
 "✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД\n"
 
-#: app/bot/routes/payment.py:69
+#: app/bot/routes/payment.py:65
 msgid ""
-"✅ You selected:\n"
+"✅ *You selected:*\n"
 "\n"
 "Plan: {plan}\n"
 "Duration: {duration}\n"
 "Price: {price} {currency}\n"
 "\n"
-"After payment, a unique key will be generated for you, to connect to the "
-"VPN."
+"_After payment, a unique key will be generated for you, to connect to the"
+" VPN. The key will be available in your profile._"
 msgstr ""
-"💸 Вы выбрали:\n"
+"💸 *Вы выбрали:*\n"
 "\n"
 "Тариф: {plan}\n"
 "Длительность: {duration}\n"
 "Стоимость: {price} {currency}\n"
 "\n"
-"После оплаты для вас сгенерируется уникальный ключ, для подключения к VPN."
+"_После оплаты для вас сгенерируется уникальный ключ, для подключения к "
+"VPN. Ключ будет доступен в вашем профиле._"
 
-#: app/bot/routes/profile.py:29
+#: app/bot/routes/profile.py:30
 msgid ""
-"👤 Your Profile:\n"
+"👤 *Your profile:*\n"
 "Name: {name}\n"
 "ID: {id}\n"
 "\n"
 msgstr ""
-"👤 Ваш профиль:\n"
+"👤 *Ваш профиль*:\n"
 "Имя: {name}\n"
 "ID: {id}\n"
 "\n"
 
 #: app/bot/routes/profile.py:35
 msgid ""
-"You don't have a subscription purchased yet, go to the subscription page "
-"to purchase or click the button below."
+"_You don't have a subscription purchased yet, go to the subscription page"
+" to purchase or click the button below._"
 msgstr ""
-"У вас еще не было приобретенной подписки, перейдите на страницу подписки "
-"для покупки или нажмите кнопку ниже."
+"_У вас еще не было приобретенной подписки, перейдите на страницу подписки"
+" для покупки или нажмите кнопку ниже._"
 
 #: app/bot/routes/profile.py:41
 msgid ""
-"📅 Subscription:\n"
+"📅 *Subscription:*\n"
 "Plan: {plan}\n"
 msgstr ""
-"📅 Подписка:\n"
+"📅 *Подписка*:\n"
 "Тариф: {plan}\n"
 
 #: app/bot/routes/profile.py:44
-msgid "Traffic limit reached.\n"
-msgstr "Достигнут лимит трафика.\n"
+msgid "_Traffic limit reached._\n"
+msgstr "_Достигнут лимит трафика._\n"
 
 #: app/bot/routes/profile.py:46
 msgid "Expires on: {expiry_time}\n"
@@ -179,8 +183,8 @@ msgid "Remaining Traffic: {traffic}\n"
 msgstr "Осталось: {traffic}\n"
 
 #: app/bot/routes/profile.py:54
-msgid "Subscription period has expired.\n"
-msgstr "Время подписки истекло.\n"
+msgid "_Subscription period has expired._\n"
+msgstr "_Время подписки истекло._\n"
 
 #: app/bot/routes/profile.py:57
 msgid ""
@@ -194,64 +198,89 @@ msgstr ""
 
 #: app/bot/routes/profile.py:66
 msgid ""
-"📊 Statistics:\n"
-"Total Traffic: {total}\n"
+"📊 *Statistics:*\n"
+"Total: {total}\n"
 "Sent: ↑ {up}\n"
 "Received: ↓ {down}"
 msgstr ""
-"📊 Статистика:\n"
-"Общий трафик: {total}\n"
+"📊 *Статистика:*\n"
+"Всего: {total}\n"
 "Отправлено: ↑ {up}\n"
 "Получено: ↓ {down}"
 
-#: app/bot/routes/subscription.py:30
+#: app/bot/routes/profile.py:117
+msgid "🔑 *Your key:* (Closes after {seconds_text}) ```{key}```"
+msgstr "🔑 *Ваш ключ:* (Скроется через {seconds_text}) ```{key}```"
+
+#: app/bot/routes/profile.py:118
+msgid "6 seconds"
+msgstr "6 секунд"
+
+#: app/bot/routes/profile.py:121
+msgid "1 second"
+msgid_plural "{} seconds"
+msgstr[0] "1 секунда"
+msgstr[1] "{} секунды"
+msgstr[2] "{} секунд"
+
+#: app/bot/routes/subscription.py:29
 msgid ""
-"⚠️ You already have an active subscription:\n"
+"⚠️ *You already have an active subscription:*\n"
 "\n"
 "Plan: {plan}\n"
 "Remaining Traffic: {traffic}\n"
 "Expires on: {expiry_time}"
 msgstr ""
-"⚠️ У вас уже есть активная подписка:\n"
+"⚠️ *У вас уже есть активная подписка:*\n"
 "\n"
-"Plan: {plan}\n"
+"Тариф: {plan}\n"
 "Осталось: {traffic}\n"
 "Заканчивается через: {expiry_time}"
 
 #: app/bot/routes/subscription.py:52
-msgid "🌐 Select the traffic volume:"
-msgstr "🌐 Выберите объем трафика:"
+msgid "🌐 *Select the traffic volume:*"
+msgstr "🌐 *Выберите объем трафика:*"
 
 #: app/bot/routes/subscription.py:72
-msgid "⏳ Specify the duration:"
-msgstr "⏳ Укажите срок действия:"
+msgid "⏳ *Specify the duration:*"
+msgstr "⏳ *Укажите срок действия:*"
 
 #: app/bot/routes/subscription.py:95
-msgid "💳 Choose a payment method:"
-msgstr "💳 Выберите способ оплаты:"
+msgid "💳 *Choose a payment method:*"
+msgstr "💳 *Выберите способ оплаты:*"
 
-#: app/bot/routes/support.py:31
+#: app/bot/routes/support.py:30
 msgid ""
-"🆘 For collaboration, improvements to functionality, and any other "
+"🆘 *Support:*\n"
+"\n"
+"For collaboration, improvements to functionality, and any other "
 "inquiries, please contact the operator."
 msgstr ""
-"🆘 По вопросам сотрудничества, улучшения функциональности и любым другим "
+"🆘 *Поддержка:*\n"
+"\n"
+"По вопросам сотрудничества, улучшения функциональности и любым другим "
 "вопросам, пожалуйста, обращайтесь к оператору."
 
-#: app/bot/routes/support.py:51
+#: app/bot/routes/support.py:50
 msgid ""
-"ℹ️ After subscribing, you will be given an access key that you can use to"
-" connect to our VPN. If you have a key, go to the application download "
+"ℹ️ *How to connect?*\n"
+"\n"
+"After subscribing, you will be given an access key that you can use to "
+"connect to our VPN. If you have a key, go to the application download "
 "page and connect the key."
 msgstr ""
-"ℹ️ После оформления подписки вам будет предоставлен ключ доступа, который"
-" вы сможете использовать для подключения к нашему VPN. Если у вас есть "
-"ключ, перейдите на страницу загрузки приложения и подключите ключ."
+"ℹ️ *Как подключиться?*\n"
+"\n"
+"После оформления подписки вам будет предоставлен ключ доступа, который вы"
+" сможете использовать для подключения к нашему VPN. Если у вас есть ключ,"
+" перейдите на страницу загрузки приложения и подключите ключ."
 
-#: app/bot/routes/support.py:72
+#: app/bot/routes/support.py:71
 msgid ""
-"ℹ️ There could be several reasons why VPN is not working. Please check "
-"the following:\n"
+"ℹ️ *VPN not working?*\n"
+"\n"
+"There could be several reasons why VPN is not working. Please check the "
+"following:\n"
 "\n"
 "- Ensure your internet connection is stable.\n"
 "- Make sure your subscription is active.\n"
@@ -259,7 +288,9 @@ msgid ""
 "\n"
 "If the issue persists, please contact support."
 msgstr ""
-"ℹ️ Может быть несколько причин, по которым VPN не работает. Пожалуйста, "
+"ℹ️ *VPN не работает?*\n"
+"\n"
+"Может быть несколько причин, по которым VPN не работает. Пожалуйста, "
 "проверьте следующее:\n"
 "\n"
 "- Убедитесь, что ваше интернет-соединение стабильно.\n"
@@ -268,69 +299,61 @@ msgstr ""
 "\n"
 "Если проблема сохраняется, свяжитесь с оператором поддержки."
 
-#: app/bot/services/client.py:157 app/bot/services/client.py:160
-msgid "B"
-msgstr "Б"
-
-#: app/bot/services/client.py:161
-msgid "KB"
-msgstr "КБ"
-
-#: app/bot/services/client.py:162
+#: app/bot/services/client.py:157 app/bot/services/client.py:159
 msgid "MB"
 msgstr "МБ"
 
-#: app/bot/services/client.py:163 app/bot/services/subscription.py:144
+#: app/bot/services/client.py:159 app/bot/services/subscription.py:155
 msgid "GB"
 msgstr "ГБ"
 
-#: app/bot/services/client.py:164
+#: app/bot/services/client.py:159
 msgid "TB"
 msgstr "ТБ"
 
-#: app/bot/services/client.py:165
+#: app/bot/services/client.py:159
 msgid "PB"
 msgstr "ПБ"
 
-#: app/bot/services/client.py:166
+#: app/bot/services/client.py:159
 msgid "EB"
 msgstr "ЭБ"
 
-#: app/bot/services/client.py:167
+#: app/bot/services/client.py:159
 msgid "ZB"
 msgstr "ЗБ"
 
-#: app/bot/services/client.py:168
+#: app/bot/services/client.py:159
 msgid "YB"
 msgstr "ЙБ"
 
-#: app/bot/services/client.py:200
+#: app/bot/services/client.py:191
 msgid "d"
 msgstr "д"
 
-#: app/bot/services/client.py:200
+#: app/bot/services/client.py:191
 msgid "h"
 msgstr "ч"
 
-#: app/bot/services/client.py:200
+#: app/bot/services/client.py:191
 msgid "m"
 msgstr "м"
 
-#: app/bot/services/subscription.py:164
+#: app/bot/services/subscription.py:175
 msgid "1 year"
 msgid_plural "{} years"
 msgstr[0] "1 год"
 msgstr[1] "{} года"
 msgstr[2] "{} лет"
 
-#: app/bot/services/subscription.py:168
+#: app/bot/services/subscription.py:179
 msgid "1 month"
 msgid_plural "{} months"
 msgstr[0] "1 месяц"
 msgstr[1] "{} месяца"
 msgstr[2] "{} месяцев"
 
-#: app/bot/services/subscription.py:170
+#: app/bot/services/subscription.py:181
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] "1 день"

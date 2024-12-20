@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 
 from py3xui import AsyncApi, Client
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Config
 from app.db.models.user import User
@@ -20,14 +21,17 @@ class VPNService:
         api (AsyncApi): An instance of the AsyncApi to interact with the 3XUI API.
     """
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, session: AsyncSession, config: Config) -> None:
         """
         Initializes the VPNService object with the given configuration.
 
         Arguments:
+            session (AsyncSession): The database session used for querying the database.
             config (Config): Configuration object containing the necessary credentials and settings
                              to authenticate and interact with the 3XUI API.
         """
+        self.session = session
+        self.subscription = config.xui.SUBSCRIPTION
         self.api = AsyncApi(
             host=config.xui.HOST,
             username=config.xui.USERNAME,
@@ -113,7 +117,7 @@ class VPNService:
         client.expiry_time = self.days_to_unix_milliseconds(duration)
         client.flow = "xtls-rprx-vision"
         client.limit_ip = 3
-        client.sub_id = str(user.user_id)
+        client.sub_id = user.vpn_id
         client.total_gb = self.gb_to_bytes(traffic)
 
         await self.api.client.update(client.id, client)
@@ -135,7 +139,7 @@ class VPNService:
             expiryTime=self.days_to_unix_milliseconds(duration),
             flow="xtls-rprx-vision",
             limitIp=3,
-            sub_id=str(user.user_id),
+            sub_id=user.vpn_id,
             totalGB=self.gb_to_bytes(traffic),
         )
         inbound_id = 7  # TODO: inbound id selection
@@ -169,3 +173,17 @@ class VPNService:
         unix_timestamp_seconds = int(target_time.timestamp())
         unix_timestamp_milliseconds = unix_timestamp_seconds * 1000
         return unix_timestamp_milliseconds
+
+    async def get_key(self, user_id: int) -> str:
+        """
+        Fetches the key from the provided URL for the given user ID.
+
+        Arguments:
+            user_id (int): The user ID for get key.
+
+        Returns:
+            str: The key extracted from the response.
+        """
+        async with self.session() as session:
+            user: User = await User.get(session, user_id=user_id)
+        return f"{self.subscription}{user.vpn_id}"

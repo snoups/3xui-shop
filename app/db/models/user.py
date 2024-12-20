@@ -76,7 +76,8 @@ class User(Base):
         try:
             user = result.scalar_one()
             for key, value in kwargs.items():
-                setattr(user, key, value)
+                if key != "vpn_id":
+                    setattr(user, key, value)
         except NoResultFound:
             user = User(user_id=user_id, **kwargs)
             session.add(user)

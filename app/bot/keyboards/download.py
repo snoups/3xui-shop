@@ -36,7 +36,7 @@ def connect_keyboard(platform: NavigationAction) -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: Inline keyboard with download and connect options, and a back button.
     """
     builder = InlineKeyboardBuilder()
-    connect = "https://telegram.org/"  # TODO: redirect to scheme
+    connect = "https://telegram.org/"  # TODO: redirect to scheme with key
 
     if platform == NavigationAction.PLATFORM_IOS:
         download = "https://apps.apple.com/ru/app/v2raytun/id6476628951"
