@@ -7,6 +7,7 @@ from aiogram.utils.i18n import gettext as _
 from app.bot.filters import IsPrivate
 from app.bot.keyboards.download import connect_keyboard, platforms_keyboard
 from app.bot.navigation import NavigationAction
+from app.bot.services.vpn import VPNService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -28,7 +29,7 @@ async def callback_download(callback: CallbackQuery) -> None:
 
 
 @router.callback_query(F.data.startswith(NavigationAction.PLATFORM), IsPrivate())
-async def callback_platform(callback: CallbackQuery) -> None:
+async def callback_platform(callback: CallbackQuery, vpn: VPNService) -> None:
     """
     Handles the callback when the user selects a platform.
 
@@ -36,6 +37,7 @@ async def callback_platform(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query from the user.
     """
     logger.info(f"User {callback.from_user.id} selected platform: {callback.data}")
+    key = await vpn.get_key(callback.from_user.id)
 
     if callback.data == NavigationAction.PLATFORM_IOS:
         icon = "🍏 "
@@ -46,5 +48,5 @@ async def callback_platform(callback: CallbackQuery) -> None:
 
     await callback.message.edit_text(
         text=icon + _("To connect you need to install the app and enter your key."),
-        reply_markup=connect_keyboard(callback.data),
+        reply_markup=connect_keyboard(callback.data, key),
     )

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-21 16:07+0500\n"
+"POT-Creation-Date: 2024-12-21 16:55+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -57,7 +57,7 @@ msgstr "Удалить"
 
 #: app/bot/keyboards/admin_tools.py:77
 msgid "Edit"
-msgstr "Редакторовать"
+msgstr "Изменить"
 
 #: app/bot/keyboards/admin_tools.py:95 app/bot/services/client.py:159
 #: app/bot/services/subscription.py:155
@@ -112,30 +112,30 @@ msgid "🔑 Show key"
 msgstr "🔑 Показать ключ"
 
 #: app/bot/keyboards/subscription.py:12
-msgid "💳 Buy subscription"
-msgstr "💳 Купить подписку"
-
-#: app/bot/keyboards/subscription.py:18
 msgid "💳 Renew subscription"
 msgstr "💳 Продлить подписку"
 
-#: app/bot/keyboards/subscription.py:32
+#: app/bot/keyboards/subscription.py:22 app/bot/keyboards/support.py:72
+msgid "💳 Buy subscription"
+msgstr "💳 Купить подписку"
+
+#: app/bot/keyboards/subscription.py:30
 msgid "🎟️ Activate promocode"
 msgstr "🎟️ Активировать промокод"
 
-#: app/bot/keyboards/support.py:21
+#: app/bot/keyboards/support.py:20
 msgid "👨‍💻 Contact the operator"
 msgstr "👨‍💻 Связаться с оператором"
 
-#: app/bot/keyboards/support.py:42
+#: app/bot/keyboards/support.py:41
 msgid "❓ How to connect"
 msgstr "❓ Как подключиться"
 
-#: app/bot/keyboards/support.py:47
+#: app/bot/keyboards/support.py:46
 msgid "❓ VPN not working"
 msgstr "❓ VPN не работает"
 
-#: app/bot/keyboards/support.py:73
+#: app/bot/keyboards/support.py:76
 msgid "📥 Download app"
 msgstr "📥 Скачать приложение"
 

@@ -25,7 +25,7 @@ def platforms_keyboard() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-def connect_keyboard(platform: NavigationAction) -> InlineKeyboardMarkup:
+def connect_keyboard(platform: NavigationAction, key: str) -> InlineKeyboardMarkup:
     """
     Generates an inline keyboard for connecting to a VPN based on the platform.
 
@@ -36,20 +36,20 @@ def connect_keyboard(platform: NavigationAction) -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: Inline keyboard with download and connect options, and a back button.
     """
     builder = InlineKeyboardBuilder()
-    connect = "https://telegram.org/"  # TODO: redirect to scheme with key
 
+    # v2raytun://import/ | hiddify://import/
     if platform == NavigationAction.PLATFORM_IOS:
         download = "https://apps.apple.com/ru/app/v2raytun/id6476628951"
-        # connect = f"v2raytun://import/{sub_link}{user_id}"
+        connect = f"https://tinyurl.com/bbpy5bx7/{key}"
     elif platform == NavigationAction.PLATFORM_ANDROID:
         download = "https://play.google.com/store/apps/details?id=com.v2raytun.android"
-        # connect = f"v2raytun://import/{sub_link}{user_id}"
+        connect = f"https://tinyurl.com/bbpy5bx7/{key}"
     else:
         download = (
             "https://github.com/hiddify/hiddify-next/releases/download/"
             + "v2.0.5/Hiddify-Windows-Setup-x64.exe"
         )
-        # connect = f"hiddify://import/{sub_link}#{user_id}"
+        connect = f"https://tinyurl.com/5cea6ra4{key}"
 
     builder.row(
         InlineKeyboardButton(text=_("Download"), url=download),

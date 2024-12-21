@@ -161,7 +161,7 @@ class VPNService:
             email=str(user.user_id),
             enable=True,
             id=user.vpn_id,
-            expiryTime=self.days_to_unix_milliseconds(duration),
+            expiryTime=self.days_to_timestamp(duration),
             flow="xtls-rprx-vision",
             limitIp=3,  # TODO: choosing amount device
             sub_id=user.vpn_id,

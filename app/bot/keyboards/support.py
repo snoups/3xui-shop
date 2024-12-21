@@ -3,7 +3,6 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
-from app.bot.keyboards.subscription import buy_subscription_button
 from app.bot.navigation import NavigationAction
 
 
@@ -68,7 +67,11 @@ def how_to_connect_keyboard(support_id: int) -> InlineKeyboardMarkup:
     """
     builder = InlineKeyboardBuilder()
 
-    builder.row(buy_subscription_button())
+    builder.row(
+        InlineKeyboardButton(
+            text=_("💳 Buy subscription"), callback_data=NavigationAction.SUBSCRIPTION
+        )
+    )
     builder.row(
         InlineKeyboardButton(text=_("📥 Download app"), callback_data=NavigationAction.DOWNLOAD)
     )

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-21 16:07+0500\n"
+"POT-Creation-Date: 2024-12-21 16:55+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -112,30 +112,30 @@ msgid "🔑 Show key"
 msgstr ""
 
 #: app/bot/keyboards/subscription.py:12
-msgid "💳 Buy subscription"
-msgstr ""
-
-#: app/bot/keyboards/subscription.py:18
 msgid "💳 Renew subscription"
 msgstr ""
 
-#: app/bot/keyboards/subscription.py:32
+#: app/bot/keyboards/subscription.py:22 app/bot/keyboards/support.py:72
+msgid "💳 Buy subscription"
+msgstr ""
+
+#: app/bot/keyboards/subscription.py:30
 msgid "🎟️ Activate promocode"
 msgstr ""
 
-#: app/bot/keyboards/support.py:21
+#: app/bot/keyboards/support.py:20
 msgid "👨‍💻 Contact the operator"
 msgstr ""
 
-#: app/bot/keyboards/support.py:42
+#: app/bot/keyboards/support.py:41
 msgid "❓ How to connect"
 msgstr ""
 
-#: app/bot/keyboards/support.py:47
+#: app/bot/keyboards/support.py:46
 msgid "❓ VPN not working"
 msgstr ""
 
-#: app/bot/keyboards/support.py:73
+#: app/bot/keyboards/support.py:76
 msgid "📥 Download app"
 msgstr ""
 
