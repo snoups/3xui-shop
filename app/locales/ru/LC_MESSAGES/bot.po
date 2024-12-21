@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-21 01:09+0500\n"
+"POT-Creation-Date: 2024-12-21 16:07+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -28,20 +28,48 @@ msgid "📊 Statistics"
 msgstr "📊 Статистика"
 
 #: app/bot/keyboards/admin_tools.py:27
-msgid "👤 Editor user"
-msgstr "👤 Редактор пользователя"
+msgid "👤 Editor users"
+msgstr "👤 Редактор пользователей"
 
 #: app/bot/keyboards/admin_tools.py:33
+msgid "🎟️ Editor promocodes"
+msgstr "🎟️ Редактор промокодов"
+
+#: app/bot/keyboards/admin_tools.py:39
 msgid "📢 Send notification"
 msgstr "📢 Отправить уведомление"
 
-#: app/bot/keyboards/admin_tools.py:39
+#: app/bot/keyboards/admin_tools.py:45
 msgid "💾 Create backup"
 msgstr "💾 Создать бэкап"
 
-#: app/bot/keyboards/admin_tools.py:45
+#: app/bot/keyboards/admin_tools.py:51
 msgid "🔄 Restart bot"
 msgstr "🔄 Перезапустить бота"
+
+#: app/bot/keyboards/admin_tools.py:65
+msgid "Create"
+msgstr "Создать"
+
+#: app/bot/keyboards/admin_tools.py:71
+msgid "Delete"
+msgstr "Удалить"
+
+#: app/bot/keyboards/admin_tools.py:77
+msgid "Edit"
+msgstr "Редакторовать"
+
+#: app/bot/keyboards/admin_tools.py:95 app/bot/services/client.py:159
+#: app/bot/services/subscription.py:155
+msgid "GB"
+msgstr "ГБ"
+
+#: app/bot/keyboards/admin_tools.py:112 app/bot/services/subscription.py:181
+msgid "1 day"
+msgid_plural "{} days"
+msgstr[0] "1 день"
+msgstr[1] "{} дня"
+msgstr[2] "{} дней"
 
 #: app/bot/keyboards/back.py:17
 msgid "◀️ Back"
@@ -111,9 +139,59 @@ msgstr "❓ VPN не работает"
 msgid "📥 Download app"
 msgstr "📥 Скачать приложение"
 
-#: app/bot/routes/admin_tools.py:19
+#: app/bot/routes/admin_tools.py:33
 msgid "🛠 *Admin tools:*"
 msgstr "🛠 *Административные инструменты:*"
+
+#: app/bot/routes/admin_tools.py:55 app/bot/routes/admin_tools.py:147
+msgid "🎟️ *Editor promocodes:*"
+msgstr "🎟️ *Редактор промокодов:*"
+
+#: app/bot/routes/admin_tools.py:85
+msgid ""
+"🎟️ *Editor promocodes:*\n"
+"\n"
+"_Select the traffic volume_"
+msgstr ""
+"🎟️ *Редактор промокодов:*\n"
+"\n"
+"_Выберите объем трафика_"
+
+#: app/bot/routes/admin_tools.py:96
+msgid ""
+"🎟️ *Editor promocodes:*\n"
+"\n"
+"_Specify the duration_"
+msgstr ""
+"🎟️ *Редактор промокодов:*\n"
+"\n"
+"_Укажите срок действия_"
+
+#: app/bot/routes/admin_tools.py:112
+msgid "🎟️ *Editor promocodes:*\n"
+msgstr "🎟️ *Редактор промокодов:*\n"
+
+#: app/bot/routes/admin_tools.py:115
+msgid "Promocode: {promocode}"
+msgstr "Промокод: {promocode}"
+
+#: app/bot/routes/admin_tools.py:128
+msgid ""
+"🎟️ *Editor promocodes:*\n"
+"\n"
+"_Send promocode to delete_"
+msgstr ""
+"🎟️ *Редактор промокодов:*\n"
+"\n"
+"_Отправьте промокод для удаления_"
+
+#: app/bot/routes/admin_tools.py:143
+msgid "✅ Promocode {} deleted successfully."
+msgstr "✅ Промокод {} успешно удален."
+
+#: app/bot/routes/admin_tools.py:153
+msgid "❌ Failed to delete promocode. Please try again."
+msgstr "❌ Не удалось удалить промокод. Пожалуйста, попробуйте еще раз."
 
 #: app/bot/routes/download.py:25
 msgid "📲 *Choose your platform:*"
@@ -123,7 +201,7 @@ msgstr "📲 *Выберите вашу платформу:*"
 msgid "To connect you need to install the app and enter your key."
 msgstr "Для подключения необходимо установить приложение и ввести свой ключ."
 
-#: app/bot/routes/main_menu.py:26
+#: app/bot/routes/main_menu.py:27
 msgid ""
 "Welcome, {name}! 🎉\n"
 "\n"
@@ -357,10 +435,6 @@ msgstr ""
 msgid "MB"
 msgstr "МБ"
 
-#: app/bot/services/client.py:159 app/bot/services/subscription.py:155
-msgid "GB"
-msgstr "ГБ"
-
 #: app/bot/services/client.py:159
 msgid "TB"
 msgstr "ТБ"
@@ -406,11 +480,4 @@ msgid_plural "{} months"
 msgstr[0] "1 месяц"
 msgstr[1] "{} месяца"
 msgstr[2] "{} месяцев"
-
-#: app/bot/services/subscription.py:181
-msgid "1 day"
-msgid_plural "{} days"
-msgstr[0] "1 день"
-msgstr[1] "{} дня"
-msgstr[2] "{} дней"
 

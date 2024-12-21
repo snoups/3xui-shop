@@ -22,6 +22,7 @@ def register(dp: Dispatcher, **kwargs) -> None:
         ServicesMiddleware(
             vpn=kwargs["vpn"],
             subscription=kwargs["subscription"],
+            promocode=kwargs["promocode"],
         )
     )
     dp.update.outer_middleware.register(ThrottlingMiddleware())

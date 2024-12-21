@@ -86,7 +86,7 @@ class User(Base):
         return user
 
     @classmethod
-    async def update(session: AsyncSession, user_id: int, **kwargs) -> None:
+    async def update(cls, session: AsyncSession, user_id: int, **kwargs) -> None:
         """
         Update a user in the database.
 
@@ -100,7 +100,7 @@ class User(Base):
         await session.commit()
 
     @classmethod
-    async def exists(session: AsyncSession, **kwargs) -> bool:
+    async def exists(cls, session: AsyncSession, **kwargs) -> bool:
         """
         Check if a user exists in the database.
 
@@ -113,4 +113,4 @@ class User(Base):
         """
         filters = [*[getattr(User, key) == value for key, value in kwargs.items()]]
         query = await session.execute(select(User).filter(*filters))
-        return query.scalar()
+        return query.scalar() is not None

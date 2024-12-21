@@ -24,8 +24,8 @@ def subscription_keyboard(is_active: bool) -> InlineKeyboardMarkup:
 
     if not is_active:
         builder.row(buy_subscription_button())
-    else:
-        builder.row(renew_subscription_button())
+    # else:
+    # builder.row(renew_subscription_button())
 
     builder.row(
         InlineKeyboardButton(

@@ -2,6 +2,7 @@ import logging
 
 from aiogram import F, Router
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, User
 from aiogram.utils.i18n import gettext as _
 
@@ -39,7 +40,7 @@ def prepare_message(user: User) -> str:
 
 
 @router.message(Command(NavigationAction.START), IsPrivate())
-async def command_main_menu(message: Message) -> None:
+async def command_main_menu(message: Message, state: FSMContext) -> None:
     """
     Handles the `/start` command and sends the main menu to the user.
 
@@ -47,6 +48,7 @@ async def command_main_menu(message: Message) -> None:
         message (Message): The incoming message with the `/start` command.
     """
     logger.info(f"User {message.from_user.id} opened main menu.")
+    await state.clear()
     is_admin = await IsAdmin()(message)
     await message.answer(
         text=prepare_message(message.from_user),
@@ -55,7 +57,7 @@ async def command_main_menu(message: Message) -> None:
 
 
 @router.callback_query(F.data == NavigationAction.MAIN_MENU, IsPrivate())
-async def callback_main_menu(callback: CallbackQuery) -> None:
+async def callback_main_menu(callback: CallbackQuery, state: FSMContext) -> None:
     """
     Handles the callback query to return to the main menu and sends the updated message to the user.
 
@@ -63,6 +65,7 @@ async def callback_main_menu(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The callback query received from the user.
     """
     logger.info(f"User {callback.from_user.id} returned to main menu.")
+    await state.clear()
     is_admin = await IsAdmin()(callback)
     await callback.message.edit_text(
         text=prepare_message(callback.from_user),

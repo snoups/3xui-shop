@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-21 01:09+0500\n"
+"POT-Creation-Date: 2024-12-21 16:07+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -27,20 +27,48 @@ msgid "📊 Statistics"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:27
-msgid "👤 Editor user"
+msgid "👤 Editor users"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:33
-msgid "📢 Send notification"
+msgid "🎟️ Editor promocodes"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:39
-msgid "💾 Create backup"
+msgid "📢 Send notification"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:45
+msgid "💾 Create backup"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:51
 msgid "🔄 Restart bot"
 msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:65
+msgid "Create"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:71
+msgid "Delete"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:77
+msgid "Edit"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:95 app/bot/services/client.py:159
+#: app/bot/services/subscription.py:155
+msgid "GB"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:112 app/bot/services/subscription.py:181
+#, fuzzy
+msgid "1 day"
+msgid_plural "{} days"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/bot/keyboards/back.py:17
 msgid "◀️ Back"
@@ -111,8 +139,49 @@ msgstr ""
 msgid "📥 Download app"
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:19
+#: app/bot/routes/admin_tools.py:33
 msgid "🛠 *Admin tools:*"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:55 app/bot/routes/admin_tools.py:147
+msgid "🎟️ *Editor promocodes:*"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:85
+msgid ""
+"🎟️ *Editor promocodes:*\n"
+"\n"
+"_Select the traffic volume_"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:96
+msgid ""
+"🎟️ *Editor promocodes:*\n"
+"\n"
+"_Specify the duration_"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:112
+msgid "🎟️ *Editor promocodes:*\n"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:115
+msgid "Promocode: {promocode}"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:128
+msgid ""
+"🎟️ *Editor promocodes:*\n"
+"\n"
+"_Send promocode to delete_"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:143
+msgid "✅ Promocode {} deleted successfully."
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:153
+msgid "❌ Failed to delete promocode. Please try again."
 msgstr ""
 
 #: app/bot/routes/download.py:25
@@ -123,7 +192,7 @@ msgstr ""
 msgid "To connect you need to install the app and enter your key."
 msgstr ""
 
-#: app/bot/routes/main_menu.py:26
+#: app/bot/routes/main_menu.py:27
 msgid ""
 "Welcome, {name}! 🎉\n"
 "\n"
@@ -293,10 +362,6 @@ msgstr ""
 msgid "MB"
 msgstr ""
 
-#: app/bot/services/client.py:159 app/bot/services/subscription.py:155
-msgid "GB"
-msgstr ""
-
 #: app/bot/services/client.py:159
 msgid "TB"
 msgstr ""
@@ -340,13 +405,6 @@ msgstr[1] ""
 #, fuzzy
 msgid "1 month"
 msgid_plural "{} months"
-msgstr[0] ""
-msgstr[1] ""
-
-#: app/bot/services/subscription.py:181
-#, fuzzy
-msgid "1 day"
-msgid_plural "{} days"
 msgstr[0] ""
 msgstr[1] ""
 

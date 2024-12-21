@@ -103,22 +103,47 @@ class VPNService:
             logger.error(f"Error retrieving client data: {e}")
             return {}
 
-    async def update_client(self, user: User, traffic: int, duration: int) -> None:
+    async def update_client(
+        self,
+        user: User,
+        traffic: int,
+        duration: int,
+        replace_traffic: bool = False,
+        replace_duration: bool = False,
+    ) -> None:
         """
         Updates the client’s traffic and subscription duration in the 3XUI.
 
+        This function can either replace the existing traffic and duration values or
+        add to them, based on the `replace_traffic` and `replace_duration` flags.
+
         Arguments:
             user (User): The user whose client data is to be updated.
-            traffic (int): The traffic limit in GB to set for the client.
-            duration (int): The duration in days for which the subscription is valid.
+            traffic (int): The traffic limit in GB to set or add for the client.
+            duration (int): The duration in days to set or add to the subscription.
+            replace_traffic (bool): If True, replaces the existing traffic limit.
+            replace_duration (bool): If True, replaces the existing subscription duration.
         """
         client: Client = await self.api.client.get_by_email(str(user.user_id))
+
+        if replace_traffic:
+            new_traffic_bytes = self.gb_to_bytes(traffic)
+        else:
+            current_traffic_bytes = client.total_gb
+            additional_traffic_bytes = self.gb_to_bytes(traffic)
+            new_traffic_bytes = current_traffic_bytes + additional_traffic_bytes
+
+        if replace_duration:
+            new_expiry_time = self.days_to_timestamp(duration)
+        else:
+            new_expiry_time = self.add_days_to_timestamp(client.expiry_time, duration)
+
         client.id = user.vpn_id
-        client.expiry_time = self.days_to_unix_milliseconds(duration)
+        client.expiry_time = new_expiry_time
         client.flow = "xtls-rprx-vision"
         client.limit_ip = 3
         client.sub_id = user.vpn_id
-        client.total_gb = self.gb_to_bytes(traffic)
+        client.total_gb = new_traffic_bytes
 
         await self.api.client.update(client.id, client)
         await self.api.client.reset_stats(client.inbound_id, client.email)
@@ -138,7 +163,7 @@ class VPNService:
             id=user.vpn_id,
             expiryTime=self.days_to_unix_milliseconds(duration),
             flow="xtls-rprx-vision",
-            limitIp=3,
+            limitIp=3,  # TODO: choosing amount device
             sub_id=user.vpn_id,
             totalGB=self.gb_to_bytes(traffic),
         )
@@ -158,21 +183,34 @@ class VPNService:
         bytes_in_gb = 1024**3  # 1 GB = 1024^3 bytes
         return int(traffic_gb * bytes_in_gb)
 
-    def days_to_unix_milliseconds(self, days: int) -> int:
+    def days_to_timestamp(self, days: int) -> int:
         """
-        Convert a number of days to a Unix timestamp in milliseconds.
+        Convert a number of days from now to a Unix timestamp in milliseconds.
 
         Arguments:
-            days (int): Number of days to convert.
+            days (int): Number of days from now.
 
         Returns:
             int: Unix timestamp in milliseconds.
         """
         now = datetime.now(timezone.utc)
         target_time = now + timedelta(days=days)
-        unix_timestamp_seconds = int(target_time.timestamp())
-        unix_timestamp_milliseconds = unix_timestamp_seconds * 1000
-        return unix_timestamp_milliseconds
+        return int(target_time.timestamp() * 1000)
+
+    def add_days_to_timestamp(self, timestamp: int, days: int) -> int:
+        """
+        Adds a number of days to a Unix timestamp in milliseconds.
+
+        Arguments:
+            timestamp (int): Current timestamp in milliseconds.
+            days (int): Number of days to add.
+
+        Returns:
+            int: New Unix timestamp in milliseconds.
+        """
+        current_datetime = datetime.fromtimestamp(timestamp / 1000, tz=timezone.utc)
+        new_datetime = current_datetime + timedelta(days=days)
+        return int(new_datetime.timestamp() * 1000)
 
     async def get_key(self, user_id: int) -> str:
         """
