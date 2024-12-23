@@ -23,11 +23,21 @@ router = Router(name=__name__)
 
 
 class DeletePromocodeStates(StatesGroup):
+    """
+    States for deleting a promocode.
+    """
+
     waiting_for_promocode = State()
 
 
 @router.callback_query(F.data == Navigation.ADMIN_TOOLS, IsPrivate(), IsAdmin())
 async def callback_admin_tools(callback: CallbackQuery) -> None:
+    """
+    Handler for opening the admin tools menu.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
     logger.info(f"Admin {callback.from_user.id} opened admin tools.")
     await callback.message.edit_text(
         text=_("🛠 *Admin tools:*"),
@@ -37,18 +47,37 @@ async def callback_admin_tools(callback: CallbackQuery) -> None:
 
 @router.callback_query(F.data == Navigation.STATISTICS, IsPrivate(), IsAdmin())
 async def callback_statistics(callback: CallbackQuery) -> None:
+    """
+    Handler for opening the statistics menu.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
     logger.info(f"Admin {callback.from_user.id} opened statistics.")
     pass
 
 
 @router.callback_query(F.data == Navigation.EDITOR_USERS, IsPrivate(), IsAdmin())
 async def callback_editor_users(callback: CallbackQuery) -> None:
+    """
+    Handler for opening the user editor.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
     logger.info(f"Admin {callback.from_user.id} opened editor users.")
     pass
 
 
 @router.callback_query(F.data == Navigation.EDITOR_PROMOCODES, IsPrivate(), IsAdmin())
 async def callback_editor_promocodes(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Handler for opening the promocode editor.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+        state (FSMContext): The state context for managing conversation state.
+    """
     logger.info(f"Admin {callback.from_user.id} opened editor promocodes.")
     await state.clear()
     await callback.message.edit_text(
@@ -59,18 +88,36 @@ async def callback_editor_promocodes(callback: CallbackQuery, state: FSMContext)
 
 @router.callback_query(F.data == Navigation.SEND_NOTIFICATION, IsPrivate(), IsAdmin())
 async def callback_send_notification(callback: CallbackQuery) -> None:
+    """
+    Handler for sending notifications.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
     logger.info(f"Admin {callback.from_user.id} opened send notification.")
     pass
 
 
 @router.callback_query(F.data == Navigation.CREATE_BACKUP, IsPrivate(), IsAdmin())
 async def callback_create_backup(callback: CallbackQuery) -> None:
+    """
+    Handler for creating backups.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
     logger.info(f"Admin {callback.from_user.id} created backup.")
     pass
 
 
 @router.callback_query(F.data == Navigation.RESTART_BOT, IsPrivate(), IsAdmin())
 async def callback_restart_bot(callback: CallbackQuery) -> None:
+    """
+    Handler for restarting the bot.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
     logger.info(f"Admin {callback.from_user.id} restarted bot.")
     pass
 
@@ -78,6 +125,12 @@ async def callback_restart_bot(callback: CallbackQuery) -> None:
 # region: Create Promocode
 @router.callback_query(F.data == Navigation.CREATE_PROMOCODE, IsPrivate(), IsAdmin())
 async def callback_create_promocode(callback: CallbackQuery) -> None:
+    """
+    Handler for starting the promocode creation process.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
     logger.info(f"Admin {callback.from_user.id} started creating promocode.")
     callback_data = CreatePromocodeCallback(state=Navigation.TRAFFIC)
     await callback.message.edit_text(
@@ -92,6 +145,13 @@ async def callback_create_promocode(callback: CallbackQuery) -> None:
 async def callback_traffic_selected(
     callback: CallbackQuery, callback_data: CreatePromocodeCallback
 ) -> None:
+    """
+    Handler for selecting traffic volume for promocode creation.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+        callback_data (CreatePromocodeCallback): The callback data containing state info.
+    """
     logger.info(f"Admin {callback.from_user.id} selected {callback_data.traffic} GB for promocode.")
     callback_data.state = Navigation.DURATION
     await callback.message.edit_text(
@@ -108,6 +168,14 @@ async def callback_duration_selected(
     callback_data: CreatePromocodeCallback,
     promocode_service: PromocodeService,
 ) -> None:
+    """
+    Handler for selecting the duration for the promocode.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+        callback_data (CreatePromocodeCallback): The callback data containing state info.
+        promocode_service (PromocodeService): Service for handling promocode creation.
+    """
     logger.info(
         f"Admin {callback.from_user.id} selected {callback_data.duration} days for promocode."
     )
@@ -129,6 +197,13 @@ async def callback_duration_selected(
 # region: Delete Promocode
 @router.callback_query(F.data == Navigation.DELETE_PROMOCODE, IsPrivate(), IsAdmin())
 async def callback_delete_promocode(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Handler for starting the promocode deletion process.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+        state (FSMContext): The state context for managing conversation state.
+    """
     logger.info(f"Admin {callback.from_user.id} started deleting promocode.")
     await state.set_state(DeletePromocodeStates.waiting_for_promocode)
     await state.update_data(message=callback.message)
@@ -142,6 +217,14 @@ async def callback_delete_promocode(callback: CallbackQuery, state: FSMContext) 
 async def handle_promocode_input(
     message: Message, promocode_service: PromocodeService, state: FSMContext
 ) -> None:
+    """
+    Handler for processing the input of a promocode to delete.
+
+    Arguments:
+        message (Message): The incoming message containing the promocode to delete.
+        promocode_service (PromocodeService): Service for handling promocode deletion.
+        state (FSMContext): The state context for managing conversation state.
+    """
     promocode = message.text.strip()
     await message.delete()
     logger.info(f"Admin {message.from_user.id} entered promocode: {promocode} for deleting.")

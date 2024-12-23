@@ -2,7 +2,7 @@ import logging
 
 from aiogram import Bot
 
-from app.bot.navigation import Navigation
+from app.bot.navigation import Navigation, SubscriptionCallback
 from app.bot.payment_gateways import Cryptomus, TelegramStars, Yookassa
 
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ class PaymentMethod:
             raise ValueError(f"Invalid callback data: {callback_data}")
 
         symbol, code, gateway = methods[callback_data]
-        logger.info(f"Created PaymentMethod from {callback_data}")
+        logger.debug(f"Created PaymentMethod from {callback_data}")
         return cls(callback_data, symbol, code, gateway)
 
 
@@ -88,12 +88,12 @@ class PaymentService:
         logger.debug(f"Initializing PaymentService with {callback_data}")
         self.method = PaymentMethod.from_callback(callback_data)
 
-    async def create_payment(self, data: dict, bot: Bot | None = None) -> str:
+    async def create_payment(self, data: SubscriptionCallback, bot: Bot | None = None) -> str:
         """
         Creates a payment using the selected payment method.
 
         Arguments:
-            data (dict): The data required to create the payment.
+            data (SubscriptionCallback): The data required to create the payment.
             bot (Bot | None): The bot instance, required for TelegramStars gateway.
 
         Returns:

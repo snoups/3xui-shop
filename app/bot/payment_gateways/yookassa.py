@@ -1,3 +1,24 @@
+from app.bot.navigation import SubscriptionCallback
+
+
 class Yookassa:
-    def create_payment(self, amount: float, user_id: int) -> str:
+    """
+    Service for creating payments through the Yookassa platform.
+
+    This class handles the payment creation process using the Yookassa API, generating
+    payment links or processing payment requests for subscriptions.
+    """
+
+    def create_payment(self, data: SubscriptionCallback) -> str:
+        """
+        Create a payment link for the subscription using Yookassa.
+
+        This method generates a payment link based on the provided subscription data.
+
+        Arguments:
+            data (SubscriptionCallback): The subscription data, including traffic and duration.
+
+        Returns:
+            str: The payment link for the subscription.
+        """
         pass

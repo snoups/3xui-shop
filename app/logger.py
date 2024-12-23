@@ -128,7 +128,7 @@ def setup_logging(config: LoggingConfig) -> None:
 
     # Suppress logs to avoid unnecessary output
     aiogram_logger = logging.getLogger("aiogram.event")
-    aiogram_logger.setLevel(logging.INFO)
+    aiogram_logger.setLevel(logging.CRITICAL)
 
     aiosqlite_logger = logging.getLogger("aiosqlite")
     aiosqlite_logger.setLevel(logging.INFO)

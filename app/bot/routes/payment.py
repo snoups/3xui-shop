@@ -1,16 +1,18 @@
-import json
 import logging
 
 from aiogram import Bot, F, Router
 from aiogram.types import CallbackQuery, Message, PreCheckoutQuery
 from aiogram.utils.i18n import gettext as _
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.filters import IsPrivate
-from app.bot.keyboards.pay import pay_keyboard
+from app.bot.filters.is_admin import IsAdmin
+from app.bot.keyboards.payment import pay_keyboard, payment_success_keyboard
 from app.bot.navigation import Navigation, SubscriptionCallback
 from app.bot.services.payment import PaymentService
 from app.bot.services.plans import PlansService
 from app.bot.services.vpn import VPNService
+from app.db.models.transaction import Transaction
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -23,33 +25,37 @@ async def callback_payment_method_selected(
     plans_service: PlansService,
     bot: Bot,
 ) -> None:
-    logger.info(f"User {callback.from_user.id} selected payment method: {callback.data}")
+    """
+    Handler for when a user selects a payment method for subscription.
 
+    Arguments:
+        callback (CallbackQuery): The callback query object containing user selection.
+        callback_data (SubscriptionCallback): The data from the callback query.
+        plans_service (PlansService): Service for managing subscription plans.
+        bot (Bot): The bot instance to send messages and interact with the user.
+    """
+    print(callback.message.message_id)
+    logger.info(f"User {callback.from_user.id} selected payment method: {callback_data.state}")
     traffic = callback_data.traffic
     duration = callback_data.duration
-    prices = plans_service.get_plan(traffic).prices.to_dict()
-
     logger.info(f"User {callback.from_user.id} selected {traffic} GB and {duration} days.")
 
     payment_service = PaymentService(callback_data.state)
     price = plans_service.get_price_for_duration(
-        prices,
+        plans_service.get_plan(traffic).prices.to_dict(),
         duration,
         payment_service.method.code,
     )
-    data = {
-        "user_id": callback.from_user.id,
-        "traffic": traffic,
-        "duration": duration,
-        "price": price,
-    }
+    callback_data.price = price
+    callback_data.message_id = callback.message.message_id
 
     # TODO: Make a check for the existence of a subscription
 
-    link = await payment_service.create_payment(data, bot)
+    link = await payment_service.create_payment(callback_data, bot)
+    logger.info(f"Payment link created for user {callback.from_user.id}: {link}")
 
     await callback.message.edit_text(
-        _(
+        text=_(
             "✅ *You selected:*\n"
             "\n"
             "Plan: {plan}\n"
@@ -70,22 +76,74 @@ async def callback_payment_method_selected(
 
 @router.pre_checkout_query()
 async def pre_checkout_handler(
-    pre_checkout_query: PreCheckoutQuery, vpn_service: VPNService
+    pre_checkout_query: PreCheckoutQuery,
 ) -> None:
-    logger.info("pre_checkout_handler")
-    data = json.loads(pre_checkout_query.invoice_payload)
-    logger.info(data)
-    await vpn_service.create_subscription(data["user_id"], data["traffic"], data["duration"])
-    await pre_checkout_query.answer(ok=True)
+    """
+    Handler for pre-checkout query to validate
+
+    Arguments:
+        pre_checkout_query (PreCheckoutQuery): The pre-checkout query from Telegram.
+        vpn_service (VPNService): Service for managing VPN subscriptions.
+    """
+    logger.info(f"Pre-checkout query received from user {pre_checkout_query.from_user.id}")
+    if pre_checkout_query.invoice_payload is not None:
+        await pre_checkout_query.answer(ok=True)
+    else:
+        await pre_checkout_query.answer(ok=False)
 
 
 @router.message(F.successful_payment)
-async def successful_payment(message: Message, bot: Bot) -> None:
-    logger.info("successful_payment")
-    await bot.refund_star_payment(
+async def successful_payment(
+    message: Message, session: AsyncSession, vpn_service: VPNService, bot: Bot
+) -> None:
+    """
+    Handler for successful payment. (create the subscription)
+
+    Arguments:
+        message (Message): The message object containing payment success details.
+        bot (Bot): The bot instance to send messages and interact with the user.
+    """
+    if await IsAdmin()(message):
+        await bot.refund_star_payment(
+            user_id=message.from_user.id,
+            telegram_payment_charge_id=message.successful_payment.telegram_payment_charge_id,
+        )
+
+    logger.info(f"Payment successful for user {message.from_user.id}")
+    data = SubscriptionCallback.unpack(message.successful_payment.invoice_payload)
+    logger.debug(f"Subscription data unpacked: {data}")
+
+    await bot.delete_message(chat_id=message.chat.id, message_id=data.message_id)
+    # await bot.edit_message_text(
+    #     text="Successful payment!",
+    #     chat_id=message.chat.id,
+    #     message_id=data.message_id,
+    #     reply_markup=back_to_main_menu_keyboard(),
+    # )
+
+    await vpn_service.create_subscription(data.user_id, data.traffic, data.duration)
+    logger.info(f"Subscription created for user {data.user_id}")
+
+    await Transaction.create_transaction(
+        session=session,
         user_id=message.from_user.id,
-        telegram_payment_charge_id=message.successful_payment.telegram_payment_charge_id,
+        payment_id=message.successful_payment.telegram_payment_charge_id,
+        amount=message.successful_payment.total_amount,
+        status="success",
     )
+
+    key = await vpn_service.get_key(message.from_user.id)
     await message.answer(
-        f"*Your transaction id*: ```{message.successful_payment.telegram_payment_charge_id}```"
+        text=_(
+            "✅ *Payment successful!*\n"
+            "\n"
+            "🔑 *Your key:* ```{key}```\n"
+            "_The key will be saved in your profile._\n"
+            "\n"
+            "To start using our service, go to the download page of the application and "
+            "download it for your platform. Then you can manually enter the key or click "
+            "`🔌 Connect` and the key will be automatically added to the application."
+        ).format(key=key),
+        message_effect_id="5046509860389126442",  # TODO: Delete effect
+        reply_markup=payment_success_keyboard(),
     )

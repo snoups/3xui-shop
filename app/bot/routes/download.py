@@ -15,6 +15,12 @@ router = Router(name=__name__)
 
 @router.callback_query(F.data == Navigation.DOWNLOAD, IsPrivate())
 async def callback_download(callback: CallbackQuery) -> None:
+    """
+    Handler for opening the platform selection menu.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
     logger.info(f"User {callback.from_user.id} opened download apps.")
     await callback.message.edit_text(
         text=_("📲 *Choose your platform:*"),
@@ -24,6 +30,13 @@ async def callback_download(callback: CallbackQuery) -> None:
 
 @router.callback_query(F.data.startswith(Navigation.PLATFORM), IsPrivate())
 async def callback_platform(callback: CallbackQuery, vpn_service: VPNService) -> None:
+    """
+    Handler for selecting a platform and providing the VPN key.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+        vpn_service (VPNService): Service for managing VPN keys.
+    """
     logger.info(f"User {callback.from_user.id} selected platform: {callback.data}")
     key = await vpn_service.get_key(callback.from_user.id)
 
@@ -35,6 +48,10 @@ async def callback_platform(callback: CallbackQuery, vpn_service: VPNService) ->
         icon = "💻 "
 
     await callback.message.edit_text(
-        text=icon + _("To connect you need to install the app and enter your key."),
+        text=icon
+        + _(
+            "To connect, you need to install the app and "
+            "enter your key manually or click the `🔌 Connect` button."
+        ),
         reply_markup=download_keyboard(callback.data, key),
     )

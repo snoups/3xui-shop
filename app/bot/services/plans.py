@@ -161,7 +161,8 @@ class PlansService:
             logger.warning(f"Plan with traffic {traffic} not found.")
         return plan
 
-    def get_price_for_duration(self, prices: dict, duration: int, currency: str = "RUB") -> float:
+    @staticmethod
+    def get_price_for_duration(prices: dict, duration: int, currency: str = "RUB") -> float:
         """
         Get the price for a specific duration and currency.
 
@@ -177,7 +178,8 @@ class PlansService:
         logger.debug(f"Price for {duration} days in {currency} currency: {price}")
         return price
 
-    def convert_traffic_to_title(self, traffic: int) -> str:
+    @staticmethod
+    def convert_traffic_to_title(traffic: int) -> str:
         """
         Convert the traffic value to a human-readable string.
 
@@ -193,7 +195,8 @@ class PlansService:
         logger.debug(f"Converted traffic {traffic} to string")
         return f"{traffic} " + _("GB")
 
-    def convert_days_to_period(self, days: int) -> str:
+    @staticmethod
+    def convert_days_to_period(days: int) -> str:
         """
         Convert the number of days to a human-readable period.
 

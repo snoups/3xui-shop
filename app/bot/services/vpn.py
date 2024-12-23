@@ -69,7 +69,7 @@ class VPNService:
         if client:
             logger.debug(f"Client {user_id} exists.")
         else:
-            logger.warning(f"Client {user_id} not found.")
+            logger.debug(f"Client {user_id} not found.")
         return client
 
     async def get_client_data(self, user_id: int) -> dict | None:
@@ -87,7 +87,7 @@ class VPNService:
             client: Client = await self.api.client.get_by_email(str(user_id))
 
             if client is None:
-                logger.warning(f"No client data found for {user_id}.")
+                logger.debug(f"No client data found for {user_id}.")
                 return None
 
             traffic_total = client.total
@@ -135,7 +135,7 @@ class VPNService:
             replace_traffic (bool): If True, replaces the existing traffic limit.
             replace_duration (bool): If True, replaces the existing subscription duration.
         """
-        logger.debug(
+        logger.info(
             f"Updating client {user.user_id} with traffic={traffic} GB "
             f"and duration={duration} days."
         )
@@ -177,7 +177,7 @@ class VPNService:
             traffic (int): The traffic limit in GB to set for the new client.
             duration (int): The duration in days for which the subscription is valid.
         """
-        logger.debug(
+        logger.info(
             f"Creating new client {user.user_id} with traffic={traffic} GB "
             f"and duration={duration} days."
         )
@@ -195,7 +195,7 @@ class VPNService:
         inbound_id = 7  # TODO: Make a server config file
         try:
             await self.api.client.add(inbound_id, [new_client])
-            logger.debug(f"Successfully created client for {user.user_id}.")
+            logger.info(f"Successfully created client for {user.user_id}.")
         except Exception as exception:
             logger.error(f"Error creating client for {user.user_id}: {exception}")
 

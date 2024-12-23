@@ -76,6 +76,13 @@ async def prepare_message(user: TelegramUser, client: ClientService) -> str:
 
 @router.callback_query(F.data == Navigation.PROFILE, IsPrivate())
 async def callback_profile(callback: CallbackQuery, vpn_service: VPNService) -> None:
+    """
+    Handler for opening the user's profile.
+
+    Arguments:
+        callback (CallbackQuery): The callback query object containing user interaction.
+        vpn_service (VPNService): Service for managing VPN subscriptions and data retrieval.
+    """
     logger.info(f"User {callback.from_user.id} opened profile.")
     client_data = await vpn_service.get_client_data(callback.from_user.id)
     client = ClientService(client_data)
@@ -89,13 +96,20 @@ async def callback_profile(callback: CallbackQuery, vpn_service: VPNService) -> 
         reply_markup = buy_subscription_keyboard()
 
     await callback.message.edit_text(
-        await prepare_message(callback.from_user, client),
+        text=await prepare_message(callback.from_user, client),
         reply_markup=reply_markup,
     )
 
 
 @router.callback_query(F.data == Navigation.SHOW_KEY, IsPrivate())
 async def callback_show_key(callback: CallbackQuery, vpn_service: VPNService) -> None:
+    """
+    Handler for showing the user's VPN key.
+
+    Arguments:
+        callback (CallbackQuery): The callback query object containing user interaction.
+        vpn_service (VPNService): Service for managing VPN subscriptions and key retrieval.
+    """
     logger.info(f"User {callback.from_user.id} looked key.")
     key = await vpn_service.get_key(callback.from_user.id)
     key_text = _("🔑 *Your key:* (Closes after {seconds_text}) ```{key}```")
@@ -104,5 +118,5 @@ async def callback_show_key(callback: CallbackQuery, vpn_service: VPNService) ->
     for seconds in range(5, 0, -1):
         seconds_text = _("1 second", "{} seconds", seconds).format(seconds)
         await asyncio.sleep(1)
-        await message.edit_text(key_text.format(key=key, seconds_text=seconds_text))
+        await message.edit_text(text=key_text.format(key=key, seconds_text=seconds_text))
     await message.delete()

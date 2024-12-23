@@ -2,9 +2,32 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from app.bot.keyboards.back import back_button
+from app.bot.keyboards.back import back_button, back_to_main_menu_button
 from app.bot.navigation import Navigation, SubscriptionCallback
 from app.bot.services.plans import PlansService
+
+
+def pay_keyboard(pay_url: str, callback_data: SubscriptionCallback) -> InlineKeyboardMarkup:
+    """
+    Generates a payment keyboard with a link to the payment URL and a back button.
+
+    This keyboard is designed for users to initiate a payment. It includes a button
+    with the specified payment URL and a back button to navigate to the duration selection menu.
+
+    Arguments:
+        pay_url (str): URL to redirect the user to the payment page.
+        callback_data (SubscriptionCallback): Callback data to identify the navigation state.
+
+    Returns:
+        InlineKeyboardMarkup: Inline keyboard with a pay button and a back button.
+    """
+    builder = InlineKeyboardBuilder()
+
+    builder.row(InlineKeyboardButton(text=_("💸 Pay"), url=pay_url))
+
+    callback_data.state = Navigation.DURATION
+    builder.row(back_button(callback_data.pack()))
+    return builder.as_markup()
 
 
 def payment_method_keyboard(
@@ -56,4 +79,27 @@ def payment_method_keyboard(
 
     callback_data.state = Navigation.TRAFFIC
     builder.row(back_button(callback_data.pack()))
+    return builder.as_markup()
+
+
+def payment_success_keyboard() -> InlineKeyboardMarkup:
+    """
+    Generates a keyboard for the successful payment confirmation.
+
+    This keyboard provides a button for the user to download the app after completing
+    the payment process, along with a back button that redirects the user to the main menu.
+
+    Returns:
+        InlineKeyboardMarkup: Inline keyboard with a download button and a back button to main menu.
+    """
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("📥 Download app"),
+            callback_data=Navigation.DOWNLOAD,
+        )
+    )
+
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()

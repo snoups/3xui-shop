@@ -1,6 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import relationship
 
 from ._base import Base
 
@@ -15,34 +16,14 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id = Column(
-        Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-    vpn_id = Column(
-        String(length=32),
-        unique=True,
-        nullable=False,
-    )
-    user_id = Column(
-        BigInteger,
-        unique=True,
-        nullable=False,
-    )
-    first_name = Column(
-        String(length=128),
-        nullable=False,
-    )
-    username = Column(
-        String(length=64),
-        nullable=True,
-    )
-    created_at = Column(
-        DateTime,
-        default=func.now(),
-        nullable=False,
-    )
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    vpn_id = Column(String(length=32), unique=True, nullable=False)
+    user_id = Column(BigInteger, unique=True, nullable=False)
+    first_name = Column(String(length=128), nullable=False)
+    username = Column(String(length=64), nullable=True)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+
+    transactions = relationship("Transaction", back_populates="user", cascade="all, delete-orphan")
 
     @classmethod
     async def get(cls, session: AsyncSession, **kwargs) -> "User | None":

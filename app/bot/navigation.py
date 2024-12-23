@@ -61,8 +61,11 @@ class Navigation(str, Enum):
 
 class SubscriptionCallback(CallbackData, prefix="subscription"):
     state: Navigation
+    user_id: int
+    message_id: int = 0
     traffic: int = 0
     duration: int = 0
+    price: int = 0
 
 
 class CreatePromocodeCallback(CallbackData, prefix="create_promocode"):

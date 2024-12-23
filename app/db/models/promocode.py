@@ -15,33 +15,12 @@ class Promocode(Base):
 
     __tablename__ = "promocodes"
 
-    id = Column(
-        Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-    code = Column(
-        String(length=8),
-        unique=True,
-        nullable=False,
-    )
-    traffic = Column(
-        BigInteger,
-        nullable=False,
-    )
-    duration = Column(
-        BigInteger,
-        nullable=False,
-    )
-    is_activated = Column(
-        Boolean,
-        default=False,
-        nullable=False,
-    )
-    activated_by = Column(
-        Integer,
-        nullable=True,
-    )
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(length=8), unique=True, nullable=False)
+    traffic = Column(BigInteger, nullable=False)
+    duration = Column(BigInteger, nullable=False)
+    is_activated = Column(Boolean, default=False, nullable=False)
+    activated_by = Column(Integer, nullable=True)
 
     @classmethod
     async def get(cls, session: AsyncSession, **kwargs) -> "Promocode | None":
