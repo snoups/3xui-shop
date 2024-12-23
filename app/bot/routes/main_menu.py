@@ -8,7 +8,7 @@ from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin, IsPrivate
 from app.bot.keyboards.main_menu import main_menu_keyboard
-from app.bot.navigation import NavigationAction
+from app.bot.navigation import Navigation
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -39,14 +39,8 @@ def prepare_message(user: User) -> str:
     ).format(name=user.full_name)
 
 
-@router.message(Command(NavigationAction.START), IsPrivate())
+@router.message(Command(Navigation.START), IsPrivate())
 async def command_main_menu(message: Message, state: FSMContext) -> None:
-    """
-    Handles the `/start` command and sends the main menu to the user.
-
-    Arguments:
-        message (Message): The incoming message with the `/start` command.
-    """
     logger.info(f"User {message.from_user.id} opened main menu.")
     await state.clear()
     is_admin = await IsAdmin()(message)
@@ -56,14 +50,8 @@ async def command_main_menu(message: Message, state: FSMContext) -> None:
     )
 
 
-@router.callback_query(F.data == NavigationAction.MAIN_MENU, IsPrivate())
+@router.callback_query(F.data == Navigation.MAIN_MENU, IsPrivate())
 async def callback_main_menu(callback: CallbackQuery, state: FSMContext) -> None:
-    """
-    Handles the callback query to return to the main menu and sends the updated message to the user.
-
-    Arguments:
-        callback (CallbackQuery): The callback query received from the user.
-    """
     logger.info(f"User {callback.from_user.id} returned to main menu.")
     await state.clear()
     is_admin = await IsAdmin()(callback)

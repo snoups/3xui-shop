@@ -11,7 +11,7 @@ from app.config import LoggingConfig
 
 class CompressingFileHandler(TimedRotatingFileHandler):
     """
-    Advanced TimedRotatingFileHandler with support for archiving logs.
+    A custom TimedRotatingFileHandler with support for log file archiving.
 
     Attributes:
         archive_format (str): Format for archiving log files ("zip" or "gz").
@@ -64,21 +64,37 @@ class CompressingFileHandler(TimedRotatingFileHandler):
         log_file = self.rotation_filename(self.baseFilename)
 
         if self.archive_format == "zip":
-            # Archive in .zip format
-            zip_file = f"{log_file}.zip"
-            logging.info(f"Archiving {log_file} to {zip_file}")
-            with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as archive:
-                archive.write(log_file, os.path.basename(log_file))
+            self._archive_to_zip(log_file)
         elif self.archive_format == "gz":
-            # Archive in .gz format
-            gz_file = f"{log_file}.gz"
-            logging.info(f"Archiving {log_file} to {gz_file}")
-            with open(log_file, "rb") as log:
-                with gzip.open(gz_file, "wb") as archive:
-                    shutil.copyfileobj(log, archive)
+            self._archive_to_gz(log_file)
 
         # Remove the original log file
         os.remove(log_file)
+
+    def _archive_to_zip(self, log_file: str) -> None:
+        """
+        Archive the log file to a .zip format.
+
+        Arguments:
+            log_file (str): Path to the log file to archive.
+        """
+        zip_file = f"{log_file}.zip"
+        logging.info(f"Archiving {log_file} to {zip_file}")
+        with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.write(log_file, os.path.basename(log_file))
+
+    def _archive_to_gz(self, log_file: str) -> None:
+        """
+        Archive the log file to a .gz format.
+
+        Arguments:
+            log_file (str): Path to the log file to archive.
+        """
+        gz_file = f"{log_file}.gz"
+        logging.info(f"Archiving {log_file} to {gz_file}")
+        with open(log_file, "rb") as log:
+            with gzip.open(gz_file, "wb") as archive:
+                shutil.copyfileobj(log, archive)
 
 
 def setup_logging(config: LoggingConfig) -> None:
@@ -110,6 +126,15 @@ def setup_logging(config: LoggingConfig) -> None:
         ],
     )
 
-    # Suppress aiogram logs to avoid unnecessary output
+    # Suppress logs to avoid unnecessary output
     aiogram_logger = logging.getLogger("aiogram.event")
-    aiogram_logger.setLevel(logging.CRITICAL)
+    aiogram_logger.setLevel(logging.INFO)
+
+    aiosqlite_logger = logging.getLogger("aiosqlite")
+    aiosqlite_logger.setLevel(logging.INFO)
+
+    httpcore_logger = logging.getLogger("httpcore")
+    httpcore_logger.setLevel(logging.INFO)
+
+    httpx_logger = logging.getLogger("httpx")
+    httpx_logger.setLevel(logging.INFO)

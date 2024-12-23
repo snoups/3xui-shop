@@ -7,7 +7,10 @@ from ._base import Base
 
 class Promocode(Base):
     """
-    Model representing the Promocode table.
+    Model representing the Promocode table in the database.
+
+    This model is used to store and manage promocodes, which can be associated with
+    subscription traffic and duration.
     """
 
     __tablename__ = "promocodes"
@@ -47,10 +50,13 @@ class Promocode(Base):
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            kwargs (dict): The filters for selecting the promocode.
+            kwargs (dict): The filters for selecting the promocode (e.g., code="ABC123").
 
         Returns:
-            Optional[Promocode]: The promocode object or None if not found.
+            Promocode | None: The promocode object if found, or None if not found.
+
+        Example:
+            promocode = await Promocode.get(session, code="ABC123")
         """
         filters = [*[getattr(Promocode, key) == value for key, value in kwargs.items()]]
         query = await session.execute(select(Promocode).where(*filters))
@@ -66,12 +72,20 @@ class Promocode(Base):
             kwargs (dict): Attributes for the new promocode.
 
         Returns:
-            Optional[Promocode]: The created promocode object, or None if creation failed.
+            Promocode | None: The created promocode if successful, None if creation failed.
+
+        Example:
+            promocode = await Promocode.create(session, code="ABC123", traffic=1000, duration=3600)
         """
         promocode = Promocode(**kwargs)
         session.add(promocode)
 
-        await session.commit()
+        try:
+            await session.commit()
+        except IntegrityError:
+            await session.rollback()
+            return None
+
         return promocode
 
     @classmethod
@@ -81,8 +95,11 @@ class Promocode(Base):
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            code (str): The unique promocode string.
-            kwargs (dict): Attributes to be updated.
+            code (str): The unique promocode string (e.g., "ABC123").
+            kwargs (dict): Attributes to be updated (e.g., traffic=2000, is_activated=True).
+
+        Example:
+            await Promocode.update(session, code="ABC123", traffic=2000, is_activated=True)
         """
         filters = [Promocode.code == code]
         await session.execute(update(Promocode).filter(*filters).values(**kwargs))
@@ -91,14 +108,17 @@ class Promocode(Base):
     @classmethod
     async def exists(cls, session: AsyncSession, **kwargs) -> bool:
         """
-        Check if a promocode exists in the database.
+        Check if a promocode exists in the database based on the provided filters.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            kwargs (dict): The filters for checking the promocode.
+            kwargs (dict): The filters for checking the promocode (e.g., code="ABC123").
 
         Returns:
             bool: True if the promocode exists, otherwise False.
+
+        Example:
+            exists = await Promocode.exists(session, code="ABC123")
         """
         filters = [*[getattr(Promocode, key) == value for key, value in kwargs.items()]]
         query = await session.execute(select(Promocode).filter(*filters))

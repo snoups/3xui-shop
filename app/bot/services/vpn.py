@@ -12,23 +12,25 @@ logger = logging.getLogger(__name__)
 
 class VPNService:
     """
-    Service for interacting with the 3XUI API to manage client data and subscriptions.
+    Service for managing client data and subscriptions through the 3XUI API.
 
-    This service provides methods to create, update, and retrieve client information, as well as
-    check if a client exists. It interacts with the 3XUI API to manage VPN clients and their data.
+    This class provides methods for interacting with the 3XUI API to handle VPN client operations,
+    such as creating, updating, retrieving, and checking client data. It also includes utility
+    methods for converting traffic and duration values to the appropriate formats.
 
     Attributes:
-        api (AsyncApi): An instance of the AsyncApi to interact with the 3XUI API.
+        session (AsyncSession): Database session for interacting with the user model.
+        subscription (str): Base subscription URL for generating user-specific keys.
+        api (AsyncApi): Instance of the AsyncApi for interacting with the 3XUI API.
     """
 
     def __init__(self, session: AsyncSession, config: Config) -> None:
         """
-        Initializes the VPNService object with the given configuration.
+        Initializes the VPNService instance with database session and API configuration.
 
         Arguments:
-            session (AsyncSession): The database session used for querying the database.
-            config (Config): Configuration object containing the necessary credentials and settings
-                             to authenticate and interact with the 3XUI API.
+            session (AsyncSession): Database session for interacting with the user model.
+            config (Config): Configuration object containing API credentials and settings.
         """
         self.session = session
         self.subscription = config.xui.SUBSCRIPTION
@@ -40,15 +42,17 @@ class VPNService:
             use_tls_verify=False,
             logger=logging.getLogger("xui"),
         )
+        logger.info("VPNService initialized.")
 
     async def initialize(self) -> None:
         """
         Logs into the 3XUI API using the provided credentials.
 
-        This method must be called before performing any actions with the API, as it authenticates
-        the session and prepares the service for interactions with the API.
+        This method must be called before performing any API operations.
         """
+        logger.info("Logging into 3XUI API...")
         await self.api.login()
+        logger.info("Logged into 3XUI API successfully.")
 
     async def is_client_exists(self, user_id: int) -> Client | None:
         """
@@ -60,24 +64,30 @@ class VPNService:
         Returns:
             Client | None: The client object if found, otherwise None.
         """
-        return await self.api.client.get_by_email(str(user_id))
+        logger.debug(f"Checking if client {user_id} exists in 3XUI.")
+        client = await self.api.client.get_by_email(str(user_id))
+        if client:
+            logger.debug(f"Client {user_id} exists.")
+        else:
+            logger.warning(f"Client {user_id} not found.")
+        return client
 
     async def get_client_data(self, user_id: int) -> dict | None:
         """
         Retrieves detailed data for a client based on the user ID.
 
         Arguments:
-            user_id (int): The user ID of the client whose data is to be retrieved.
+            user_id (int): The user ID of the client.
 
         Returns:
-            dict | None: A dictionary containing the client’s traffic and subscription data.
-                         If an error occurs or client is not found, an empty dictionary is returned.
-                         Traffic values are in bytes (`-1` unlimited traffic or subscription).
+            dict | None: Dictionary containing client traffic and subscription data.
         """
+        logger.debug(f"Starting to retrieve client data for {user_id}.")
         try:
             client: Client = await self.api.client.get_by_email(str(user_id))
 
             if client is None:
+                logger.warning(f"No client data found for {user_id}.")
                 return None
 
             traffic_total = client.total
@@ -90,8 +100,7 @@ class VPNService:
             expiry_time = -1 if client.expiry_time == 0 else client.expiry_time
 
             traffic_used = client.up + client.down
-
-            return {
+            client_data = {
                 "traffic_total": traffic_total,
                 "traffic_remaining": traffic_remaining,
                 "traffic_used": traffic_used,
@@ -99,9 +108,11 @@ class VPNService:
                 "traffic_down": client.down,
                 "expiry_time": expiry_time,
             }
-        except Exception as e:
-            logger.error(f"Error retrieving client data: {e}")
-            return {}
+            logger.debug(f"Successfully retrieved client data for {user_id}: {client_data}.")
+            return client_data
+        except Exception as exception:
+            logger.error(f"Error retrieving client data for {user_id}: {exception}")
+            return None
 
     async def update_client(
         self,
@@ -124,29 +135,38 @@ class VPNService:
             replace_traffic (bool): If True, replaces the existing traffic limit.
             replace_duration (bool): If True, replaces the existing subscription duration.
         """
-        client: Client = await self.api.client.get_by_email(str(user.user_id))
+        logger.debug(
+            f"Updating client {user.user_id} with traffic={traffic} GB "
+            f"and duration={duration} days."
+        )
 
-        if replace_traffic:
-            new_traffic_bytes = self.gb_to_bytes(traffic)
-        else:
-            current_traffic_bytes = client.total_gb
-            additional_traffic_bytes = self.gb_to_bytes(traffic)
-            new_traffic_bytes = current_traffic_bytes + additional_traffic_bytes
+        try:
+            client: Client = await self.api.client.get_by_email(str(user.user_id))
 
-        if replace_duration:
-            new_expiry_time = self.days_to_timestamp(duration)
-        else:
-            new_expiry_time = self.add_days_to_timestamp(client.expiry_time, duration)
+            if replace_traffic:
+                new_traffic_bytes = self.gb_to_bytes(traffic)
+            else:
+                current_traffic_bytes = client.total_gb
+                additional_traffic_bytes = self.gb_to_bytes(traffic)
+                new_traffic_bytes = current_traffic_bytes + additional_traffic_bytes
 
-        client.id = user.vpn_id
-        client.expiry_time = new_expiry_time
-        client.flow = "xtls-rprx-vision"
-        client.limit_ip = 3
-        client.sub_id = user.vpn_id
-        client.total_gb = new_traffic_bytes
+            if replace_duration:
+                new_expiry_time = self.days_to_timestamp(duration)
+            else:
+                new_expiry_time = self.add_days_to_timestamp(client.expiry_time, duration)
 
-        await self.api.client.update(client.id, client)
-        await self.api.client.reset_stats(client.inbound_id, client.email)
+            client.id = user.vpn_id
+            client.expiry_time = new_expiry_time
+            client.flow = "xtls-rprx-vision"
+            client.limit_ip = 3
+            client.sub_id = user.vpn_id
+            client.total_gb = new_traffic_bytes
+
+            await self.api.client.update(client.id, client)
+            await self.api.client.reset_stats(client.inbound_id, client.email)
+            logger.info(f"Client {user.user_id} updated successfully.")
+        except Exception as exception:
+            logger.error(f"Error updating client {user.user_id}: {exception}")
 
     async def create_client(self, user: User, traffic: int, duration: int) -> None:
         """
@@ -157,18 +177,27 @@ class VPNService:
             traffic (int): The traffic limit in GB to set for the new client.
             duration (int): The duration in days for which the subscription is valid.
         """
+        logger.debug(
+            f"Creating new client {user.user_id} with traffic={traffic} GB "
+            f"and duration={duration} days."
+        )
+
         new_client = Client(
             email=str(user.user_id),
             enable=True,
             id=user.vpn_id,
             expiryTime=self.days_to_timestamp(duration),
             flow="xtls-rprx-vision",
-            limitIp=3,  # TODO: choosing amount device
+            limitIp=3,  # TODO: Make a choice of the number of devices
             sub_id=user.vpn_id,
             totalGB=self.gb_to_bytes(traffic),
         )
-        inbound_id = 7  # TODO: inbound id selection
-        await self.api.client.add(inbound_id, [new_client])
+        inbound_id = 7  # TODO: Make a server config file
+        try:
+            await self.api.client.add(inbound_id, [new_client])
+            logger.debug(f"Successfully created client for {user.user_id}.")
+        except Exception as exception:
+            logger.error(f"Error creating client for {user.user_id}: {exception}")
 
     def gb_to_bytes(self, traffic_gb: int) -> int:
         """
@@ -222,6 +251,25 @@ class VPNService:
         Returns:
             str: The key extracted from the response.
         """
+        logger.debug(f"Fetching key for {user_id}.")
         async with self.session() as session:
             user: User = await User.get(session, user_id=user_id)
-        return f"{self.subscription}{user.vpn_id}"
+        key = f"{self.subscription}{user.vpn_id}"
+        logger.debug(f"Fetched key for {user_id}: {key}.")
+        return key
+
+    async def create_subscription(self, user_id: int, traffic: int, duration: int) -> None:
+        """
+        Create or update a subscription for the user.
+
+        Arguments:
+            user_id (int): The ID of the user for whom the subscription is being created or updated.
+            traffic (int): The amount of traffic allocated to the user in bytes.
+            duration (int): The duration of the subscription in seconds.
+        """
+        async with self.session() as session:
+            user: User = await User.get(session, user_id=user_id)
+        if await self.is_client_exists(user.user_id):
+            await self.update_client(user, traffic, duration)
+        else:
+            await self.create_client(user, traffic, duration)

@@ -23,7 +23,7 @@ class BotConfig:
 
     Attributes:
         TOKEN (str): API token for the Telegram bot.
-        ADMINS (list[int]): Admins IDs (user IDs) for admin tools.
+        ADMINS (list[int]): List of admin IDs (user IDs) for admin tools.
         DEV_ID (int | None): Developer ID (user ID) for notifications.
         SUPPORT_ID (int): Support ID (user ID) for support.
     """
@@ -43,7 +43,7 @@ class XUIConfig:
         HOST (str): Host URL for the XUI service.
         USERNAME (str): Username for XUI authentication.
         PASSWORD (str): Password for XUI authentication.
-        TOKEN (str | None): API token for XUI.
+        TOKEN (str | None): API token for XUI (if provided).
         SUBSCRIPTION (str): Base URL for XUI subscription.
     """
 
@@ -60,8 +60,8 @@ class DatabaseConfig:  # TODO: Add support for different drivers
     Configuration for the database.
 
     Attributes:
-        HOST (str | None): Host address of the database server.
-        PORT (int | None): Port number for the database server.
+        HOST (str | None):  Host address of the database server (if available).
+        PORT (int | None): Port number for the database server (if available).
         USERNAME (str | None): Username for database authentication.
         PASSWORD (str | None): Password for database authentication.
         NAME (str): Name of the database to connect to.
@@ -98,7 +98,7 @@ class LoggingConfig:
         LEVEL (str): Logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).
         FORMAT (str): Format string for log messages.
         DIR (str): Directory where log files are stored.
-        ARCHIVE_FORMAT (str): Archive format for log archiving.
+        ARCHIVE_FORMAT (str): Archive format for log archiving (either "zip" or "gz").
     """
 
     LEVEL: str
@@ -110,7 +110,10 @@ class LoggingConfig:
 @dataclass
 class Config:
     """
-    Main configuration class.
+    Main configuration class for the application.
+
+    Contains all configurations related to the bot, XUI service,
+    database, and logging.
 
     Attributes:
         bot (BotConfig): Bot configuration.
@@ -127,10 +130,13 @@ class Config:
 
 def load_config() -> Config:
     """
-    Load configuration from environment variables.
+    Load configuration from environment variables using `environs`.
+
+    This function reads the environment variables and returns a fully populated
+    `Config` object containing bot, XUI, database, and logging configurations.
 
     Returns:
-        Config: Application configuration.
+        Config: A fully populated configuration object for the application.
     """
     env = Env()
     env.read_env()

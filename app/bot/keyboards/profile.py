@@ -3,44 +3,51 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
-from app.bot.keyboards.subscription import buy_subscription_button
-from app.bot.navigation import NavigationAction
+from app.bot.navigation import Navigation
 
 
 def buy_subscription_keyboard() -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for the user profile menu.
+    Generates a keyboard for purchasing a subscription.
 
-    This keyboard includes an option to buy a subscription and a back button
-    to return to the main menu.
+    This keyboard allows the user to navigate to the subscription purchase page.
+    It includes a button for subscription purchase and a back button for returning
+    to the main menu.
 
     Returns:
-        InlineKeyboardMarkup: The inline keyboard with the buy subscription option and back button.
+        InlineKeyboardMarkup: Keyboard with a subscription button and a back button.
     """
     builder = InlineKeyboardBuilder()
-    builder.row(buy_subscription_button())
-    builder.row(back_button(NavigationAction.MAIN_MENU))
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("💳 Buy subscription"),
+            callback_data=Navigation.SUBSCRIPTION,
+        )
+    )
+
+    builder.row(back_button(Navigation.MAIN_MENU))
     return builder.as_markup()
 
 
 def show_key_keyboard() -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for showing the user's key.
+    Generates a keyboard to display the user's VPN access key.
 
-    This keyboard includes an option to show the user's key and a back button
-    to return to the main menu.
+    This keyboard provides a button for showing the VPN key and a back button to return
+    to the main menu. It is intended for users to retrieve their key after subscription.
 
     Returns:
-        InlineKeyboardMarkup: The inline keyboard with the show key option and back button.
+        InlineKeyboardMarkup: Keyboard with options to show the key and go back.
     """
     builder = InlineKeyboardBuilder()
 
     builder.row(
         InlineKeyboardButton(
             text=_("🔑 Show key"),
-            callback_data=NavigationAction.SHOW_KEY,
+            callback_data=Navigation.SHOW_KEY,
         )
     )
 
-    builder.row(back_button(NavigationAction.MAIN_MENU))
+    builder.row(back_button(Navigation.MAIN_MENU))
     return builder.as_markup()

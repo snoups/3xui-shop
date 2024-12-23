@@ -3,47 +3,45 @@ from enum import Enum
 from aiogram.filters.callback_data import CallbackData
 
 
-class NavigationAction(str, Enum):
-    """
-    Enum for navigation actions within the bot.
-    """
-
-    START = "start"  # Command to start the bot.
-    MAIN_MENU = "main_menu"  # Navigate to main menu.
-    REFERRAL = "referral"  # Navigate to referral system.
-    PROMOCODE = "promocode"  # Navigate to activate promocode.
+class Navigation(str, Enum):
+    START = "start"
+    MAIN_MENU = "main_menu"
+    REFERRAL = "referral"
+    PROMOCODE = "promocode"
 
     # region: Profile
     PROFILE = "profile"
     SHOW_KEY = "show_key"
+    # endregion
 
-    # region: Admin tools
+    # region: Subscription
     ADMIN_TOOLS = "admin_tools"
     STATISTICS = "statistics"
     EDITOR_USERS = "editor_users"
+
     EDITOR_PROMOCODES = "editor_promocodes"
+    CREATE_PROMOCODE = "create_promocode"
+    DELETE_PROMOCODE = "delete_promocode"
+    EDIT_PROMOCODE = "edit_promocode"
+
     SEND_NOTIFICATION = "send_notification"
     CREATE_BACKUP = "create_backup"
     RESTART_BOT = "restart_bot"
     # endregion
 
-    # region: Editor Promocodes
-    CREATE_PROMOCODE = "create_promocode"
-    DELETE_PROMOCODE = "delete_promocode"
-    EDIT_PROMOCODE = "edit_promocode"
-    # endregion
-
-    # region: Subscribtion
+    # region: Subscription
     SUBSCRIPTION = "subscription"
     PROCESS = "process"
     TRAFFIC = "traffic"
     DURATION = "duration"
-    BACK_TO_DURATION = "back_to_duration"
-    BACK_TO_PAYMENT = "back_to_payment"
+
     PAY = "pay"
     PAY_YOOKASSA = f"{PAY}_yookassa"
     PAY_TELEGRAM_STARS = f"{PAY}_telegram_stars"
     PAY_CRYPTOMUS = f"{PAY}_cryptomus"
+
+    BACK_TO_DURATION = "back_to_duration"
+    BACK_TO_PAYMENT = "back_to_payment"
     # endregion
 
     # region: Download
@@ -61,23 +59,13 @@ class NavigationAction(str, Enum):
     # endregion
 
 
-class States(Enum):
-    TRAFFIC = "traffic"
-    DURATION = "duration"
-    PAY = "pay"
-    PAY_YOOKASSA = f"{PAY}_yookassa"
-    PAY_TELEGRAM_STARS = f"{PAY}_telegram_stars"
-    PAY_CRYPTOMUS = f"{PAY}_cryptomus"
-
-
 class SubscriptionCallback(CallbackData, prefix="subscription"):
-    state: States
+    state: Navigation
     traffic: int = 0
     duration: int = 0
-    price: int = 0
 
 
-class PromocodeCallback(CallbackData, prefix="create_promocode"):
-    state: States
+class CreatePromocodeCallback(CallbackData, prefix="create_promocode"):
+    state: Navigation
     traffic: int = 0
     duration: int = 0

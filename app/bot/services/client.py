@@ -31,6 +31,7 @@ class ClientService:
             client_data (dict): A dictionary containing client data.
         """
         self.client_data = client_data
+        logger.debug(f"ClientService initialized with client_data: {client_data}")
 
     def __bool__(self) -> bool:
         """
@@ -39,7 +40,9 @@ class ClientService:
         Returns:
             bool: True if client data exists, False otherwise.
         """
-        return bool(self.client_data)
+        exists = bool(self.client_data)
+        logger.debug(f"Client data existence check: {exists}")
+        return exists
 
     @property
     def traffic_total(self) -> str:
@@ -110,9 +113,9 @@ class ClientService:
             bool: True if traffic expired, False otherwise.
         """
         remaining_traffic = self.client_data.get("traffic_remaining", -1)
-        if remaining_traffic == -1:
-            return False  # Unlimited traffic
-        return remaining_traffic <= 0
+        expired = remaining_traffic != -1 and remaining_traffic <= 0
+        logger.debug(f"Traffic expired: {expired}")
+        return expired
 
     @property
     def has_subscription_expired(self) -> bool:
@@ -123,11 +126,10 @@ class ClientService:
             bool: True if the subscription expired, False otherwise.
         """
         expiry_time = self.client_data.get("expiry_time", -1)
-        if expiry_time == -1:
-            return False  # Unlimited subscription
-
         current_time = time.time() * 1000
-        return current_time > expiry_time
+        expired = expiry_time != -1 and current_time > expiry_time
+        logger.debug(f"Subscription expired: {expired}")
+        return expired
 
     @property
     def has_valid_subscription(self) -> bool:
@@ -137,9 +139,9 @@ class ClientService:
         Returns:
             bool: True if the client has a valid subscription, False otherwise.
         """
-        if self.has_traffic_expired or self.has_subscription_expired:
-            return False
-        return True
+        valid = not (self.has_traffic_expired or self.has_subscription_expired)
+        logger.debug(f"Valid subscription: {valid}")
+        return valid
 
     def _convert_size(self, size_bytes: int) -> str:
         """
@@ -151,21 +153,27 @@ class ClientService:
         Returns:
             str: The size in a human-readable format.
         """
-        if size_bytes == -1:
-            return UNLIMITED
-        elif size_bytes == 0:
-            return f"{size_bytes} {_('MB')}"
+        try:
+            if size_bytes == -1:
+                return UNLIMITED
+            elif size_bytes == 0:
+                return f"{size_bytes} {_('MB')}"
 
-        size_units_keys = [_("MB"), _("GB"), _("TB"), _("PB"), _("EB"), _("ZB"), _("YB")]
-        size_in_mb = max(size_bytes / 1024**2, 1)
-        i = min(int(math.floor(math.log(size_in_mb, 1024))), len(size_units_keys) - 1)
-        p = math.pow(1024, i)
-        s = round(size_in_mb / p, 2)
+            size_units_keys = [_("MB"), _("GB"), _("TB"), _("PB"), _("EB"), _("ZB"), _("YB")]
+            size_in_mb = max(size_bytes / 1024**2, 1)
+            i = min(int(math.floor(math.log(size_in_mb, 1024))), len(size_units_keys) - 1)
+            p = math.pow(1024, i)
+            s = round(size_in_mb / p, 2)
 
-        if s.is_integer():
-            s = int(s)
+            if s.is_integer():
+                s = int(s)
 
-        return f"{s} {size_units_keys[i]}"
+            result = f"{s} {size_units_keys[i]}"
+            logger.debug(f"Converted size: {size_bytes} bytes to {result}")
+            return result
+        except Exception as exception:
+            logger.error(f"Error converting size: {exception}")
+            return f"0 {_('MB')}"
 
     def _time_left_to_expiry(self, expiry_time: int) -> str:
         """
@@ -177,15 +185,29 @@ class ClientService:
         Returns:
             str: The remaining time in a human-readable format.
         """
-        if expiry_time == -1:
-            return UNLIMITED
+        try:
+            if expiry_time == -1:
+                return UNLIMITED
 
-        now = datetime.now(tz=timezone.utc)
-        expiry_datetime = datetime.fromtimestamp(expiry_time / 1000, tz=timezone.utc)
-        time_left = expiry_datetime - now
+            now = datetime.now(tz=timezone.utc)
+            expiry_datetime = datetime.fromtimestamp(expiry_time / 1000, tz=timezone.utc)
+            time_left = expiry_datetime - now
 
-        days, remainder = divmod(time_left.total_seconds(), 86400)
-        hours, remainder = divmod(remainder, 3600)
-        minutes = remainder // 60
+            days, remainder = divmod(time_left.total_seconds(), 86400)
+            hours, remainder = divmod(remainder, 3600)
+            minutes = remainder // 60
 
-        return f"{int(days)}{_('d')}, {int(hours)}{_('h')}, {int(minutes)}{_('m')}"
+            result_parts = []
+            if days > 0:
+                result_parts.append(f"{int(days)}{_('d')}")
+            if hours > 0:
+                result_parts.append(f"{int(hours)}{_('h')}")
+            if minutes > 0 or not result_parts:
+                result_parts.append(f"{int(minutes)}{_('m')}")
+
+            result = ", ".join(result_parts)
+            logger.debug(f"Time left to expiry: {result}")
+            return result
+        except Exception as exception:
+            logger.error(f"Error calculating time to expiry: {exception}")
+            return f"0{_('m')}"

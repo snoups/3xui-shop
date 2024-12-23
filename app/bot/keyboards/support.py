@@ -3,18 +3,18 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
-from app.bot.navigation import NavigationAction
+from app.bot.navigation import Navigation
 
 
 def contact_button(support_id: int) -> InlineKeyboardButton:
     """
-    Creates a contact button to reach the operator via Telegram.
+    Generates a button for contacting the support operator via Telegram.
 
     Arguments:
         support_id (int): Telegram user ID of the support operator.
 
     Returns:
-        InlineKeyboardButton: Inline keyboard button with a URL to contact the operator.
+        InlineKeyboardButton: Button linking to the support operator's Telegram profile.
     """
     return InlineKeyboardButton(
         text=_("👨‍💻 Contact the operator"), url=f"tg://user?id={support_id}"
@@ -23,80 +23,85 @@ def contact_button(support_id: int) -> InlineKeyboardButton:
 
 def support_keyboard(support_id: int) -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for support-related actions.
+    Generates a keyboard with support options, including common issues and direct contact.
 
-    This keyboard provides options for users to get help with connecting, report
-    VPN issues, contact the support operator, and return to the main menu.
+    Users can select predefined support topics or contact the support operator directly.
+    A back button allows navigation back to the main menu.
 
     Arguments:
         support_id (int): Telegram user ID of the support operator.
 
     Returns:
-        InlineKeyboardMarkup: Inline keyboard with support options and a back button.
+        InlineKeyboardMarkup: Keyboard with support options and a back button.
     """
     builder = InlineKeyboardBuilder()
 
     builder.row(
         InlineKeyboardButton(
-            text=_("❓ How to connect"), callback_data=NavigationAction.HOW_TO_CONNECT
+            text=_("❓ How to connect"),
+            callback_data=Navigation.HOW_TO_CONNECT,
         )
     )
     builder.row(
         InlineKeyboardButton(
-            text=_("❓ VPN not working"), callback_data=NavigationAction.VPN_NOT_WORKING
+            text=_("❓ VPN not working"),
+            callback_data=Navigation.VPN_NOT_WORKING,
         )
     )
     builder.row(contact_button(support_id))
 
-    builder.row(back_button(NavigationAction.MAIN_MENU))
+    builder.row(back_button(Navigation.MAIN_MENU))
     return builder.as_markup()
 
 
 def how_to_connect_keyboard(support_id: int) -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for users seeking connection instructions.
+    Generates a keyboard with instructions for connecting to the VPN and contacting support.
 
-    This keyboard includes options for buying a subscription, downloading the app,
-    contacting support, and returning to the previous support menu.
+    Includes options to purchase a subscription, download the app, and contact the operator.
+    A back button navigates to the support menu.
 
     Arguments:
         support_id (int): Telegram user ID of the support operator.
 
     Returns:
-        InlineKeyboardMarkup: Inline keyboard with connection help options and a back button.
+        InlineKeyboardMarkup: Keyboard with connection instructions and support options.
     """
     builder = InlineKeyboardBuilder()
 
     builder.row(
         InlineKeyboardButton(
-            text=_("💳 Buy subscription"), callback_data=NavigationAction.SUBSCRIPTION
+            text=_("💳 Buy subscription"),
+            callback_data=Navigation.SUBSCRIPTION,
         )
     )
     builder.row(
-        InlineKeyboardButton(text=_("📥 Download app"), callback_data=NavigationAction.DOWNLOAD)
+        InlineKeyboardButton(
+            text=_("📥 Download app"),
+            callback_data=Navigation.DOWNLOAD,
+        )
     )
     builder.row(contact_button(support_id))
 
-    builder.row(back_button(NavigationAction.SUPPORT))
+    builder.row(back_button(Navigation.SUPPORT))
     return builder.as_markup()
 
 
 def contact_keyboard(support_id: int) -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for contacting support.
+    Generates a keyboard for contacting the support operator.
 
-    This keyboard includes a button for contacting the support operator and a back button
-    to return to the previous support menu.
+    Displays a button to contact the operator directly and a back button to the support menu.
 
     Arguments:
         support_id (int): Telegram user ID of the support operator.
 
     Returns:
-        InlineKeyboardMarkup: Inline keyboard with the contact button and a back button.
+        InlineKeyboardMarkup: Keyboard with the contact button and a back button.
     """
     builder = InlineKeyboardBuilder()
 
     builder.row(contact_button(support_id))
 
-    builder.row(back_button(NavigationAction.SUPPORT))
+    builder.row(back_button(Navigation.SUPPORT))
     return builder.as_markup()

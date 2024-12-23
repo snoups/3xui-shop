@@ -2,58 +2,49 @@ import json
 import logging
 
 from aiogram import Bot, F, Router
-from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, PreCheckoutQuery
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsPrivate
 from app.bot.keyboards.pay import pay_keyboard
-from app.bot.navigation import NavigationAction
+from app.bot.navigation import Navigation, SubscriptionCallback
 from app.bot.services.payment import PaymentService
-from app.bot.services.subscription import SubscriptionService
+from app.bot.services.plans import PlansService
+from app.bot.services.vpn import VPNService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-@router.callback_query(F.data.startswith(NavigationAction.PAY), IsPrivate())
-async def callback_choosing_payment_method(
+@router.callback_query(SubscriptionCallback.filter(F.state.startswith(Navigation.PAY)), IsPrivate())
+async def callback_payment_method_selected(
     callback: CallbackQuery,
-    state: FSMContext,
+    callback_data: SubscriptionCallback,
+    plans_service: PlansService,
     bot: Bot,
-    subscription: SubscriptionService,
 ) -> None:
-    """
-    Handles the payment method selection and displays payment information to the user.
-
-    Arguments:
-        callback (CallbackQuery): The callback query received from the user.
-        state (FSMContext): The user's FSM state.
-        bot (Bot): The bot instance.
-        subscription (SubscriptionService): The subscription service instance.
-    """
     logger.info(f"User {callback.from_user.id} selected payment method: {callback.data}")
 
-    plan_callback = await state.get_value("plan_callback")
-    duration_callback = await state.get_value("duration_callback")
-    plan = subscription.get_plan(plan_callback)
-    duration = subscription.get_duration(duration_callback)
+    traffic = callback_data.traffic
+    duration = callback_data.duration
+    prices = plans_service.get_plan(traffic).prices.to_dict()
 
-    logger.info(f"User {callback.from_user.id} selected plan: {plan} {duration}")
+    logger.info(f"User {callback.from_user.id} selected {traffic} GB and {duration} days.")
 
-    payment_service = PaymentService(callback.data)
-    price = subscription.get_price_for_duration(
-        plan["prices"],
+    payment_service = PaymentService(callback_data.state)
+    price = plans_service.get_price_for_duration(
+        prices,
         duration,
         payment_service.method.code,
     )
-
     data = {
         "user_id": callback.from_user.id,
-        "traffic": plan["traffic"],
+        "traffic": traffic,
         "duration": duration,
         "price": price,
     }
+
+    # TODO: Make a check for the existence of a subscription
 
     link = await payment_service.create_payment(data, bot)
 
@@ -68,44 +59,28 @@ async def callback_choosing_payment_method(
             "_After payment, a unique key will be generated for you, to connect to the VPN. "
             "The key will be available in your profile._"
         ).format(
-            plan=subscription.convert_traffic_to_title(plan["traffic"]),
-            duration=subscription.convert_days_to_period(duration),
+            plan=plans_service.convert_traffic_to_title(traffic),
+            duration=plans_service.convert_days_to_period(duration),
             price=price,
             currency=payment_service.method.symbol,
         ),
-        reply_markup=pay_keyboard(link),
+        reply_markup=pay_keyboard(link, callback_data),
     )
 
 
 @router.pre_checkout_query()
 async def pre_checkout_handler(
-    pre_checkout_query: PreCheckoutQuery,
-    subscription: SubscriptionService,
+    pre_checkout_query: PreCheckoutQuery, vpn_service: VPNService
 ) -> None:
-    """
-    Handles the pre-checkout query before the user proceeds with payment.
-
-    Arguments:
-        pre_checkout_query (PreCheckoutQuery): The pre-checkout query from Telegram.
-        subscription (SubscriptionService): The subscription service instance.
-    """
     logger.info("pre_checkout_handler")
     data = json.loads(pre_checkout_query.invoice_payload)
     logger.info(data)
-
-    await subscription.create_subscription(data["user_id"], data["traffic"], data["duration"])
+    await vpn_service.create_subscription(data["user_id"], data["traffic"], data["duration"])
     await pre_checkout_query.answer(ok=True)
 
 
 @router.message(F.successful_payment)
 async def successful_payment(message: Message, bot: Bot) -> None:
-    """
-    Handles the successful payment notification from Telegram.
-
-    Arguments:
-        message (Message): The message containing payment details.
-        bot (Bot): The bot instance.
-    """
     logger.info("successful_payment")
     await bot.refund_star_payment(
         user_id=message.from_user.id,

@@ -10,21 +10,15 @@ from app.bot.keyboards.support import (
     how_to_connect_keyboard,
     support_keyboard,
 )
-from app.bot.navigation import NavigationAction
+from app.bot.navigation import Navigation
 from app.config import Config
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-@router.callback_query(F.data == NavigationAction.SUPPORT, IsPrivate())
+@router.callback_query(F.data == Navigation.SUPPORT, IsPrivate())
 async def callback_support(callback: CallbackQuery, config: Config) -> None:
-    """
-    Handles the callback query to show the support page.
-
-    Arguments:
-        callback (CallbackQuery): The callback query received from the user.
-    """
     logger.info(f"User {callback.from_user.id} opened support.")
     await callback.message.edit_text(
         text=_(
@@ -37,14 +31,8 @@ async def callback_support(callback: CallbackQuery, config: Config) -> None:
     )
 
 
-@router.callback_query(F.data == NavigationAction.HOW_TO_CONNECT, IsPrivate())
+@router.callback_query(F.data == Navigation.HOW_TO_CONNECT, IsPrivate())
 async def callback_how_to_connect(callback: CallbackQuery, config: Config) -> None:
-    """
-    Handles the callback query to show the instructions on how to connect to the VPN.
-
-    Arguments:
-        callback (CallbackQuery): The callback query received from the user.
-    """
     logger.info(f"User {callback.from_user.id} opened how to connect.")
     await callback.message.edit_text(
         text=_(
@@ -58,14 +46,8 @@ async def callback_how_to_connect(callback: CallbackQuery, config: Config) -> No
     )
 
 
-@router.callback_query(F.data == NavigationAction.VPN_NOT_WORKING, IsPrivate())
+@router.callback_query(F.data == Navigation.VPN_NOT_WORKING, IsPrivate())
 async def callback_vpn_not_working(callback: CallbackQuery, config: Config) -> None:
-    """
-    Handles the callback query to display VPN troubleshooting information.
-
-    Arguments:
-        callback (CallbackQuery): The callback query received from the user.
-    """
     logger.info(f"User {callback.from_user.id} opened vpn_not_working.")
     await callback.message.edit_text(
         text=_(

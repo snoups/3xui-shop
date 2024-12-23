@@ -15,7 +15,7 @@ from app.bot.keyboards.admin_tools import (
     promocode_traffic_keyboard,
 )
 from app.bot.keyboards.back import back_keyboard
-from app.bot.navigation import NavigationAction, PromocodeCallback, States
+from app.bot.navigation import CreatePromocodeCallback, Navigation
 from app.bot.services.promocode import PromocodeService
 
 logger = logging.getLogger(__name__)
@@ -26,8 +26,8 @@ class DeletePromocodeStates(StatesGroup):
     waiting_for_promocode = State()
 
 
-@router.callback_query(F.data == NavigationAction.ADMIN_TOOLS, IsPrivate(), IsAdmin())
-async def callback_statistics(callback: CallbackQuery) -> None:
+@router.callback_query(F.data == Navigation.ADMIN_TOOLS, IsPrivate(), IsAdmin())
+async def callback_admin_tools(callback: CallbackQuery) -> None:
     logger.info(f"Admin {callback.from_user.id} opened admin tools.")
     await callback.message.edit_text(
         text=_("🛠 *Admin tools:*"),
@@ -35,19 +35,19 @@ async def callback_statistics(callback: CallbackQuery) -> None:
     )
 
 
-@router.callback_query(F.data == NavigationAction.STATISTICS, IsPrivate(), IsAdmin())
+@router.callback_query(F.data == Navigation.STATISTICS, IsPrivate(), IsAdmin())
 async def callback_statistics(callback: CallbackQuery) -> None:
     logger.info(f"Admin {callback.from_user.id} opened statistics.")
     pass
 
 
-@router.callback_query(F.data == NavigationAction.EDITOR_USERS, IsPrivate(), IsAdmin())
+@router.callback_query(F.data == Navigation.EDITOR_USERS, IsPrivate(), IsAdmin())
 async def callback_editor_users(callback: CallbackQuery) -> None:
     logger.info(f"Admin {callback.from_user.id} opened editor users.")
     pass
 
 
-@router.callback_query(F.data == NavigationAction.EDITOR_PROMOCODES, IsPrivate(), IsAdmin())
+@router.callback_query(F.data == Navigation.EDITOR_PROMOCODES, IsPrivate(), IsAdmin())
 async def callback_editor_promocodes(callback: CallbackQuery, state: FSMContext) -> None:
     logger.info(f"Admin {callback.from_user.id} opened editor promocodes.")
     await state.clear()
@@ -57,90 +57,98 @@ async def callback_editor_promocodes(callback: CallbackQuery, state: FSMContext)
     )
 
 
-@router.callback_query(F.data == NavigationAction.SEND_NOTIFICATION, IsPrivate(), IsAdmin())
+@router.callback_query(F.data == Navigation.SEND_NOTIFICATION, IsPrivate(), IsAdmin())
 async def callback_send_notification(callback: CallbackQuery) -> None:
     logger.info(f"Admin {callback.from_user.id} opened send notification.")
     pass
 
 
-@router.callback_query(F.data == NavigationAction.CREATE_BACKUP, IsPrivate(), IsAdmin())
+@router.callback_query(F.data == Navigation.CREATE_BACKUP, IsPrivate(), IsAdmin())
 async def callback_create_backup(callback: CallbackQuery) -> None:
     logger.info(f"Admin {callback.from_user.id} created backup.")
     pass
 
 
-@router.callback_query(F.data == NavigationAction.RESTART_BOT, IsPrivate(), IsAdmin())
+@router.callback_query(F.data == Navigation.RESTART_BOT, IsPrivate(), IsAdmin())
 async def callback_restart_bot(callback: CallbackQuery) -> None:
     logger.info(f"Admin {callback.from_user.id} restarted bot.")
     pass
 
 
 # region: Create Promocode
-@router.callback_query(F.data == NavigationAction.CREATE_PROMOCODE, IsPrivate(), IsAdmin())
+@router.callback_query(F.data == Navigation.CREATE_PROMOCODE, IsPrivate(), IsAdmin())
 async def callback_create_promocode(callback: CallbackQuery) -> None:
     logger.info(f"Admin {callback.from_user.id} started creating promocode.")
-    data = PromocodeCallback(state=States.TRAFFIC)
-    traffic_keyboard = promocode_traffic_keyboard(data)
+    callback_data = CreatePromocodeCallback(state=Navigation.TRAFFIC)
     await callback.message.edit_text(
         text=_("🎟️ *Editor promocodes:*\n" "\n" "_Select the traffic volume_"),
-        reply_markup=traffic_keyboard,
+        reply_markup=promocode_traffic_keyboard(callback_data),
     )
 
 
-@router.callback_query(IsPrivate(), IsAdmin(), PromocodeCallback.filter(F.state == States.TRAFFIC))
-async def choose_traffic(callback: CallbackQuery, callback_data: PromocodeCallback) -> None:
+@router.callback_query(
+    CreatePromocodeCallback.filter(F.state == Navigation.TRAFFIC), IsPrivate(), IsAdmin()
+)
+async def callback_traffic_selected(
+    callback: CallbackQuery, callback_data: CreatePromocodeCallback
+) -> None:
     logger.info(f"Admin {callback.from_user.id} selected {callback_data.traffic} GB for promocode.")
-    callback_data.state = States.DURATION
-    duration_keyboard = promocode_duration_keyboard(callback_data)
+    callback_data.state = Navigation.DURATION
     await callback.message.edit_text(
         text=_("🎟️ *Editor promocodes:*\n" "\n" "_Specify the duration_"),
-        reply_markup=duration_keyboard,
+        reply_markup=promocode_duration_keyboard(callback_data),
     )
 
 
-@router.callback_query(IsPrivate(), IsAdmin(), PromocodeCallback.filter(F.state == States.DURATION))
-async def choose_duration(
+@router.callback_query(
+    CreatePromocodeCallback.filter(F.state == Navigation.DURATION), IsPrivate(), IsAdmin()
+)
+async def callback_duration_selected(
     callback: CallbackQuery,
-    callback_data: PromocodeCallback,
-    promocode: PromocodeService,
+    callback_data: CreatePromocodeCallback,
+    promocode_service: PromocodeService,
 ) -> None:
     logger.info(
         f"Admin {callback.from_user.id} selected {callback_data.duration} days for promocode."
     )
-    promo = await promocode.create_promocode(callback_data.traffic, callback_data.duration)
+    promocode = await promocode_service.create_promocode(
+        callback_data.traffic, callback_data.duration
+    )
     await callback.message.edit_text(
         text=_("🎟️ *Editor promocodes:*\n"),
         reply_markup=editor_promocodes(),
     )
-    await callback.message.answer(text=_("Promocode: {promocode}").format(promocode=promo.code))
+    await callback.message.answer(
+        text=_("Your created promocode: ```{promocode}```").format(promocode=promocode.code)
+    )
 
 
 # endregion
 
 
 # region: Delete Promocode
-@router.callback_query(F.data == NavigationAction.DELETE_PROMOCODE, IsPrivate(), IsAdmin())
-async def callback_create_promocode(callback: CallbackQuery, state: FSMContext) -> None:
+@router.callback_query(F.data == Navigation.DELETE_PROMOCODE, IsPrivate(), IsAdmin())
+async def callback_delete_promocode(callback: CallbackQuery, state: FSMContext) -> None:
     logger.info(f"Admin {callback.from_user.id} started deleting promocode.")
     await state.set_state(DeletePromocodeStates.waiting_for_promocode)
     await state.update_data(message=callback.message)
     await callback.message.edit_text(
         text=_("🎟️ *Editor promocodes:*\n" "\n" "_Send promocode to delete_"),
-        reply_markup=back_keyboard(NavigationAction.EDITOR_PROMOCODES),
+        reply_markup=back_keyboard(Navigation.EDITOR_PROMOCODES),
     )
 
 
 @router.message(DeletePromocodeStates.waiting_for_promocode, IsPrivate(), IsAdmin())
 async def handle_promocode_input(
-    message: Message, promocode: PromocodeService, state: FSMContext
+    message: Message, promocode_service: PromocodeService, state: FSMContext
 ) -> None:
-    code = message.text.strip()
+    promocode = message.text.strip()
     await message.delete()
-    logger.info(f"Admin {message.from_user.id} entered promocode: {code}")
+    logger.info(f"Admin {message.from_user.id} entered promocode: {promocode} for deleting.")
 
-    if await promocode.delete_promocode(code):
+    if await promocode_service.delete_promocode(promocode):
         notification = await message.answer(
-            text=_("✅ Promocode {} deleted successfully.").format(code)
+            text=_("✅ Promocode {promocode} deleted successfully.").format(promocode=promocode)
         )
         message = await state.get_value("message")
         await message.edit_text(

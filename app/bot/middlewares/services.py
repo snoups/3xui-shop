@@ -11,18 +11,24 @@ class ServicesMiddleware(BaseMiddleware):
     """
     Middleware for injecting service instances into handler data.
 
-    This middleware allows for injecting various service instances (such as VPNService)
-    into handler data, making them accessible within handlers.
+    This middleware provides a way to inject various services, such as VPN and
+    Plans services, into the handler's data. It helps centralize and
+    share the service instances across all handlers.
+
+    Attributes:
+        services (dict[str, Any]): A dictionary containing various services to inject.
     """
 
     def __init__(self, **services) -> None:
         """
-        Initializes the ServicesMiddleware with a list of services to inject.
+        Initializes the middleware with a list of services.
 
         Arguments:
-            services (dict[str, Any]): Any additional services to be injected.
+            services (dict[str, Any]): A dictionary of service instances to be injected
+                                       into handler data (e.g., VPN service, Plans service).
         """
         self.services = services
+        logger.info(f"ServicesMiddleware initialized with services: {list(services.keys())}")
 
     async def __call__(
         self,
@@ -31,15 +37,19 @@ class ServicesMiddleware(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         """
-        Middleware handler to inject services into handler data.
+        Middleware handler that injects services into the handler data.
+
+        This method updates the handler data dictionary with the provided services,
+        making them available to the handler for further processing.
 
         Arguments:
-            handler (Callable): The handler function to process the event.
-            event (TelegramObject): The incoming Telegram event.
-            data (dict): Context data passed to the handler.
+            handler (Callable): The handler function that processes the incoming event.
+            event (TelegramObject): The incoming Telegram event (message, callback, etc.).
+            data (dict): The data dictionary passed to the handler.
 
         Returns:
-            Any: The result of the next handler with injected services.
+            Any: The result of calling the next handler with the updated data containing services.
         """
+        logger.debug(f"Injecting services into handler data: {list(self.services.keys())}")
         data.update(self.services)
         return await handler(event, data)

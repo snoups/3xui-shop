@@ -3,54 +3,57 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
-from app.bot.navigation import NavigationAction
-from app.bot.services.subscription import SubscriptionService
+from app.bot.navigation import Navigation, SubscriptionCallback
+from app.bot.services.plans import PlansService
 
 
 def payment_method_keyboard(
-    prices: dict,
-    duration: int,
-    subscription: SubscriptionService,
+    callback_data: SubscriptionCallback,
+    plans_service: PlansService,
 ) -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for selecting a payment method.
+    Generates a keyboard for choosing a payment method.
 
-    This keyboard includes options for different payment methods
-    and a button to navigate back to the duration selection step.
+    The keyboard includes options for selecting a payment method, such as YooKassa,
+    TelegramStars, and Cryptomus. The prices are dynamically fetched from the subscription
+    service based on the selected traffic amount and duration.
 
     Arguments:
-        prices (dict): A dictionary of prices for various payment methods.
-        duration (int): The selected duration of the subscription in days.
-        subscription (SubscriptionService): Service for retrieving price information.
+        callback_data (SubscriptionCallback): Data used to track user navigation and selections.
+        plans_service (PlansService): Service providing subscription plans.
 
     Returns:
-        InlineKeyboardMarkup: An inline keyboard with payment method options and a back button.
+        InlineKeyboardMarkup: A keyboard with buttons for each payment method,
+        along with a back button to return to the previous menu.
     """
     builder = InlineKeyboardBuilder()
+    plan = plans_service.get_plan(callback_data.traffic)
 
-    price = subscription.get_price_for_duration(prices, duration, "RUB")
+    callback_data.state = Navigation.PAY_YOOKASSA
+    price = plan.prices.rub[callback_data.duration]
     builder.row(
         InlineKeyboardButton(
             text=_("YooKassa | {price} ₽").format(price=price),
-            callback_data=NavigationAction.PAY_YOOKASSA,
+            callback_data=callback_data.pack(),
         )
     )
-
-    price = subscription.get_price_for_duration(prices, duration, "XTR")
+    callback_data.state = Navigation.PAY_TELEGRAM_STARS
+    price = plan.prices.xtr[callback_data.duration]
     builder.row(
         InlineKeyboardButton(
             text="TelegramStars | {price} ★".format(price=price),
-            callback_data=NavigationAction.PAY_TELEGRAM_STARS,
+            callback_data=callback_data.pack(),
         )
     )
-
-    price = subscription.get_price_for_duration(prices, duration, "USD")
+    callback_data.state = Navigation.PAY_CRYPTOMUS
+    price = plan.prices.usd[callback_data.duration]
     builder.row(
         InlineKeyboardButton(
             text="Cryptomus | {price} $".format(price=price),
-            callback_data=NavigationAction.PAY_CRYPTOMUS,
+            callback_data=callback_data.pack(),
         )
     )
 
-    builder.row(back_button(NavigationAction.BACK_TO_DURATION))
+    callback_data.state = Navigation.TRAFFIC
+    builder.row(back_button(callback_data.pack()))
     return builder.as_markup()

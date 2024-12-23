@@ -8,7 +8,7 @@ from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsPrivate
 from app.bot.keyboards.profile import buy_subscription_keyboard, show_key_keyboard
-from app.bot.navigation import NavigationAction
+from app.bot.navigation import Navigation
 from app.bot.services.client import ClientService
 from app.bot.services.vpn import VPNService
 
@@ -74,18 +74,11 @@ async def prepare_message(user: TelegramUser, client: ClientService) -> str:
     return header_text + subscription_text + statistics_text
 
 
-@router.callback_query(F.data == NavigationAction.PROFILE, IsPrivate())
-async def callback_profile(callback: CallbackQuery, vpn: VPNService) -> None:
-    """
-    Handles the user's profile view, displaying subscription status and statistics.
-
-    Arguments:
-        callback (CallbackQuery): The callback query received from the user.
-        vpn (VPNService): The VPN service instance.
-    """
+@router.callback_query(F.data == Navigation.PROFILE, IsPrivate())
+async def callback_profile(callback: CallbackQuery, vpn_service: VPNService) -> None:
     logger.info(f"User {callback.from_user.id} opened profile.")
-    data = await vpn.get_client_data(callback.from_user.id)
-    client = ClientService(data)
+    client_data = await vpn_service.get_client_data(callback.from_user.id)
+    client = ClientService(client_data)
 
     if client:
         if client.has_valid_subscription:
@@ -101,22 +94,13 @@ async def callback_profile(callback: CallbackQuery, vpn: VPNService) -> None:
     )
 
 
-@router.callback_query(F.data == NavigationAction.SHOW_KEY, IsPrivate())
-async def callback_show_key(callback: CallbackQuery, vpn: VPNService) -> None:
-    """
-    Sends the user's VPN key and deletes it after a short time.
-
-    This handler is triggered when the user requests to view their VPN key. The key
-    is sent to the user and automatically deleted after 5 seconds.
-
-    Arguments:
-        callback (CallbackQuery): The callback query received from the user.
-        vpn (VPNService): The VPN service instance.
-    """
-    key = await vpn.get_key(callback.from_user.id)
-
+@router.callback_query(F.data == Navigation.SHOW_KEY, IsPrivate())
+async def callback_show_key(callback: CallbackQuery, vpn_service: VPNService) -> None:
+    logger.info(f"User {callback.from_user.id} looked key.")
+    key = await vpn_service.get_key(callback.from_user.id)
     key_text = _("🔑 *Your key:* (Closes after {seconds_text}) ```{key}```")
     message = await callback.message.answer(key_text.format(key=key, seconds_text=_("6 seconds")))
+
     for seconds in range(5, 0, -1):
         seconds_text = _("1 second", "{} seconds", seconds).format(seconds)
         await asyncio.sleep(1)

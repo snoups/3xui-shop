@@ -7,8 +7,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.i18n import I18n
 
 from app.bot import commands, filters, middlewares, routes
+from app.bot.services.plans import PlansService
 from app.bot.services.promocode import PromocodeService
-from app.bot.services.subscription import SubscriptionService
 from app.bot.services.vpn import VPNService
 from app.config import Config, load_config
 from app.db.database import Database
@@ -25,7 +25,7 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
         dispatcher (Dispatcher): The dispatcher instance.
         bot (Bot): The bot instance.
     """
-    logger.info("Bot stopped")
+    logger.info("Bot stopped.")
     db: Database = dispatcher.get("db")
     config: Config = dispatcher.get("config")
 
@@ -48,7 +48,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
         dispatcher (Dispatcher): The dispatcher instance.
         bot (Bot): The bot instance.
     """
-    logger.info("Bot started")
+    logger.info("Bot started.")
     config: Config = dispatcher.get("config")
 
     # Notify developer about bot start
@@ -73,8 +73,8 @@ async def main() -> None:
     dp = Dispatcher(storage=storage, config=config, bot=bot, db=db)
     i18n = I18n(path="app/locales", default_locale="en", domain="bot")
     vpn_service = VPNService(db.session, config)
-    subscription_service = SubscriptionService(db.session, vpn_service)
-    promocode_service = PromocodeService(db.session, vpn_service)
+    plans_service = PlansService()
+    promocode_service = PromocodeService(db.session)
 
     # Register event handlers
     dp.startup.register(on_startup)
@@ -90,7 +90,7 @@ async def main() -> None:
         session=db.session,
         i18n=i18n,
         vpn=vpn_service,
-        subscription=subscription_service,
+        plans=plans_service,
         promocode=promocode_service,
     )
 
@@ -115,4 +115,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        logger.info("Bot stopped")
+        logger.info("Bot stopped.")

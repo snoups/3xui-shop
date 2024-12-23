@@ -5,22 +5,16 @@ from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsPrivate
-from app.bot.keyboards.download import connect_keyboard, platforms_keyboard
-from app.bot.navigation import NavigationAction
+from app.bot.keyboards.download import download_keyboard, platforms_keyboard
+from app.bot.navigation import Navigation
 from app.bot.services.vpn import VPNService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-@router.callback_query(F.data == NavigationAction.DOWNLOAD, IsPrivate())
+@router.callback_query(F.data == Navigation.DOWNLOAD, IsPrivate())
 async def callback_download(callback: CallbackQuery) -> None:
-    """
-    Handles the callback when the user selects the download option.
-
-    Arguments:
-        callback (CallbackQuery): The callback query from the user.
-    """
     logger.info(f"User {callback.from_user.id} opened download apps.")
     await callback.message.edit_text(
         text=_("📲 *Choose your platform:*"),
@@ -28,25 +22,19 @@ async def callback_download(callback: CallbackQuery) -> None:
     )
 
 
-@router.callback_query(F.data.startswith(NavigationAction.PLATFORM), IsPrivate())
-async def callback_platform(callback: CallbackQuery, vpn: VPNService) -> None:
-    """
-    Handles the callback when the user selects a platform.
-
-    Arguments:
-        callback (CallbackQuery): The callback query from the user.
-    """
+@router.callback_query(F.data.startswith(Navigation.PLATFORM), IsPrivate())
+async def callback_platform(callback: CallbackQuery, vpn_service: VPNService) -> None:
     logger.info(f"User {callback.from_user.id} selected platform: {callback.data}")
-    key = await vpn.get_key(callback.from_user.id)
+    key = await vpn_service.get_key(callback.from_user.id)
 
-    if callback.data == NavigationAction.PLATFORM_IOS:
+    if callback.data == Navigation.PLATFORM_IOS:
         icon = "🍏 "
-    elif callback.data == NavigationAction.PLATFORM_ANDROID:
+    elif callback.data == Navigation.PLATFORM_ANDROID:
         icon = "🤖 "
     else:
         icon = "💻 "
 
     await callback.message.edit_text(
         text=icon + _("To connect you need to install the app and enter your key."),
-        reply_markup=connect_keyboard(callback.data, key),
+        reply_markup=download_keyboard(callback.data, key),
     )

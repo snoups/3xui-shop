@@ -2,101 +2,125 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from app.bot.keyboards.back import back_button
-from app.bot.navigation import NavigationAction
-from app.bot.services.subscription import SubscriptionService
-
-
-def buy_subscription_button() -> InlineKeyboardButton:
-    return InlineKeyboardButton(
-        text=_("💳 Buy subscription"), callback_data=NavigationAction.PROCESS
-    )
+from app.bot.keyboards.back import back_button, back_to_main_menu_button
+from app.bot.navigation import Navigation, SubscriptionCallback
+from app.bot.services.plans import PlansService
 
 
 def renew_subscription_button() -> InlineKeyboardButton:
-    return InlineKeyboardButton(
-        text=_("💳 Renew subscription"), callback_data=NavigationAction.PROCESS
-    )
+    """
+    Generates a button for renewing the user's subscription.
+
+    Returns:
+        InlineKeyboardButton: Button to renew the subscription.
+    """
+    return InlineKeyboardButton(text=_("💳 Renew subscription"), callback_data=Navigation.PROCESS)
 
 
-def subscription_keyboard(is_active: bool) -> InlineKeyboardMarkup:
+def subscription_keyboard(
+    has_subscription: bool, callback_data: SubscriptionCallback
+) -> InlineKeyboardMarkup:
+    """
+    Generates a subscription keyboard with options based on the user's subscription status.
+
+    If the user doesn't have an active subscription, a button to purchase one is displayed.
+    Additionally, all users have access to a promocode activation button and a main menu button.
+
+    Arguments:
+        has_subscription (bool): Indicates whether the user has an active subscription.
+        callback_data (SubscriptionCallback): Data for tracking the user's navigation state.
+
+    Returns:
+        InlineKeyboardMarkup: Keyboard with subscription management options.
+    """
     builder = InlineKeyboardBuilder()
 
-    if not is_active:
-        builder.row(buy_subscription_button())
-    # else:
-    # builder.row(renew_subscription_button())
+    if not has_subscription:
+        builder.row(
+            InlineKeyboardButton(
+                text=_("💳 Buy subscription"),
+                callback_data=callback_data.pack(),
+            )
+        )
 
     builder.row(
         InlineKeyboardButton(
-            text=_("🎟️ Activate promocode"), callback_data=NavigationAction.PROMOCODE
-        ),
+            text=_("🎟️ Activate promocode"),
+            callback_data=Navigation.PROMOCODE,
+        )
     )
 
-    builder.row(back_button(NavigationAction.MAIN_MENU))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
-def traffic_keyboard(subscription: SubscriptionService) -> InlineKeyboardMarkup:
+def traffic_keyboard(
+    plans_service: PlansService,
+    callback_data: SubscriptionCallback,
+) -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for selecting a subscription plan based on traffic volume.
+    Generates a keyboard for selecting a traffic plan during subscription purchase.
 
-    This keyboard allows the user to choose a subscription plan based on traffic (in GB).
-    It generates callback data for each plan and includes a back button to return to the main menu.
+    Displays traffic options based on the available plans from the subscription service.
+    Each button updates the callback data with the selected traffic amount.
 
     Arguments:
-        subscription (SubscriptionService): The service used to fetch subscription plans.
+        plans_service (PlansService): Service providing subscription plans.
+        callback_data (SubscriptionCallback): Data to track the user's navigation and selections.
 
     Returns:
-        InlineKeyboardMarkup: The inline keyboard markup with traffic options and a back button.
+        InlineKeyboardMarkup: Keyboard with traffic plan options and a back button.
     """
     builder = InlineKeyboardBuilder()
-    plans = subscription.plans
+    plans = plans_service.plans
 
     for plan in plans:
-        traffic = subscription.convert_traffic_to_title(plan["traffic"])
-        callback_data = subscription.generate_plan_callback(plan["traffic"])
+        callback_data.traffic = plan.traffic
+        traffic = plans_service.convert_traffic_to_title(plan.traffic)
         builder.row(
             InlineKeyboardButton(
                 text=traffic,
-                callback_data=callback_data,
+                callback_data=callback_data.pack(),
             )
         )
 
     builder.adjust(2)
-    builder.row(back_button(NavigationAction.SUBSCRIPTION))
+    builder.row(back_button(Navigation.SUBSCRIPTION))
     return builder.as_markup()
 
 
-def duration_keyboard(prices: dict, subscription: SubscriptionService) -> InlineKeyboardMarkup:
+def duration_keyboard(
+    plans_service: PlansService,
+    callback_data: SubscriptionCallback,
+) -> InlineKeyboardMarkup:
     """
-    Generates an inline keyboard for selecting the subscription duration with calculated prices.
+    Generates a keyboard for selecting the subscription duration.
 
-    This keyboard displays the available subscription durations, along with the price for each
-    duration based on the selected traffic plan. It also includes a back button to return to
-    the subscription selection.
+    Options include various duration periods, with dynamically fetched prices based on the
+    selected traffic plan. Buttons update the callback data with the chosen duration.
 
     Arguments:
-        prices (dict): A dictionary containing the prices for various payment methods.
-        subscription (SubscriptionService): The service used to fetch subscription durations.
+        plans_service (PlansService): Service providing subscription plans and prices.
+        callback_data (SubscriptionCallback): Data to track the user's navigation and selections.
 
     Returns:
-        InlineKeyboardMarkup: The inline keyboard markup with duration options and a back button.
+        InlineKeyboardMarkup: Keyboard with duration options and a back button.
     """
     builder = InlineKeyboardBuilder()
-    durations = subscription.durations
+    durations = plans_service.durations
 
     for duration in durations:
-        period = subscription.convert_days_to_period(duration)
-        price = subscription.get_price_for_duration(prices, duration)
-        callback_data = subscription.generate_duration_callback(duration)
+        callback_data.duration = duration
+        period = plans_service.convert_days_to_period(duration)
+        price = plans_service.get_plan(callback_data.traffic).prices.rub[duration]
         builder.row(
             InlineKeyboardButton(
                 text=f"{period} | {price} ₽",
-                callback_data=callback_data,
+                callback_data=callback_data.pack(),
             )
         )
 
     builder.adjust(2)
-    builder.row(back_button(NavigationAction.SUBSCRIPTION))
+    callback_data.state = Navigation.PROCESS
+    builder.row(back_button(callback_data.pack()))
     return builder.as_markup()
