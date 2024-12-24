@@ -225,13 +225,15 @@ async def handle_promocode_input(
         promocode_service (PromocodeService): Service for handling promocode deletion.
         state (FSMContext): The state context for managing conversation state.
     """
-    promocode = message.text.strip()
+    input_promocode = message.text.strip()
     await message.delete()
-    logger.info(f"Admin {message.from_user.id} entered promocode: {promocode} for deleting.")
+    logger.info(f"Admin {message.from_user.id} entered promocode: {input_promocode} for deleting.")
 
-    if await promocode_service.delete_promocode(promocode):
+    if await promocode_service.delete_promocode(input_promocode):
         notification = await message.answer(
-            text=_("✅ Promocode {promocode} deleted successfully.").format(promocode=promocode)
+            text=_("✅ Promocode {promocode} deleted successfully.").format(
+                promocode=input_promocode
+            )
         )
         message = await state.get_value("message")
         await message.edit_text(

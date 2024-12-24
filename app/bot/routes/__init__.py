@@ -7,6 +7,7 @@ from . import (
     main_menu,
     payment,
     profile,
+    promocode,
     subscription,
     support,
 )
@@ -32,6 +33,7 @@ def include(dp: Dispatcher) -> None:
             download.router,
             support.router,
             admin_tools.router,
+            promocode.router,
         ]
     )
 

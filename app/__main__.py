@@ -72,9 +72,9 @@ async def main() -> None:
     bot = Bot(token=config.bot.TOKEN, default=DefaultBotProperties(parse_mode="MarkDown"))
     dp = Dispatcher(storage=storage, config=config, bot=bot, db=db)
     i18n = I18n(path="app/locales", default_locale="en", domain="bot")
-    vpn_service = VPNService(db.session, config)
     plans_service = PlansService()
     promocode_service = PromocodeService(db.session)
+    vpn_service = VPNService(db.session, config, promocode_service)
 
     # Register event handlers
     dp.startup.register(on_startup)
@@ -89,9 +89,9 @@ async def main() -> None:
         config=config,
         session=db.session,
         i18n=i18n,
-        vpn=vpn_service,
         plans=plans_service,
         promocode=promocode_service,
+        vpn=vpn_service,
     )
 
     # Include bot routes

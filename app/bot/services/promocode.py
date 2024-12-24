@@ -4,7 +4,6 @@ import uuid
 from aiogram.utils.i18n import gettext as _
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.bot.services.vpn import VPNService
 from app.db.models.promocode import Promocode
 
 logger = logging.getLogger(__name__)

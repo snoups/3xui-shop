@@ -4,7 +4,9 @@ from datetime import datetime, timedelta, timezone
 from py3xui import AsyncApi, Client
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.bot.services.promocode import PromocodeService
 from app.config import Config
+from app.db.models.promocode import Promocode
 from app.db.models.user import User
 
 logger = logging.getLogger(__name__)
@@ -22,15 +24,20 @@ class VPNService:
         session (AsyncSession): Database session for interacting with the user model.
         subscription (str): Base subscription URL for generating user-specific keys.
         api (AsyncApi): Instance of the AsyncApi for interacting with the 3XUI API.
+        promocode_service (PromocodeService): Service for managing promocodes.
     """
 
-    def __init__(self, session: AsyncSession, config: Config) -> None:
+    def __init__(
+        self, session: AsyncSession, config: Config, promocode_service: PromocodeService
+    ) -> None:
         """
-        Initializes the VPNService instance with database session and API configuration.
+        Initializes the VPNService instance with database session, API configuration,
+        and promocode service.
 
         Arguments:
             session (AsyncSession): Database session for interacting with the user model.
             config (Config): Configuration object containing API credentials and settings.
+            promocode_service (PromocodeService): Service for managing promocodes.
         """
         self.session = session
         self.subscription = config.xui.SUBSCRIPTION
@@ -42,6 +49,7 @@ class VPNService:
             use_tls_verify=False,
             logger=logging.getLogger("xui"),
         )
+        self.promocode_service = promocode_service
         logger.info("VPNService initialized.")
 
     async def initialize(self) -> None:
@@ -146,7 +154,7 @@ class VPNService:
             if replace_traffic:
                 new_traffic_bytes = self.gb_to_bytes(traffic)
             else:
-                current_traffic_bytes = client.total_gb
+                current_traffic_bytes = client.total
                 additional_traffic_bytes = self.gb_to_bytes(traffic)
                 new_traffic_bytes = current_traffic_bytes + additional_traffic_bytes
 
@@ -273,3 +281,17 @@ class VPNService:
             await self.update_client(user, traffic, duration)
         else:
             await self.create_client(user, traffic, duration)
+
+    async def activate_promocode(self, user_id: int, promocode: Promocode) -> None:
+        """
+        Activates a promocode for the user, updating their subscription.
+
+        Arguments:
+            user_id (int): The ID of the user to activate the promocode for.
+            promocode (Promocode): The promocode object containing traffic and duration.
+        """
+
+        await self.promocode_service.activate_promocode(promocode.code, user_id)
+        async with self.session() as session:
+            user: User = await User.get(session, user_id=user_id)
+        await self.update_client(user, promocode.traffic, promocode.duration)

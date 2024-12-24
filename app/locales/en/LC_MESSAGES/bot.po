@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-23 22:25+0500\n"
+"POT-Creation-Date: 2024-12-24 07:33+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -310,6 +310,28 @@ msgid_plural "{} seconds"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/bot/routes/promocode.py:36
+msgid ""
+"🎟️ *Activate promocode:*\n"
+"\n"
+"_Send promocode to activation_"
+msgstr ""
+
+#: app/bot/routes/promocode.py:60
+msgid "✅ Promocode {promocode} was successfully activated!"
+msgstr ""
+
+#: app/bot/routes/promocode.py:67
+msgid ""
+"✅ Promocode {promocode} was successfully activated!\n"
+"\n"
+"_You have received {traffic} and {duration}._"
+msgstr ""
+
+#: app/bot/routes/promocode.py:92 app/bot/routes/promocode.py:98
+msgid "❌ Promocode is invalid or has already been activated!"
+msgstr ""
+
 #: app/bot/routes/subscription.py:39
 msgid "⚠️ *Your subscription period and traffic have expired!*\n"
 msgstr ""
@@ -343,15 +365,15 @@ msgid ""
 "subscription to start using our service."
 msgstr ""
 
-#: app/bot/routes/subscription.py:103
+#: app/bot/routes/subscription.py:104
 msgid "🌐 *Select the traffic volume:*"
 msgstr ""
 
-#: app/bot/routes/subscription.py:126
+#: app/bot/routes/subscription.py:127
 msgid "⏳ *Specify the duration:*"
 msgstr ""
 
-#: app/bot/routes/subscription.py:148
+#: app/bot/routes/subscription.py:149
 msgid "💳 *Choose a payment method:*"
 msgstr ""
 
@@ -436,3 +458,4 @@ msgid "1 month"
 msgid_plural "{} months"
 msgstr[0] ""
 msgstr[1] ""
+
