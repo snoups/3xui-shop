@@ -66,7 +66,6 @@ async def show_subscription(
     await callback.message.edit_text(
         text=text, reply_markup=subscription_keyboard(client_service, callback_data)
     )  # TODO: Make subscription renewals and changes possible
-    # TODO: Make activation promocodes
 
 
 @router.callback_query(F.data == Navigation.SUBSCRIPTION, IsPrivate())

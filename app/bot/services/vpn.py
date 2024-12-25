@@ -294,4 +294,7 @@ class VPNService:
         await self.promocode_service.activate_promocode(promocode.code, user_id)
         async with self.session() as session:
             user: User = await User.get(session, user_id=user_id)
-        await self.update_client(user, promocode.traffic, promocode.duration)
+        if await self.is_client_exists(user_id):
+            await self.update_client(user, promocode.traffic, promocode.duration)
+        else:
+            await self.create_client(user, promocode.traffic, promocode.duration)
