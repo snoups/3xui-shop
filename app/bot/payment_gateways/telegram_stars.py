@@ -10,8 +10,9 @@ class TelegramStars:
     """
     Service for handling payment creation using Telegram Stars.
 
-    This service provides methods to create a payment link for a subscription based on traffic
-    and duration. The payment is processed via Telegram's invoice system with specified prices.
+    This service provides methods to create a payment link for a subscription
+    based on the number of selected devices and duration. The payment is processed
+    via Telegram's invoice system with specified prices.
     """
 
     async def create_payment(self, data: SubscriptionCallback, bot: Bot) -> str:
@@ -19,10 +20,10 @@ class TelegramStars:
         Create a payment link for the subscription.
 
         This method generates a payment link for a user subscription based on the provided data,
-        including traffic and duration. It uses the Telegram bot's invoice creation system.
+        including devices and duration. It uses the Telegram bot's invoice creation system.
 
         Arguments:
-            data (SubscriptionCallback): The data for the subscription, including traffic and duration.
+            data (SubscriptionCallback): The subscription data, including devices and duration.
             bot (Bot): The instance of the Bot for creating the invoice link.
 
         Returns:

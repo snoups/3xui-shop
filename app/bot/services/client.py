@@ -13,11 +13,11 @@ logger = logging.getLogger(__name__)
 
 class ClientService:
     """
-    Service for managing client data related to traffic and subscription expiry.
+    Service for managing client data related to traffic, number of devices and subscription expiry.
 
     This service processes and formats client data, including traffic usage,
-    remaining quota, and subscription expiry time. It provides human-readable
-    outputs for these values and checks for traffic or subscription expiration.
+    max number of devices, and subscription expiry time. It provides human-readable
+    outputs for these values and checks subscription expiration.
 
     Attributes:
         client_data (dict): Dictionary containing client-related data such as traffic and expiry.
@@ -118,19 +118,6 @@ class ClientService:
         return self._time_left_to_expiry(self.client_data.get("expiry_time", 0))
 
     @property
-    def has_traffic_expired(self) -> bool:
-        """
-        Check if the client's traffic has expired.
-
-        Returns:
-            bool: True if traffic expired, False otherwise.
-        """
-        remaining_traffic = self.client_data.get("traffic_remaining", -1)
-        expired = remaining_traffic != -1 and remaining_traffic <= 0
-        logger.debug(f"Traffic expired: {expired}")
-        return expired
-
-    @property
     def has_subscription_expired(self) -> bool:
         """
         Check if the client's subscription has expired.
@@ -143,18 +130,6 @@ class ClientService:
         expired = expiry_time != -1 and current_time > expiry_time
         logger.debug(f"Subscription expired: {expired}")
         return expired
-
-    @property
-    def has_valid_subscription(self) -> bool:
-        """
-        Checks if the client has a valid subscription.
-
-        Returns:
-            bool: True if the client has a valid subscription, False otherwise.
-        """
-        valid = not (self.has_traffic_expired or self.has_subscription_expired)
-        logger.debug(f"Valid subscription: {valid}")
-        return valid
 
     def _convert_size(self, size_bytes: int) -> str:
         """

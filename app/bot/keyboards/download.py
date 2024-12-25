@@ -10,7 +10,7 @@ def platforms_keyboard() -> InlineKeyboardMarkup:
     """
     Generates a keyboard for selecting the platform to download the app.
 
-    Options include iOS, Android, and Windows, with a back button to the connection instructions.
+    Options include iOS, Android, and Windows with a back button to connection instructions.
 
     Returns:
         InlineKeyboardMarkup: Keyboard with platform selection options.
@@ -30,9 +30,6 @@ def platforms_keyboard() -> InlineKeyboardMarkup:
 def download_keyboard(platform: Navigation, key: str) -> InlineKeyboardMarkup:
     """
     Generates a keyboard with download and connection options based on the selected platform.
-
-    The platform could be iOS, Android, or Windows, and each option provides a
-    link to the corresponding app store or download page and key connection by url scheme.
 
     Arguments:
         platform (Navigation): The selected platform for download.
@@ -58,8 +55,8 @@ def download_keyboard(platform: Navigation, key: str) -> InlineKeyboardMarkup:
         connect = f"https://tinyurl.com/5cea6ra4{key}"
 
     builder.row(
-        InlineKeyboardButton(text=_("Download"), url=download),
-        InlineKeyboardButton(text=_("Connect"), url=connect),
+        InlineKeyboardButton(text=_("📥 Download"), url=download),
+        InlineKeyboardButton(text=_("🔌 Connect"), url=connect),
     )
 
     builder.row(back_button(Navigation.DOWNLOAD))

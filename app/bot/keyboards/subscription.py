@@ -23,8 +23,8 @@ def subscription_keyboard(
     """
     Generates a subscription keyboard with options based on the user's subscription status.
 
-    If the user doesn't have an active subscription, a button to purchase one is displayed.
-    Additionally, all users have access to a promocode activation button and a main menu button.
+    Displays a button to buy a subscription if not active, a promocode activation button,
+    and a back button.
 
     Arguments:
         has_subscription (bool): Indicates whether the user has an active subscription.
@@ -55,9 +55,20 @@ def subscription_keyboard(
 
 
 def devices_keyboard(
-    plans_service: PlansService,
-    callback_data: SubscriptionCallback,
+    plans_service: PlansService, callback_data: SubscriptionCallback
 ) -> InlineKeyboardMarkup:
+    """
+    Generates a keyboard to select subscription devices.
+
+    Displays a row of device options based on available plans, each updating the callback data.
+
+    Arguments:
+        plans_service (PlansService): Service providing available plans.
+        callback_data (SubscriptionCallback): Data for tracking the user's selection.
+
+    Returns:
+        InlineKeyboardMarkup: Keyboard with device options and a back button.
+    """
     builder = InlineKeyboardBuilder()
     plans = plans_service.plans
 
@@ -75,54 +86,18 @@ def devices_keyboard(
     return builder.as_markup()
 
 
-def traffic_keyboard(
-    plans_service: PlansService,
-    callback_data: SubscriptionCallback,
-) -> InlineKeyboardMarkup:
-    """
-    Generates a keyboard for selecting a traffic plan during subscription purchase.
-
-    Displays traffic options based on the available plans from the subscription service.
-    Each button updates the callback data with the selected traffic amount.
-
-    Arguments:
-        plans_service (PlansService): Service providing subscription plans.
-        callback_data (SubscriptionCallback): Data to track the user's navigation and selections.
-
-    Returns:
-        InlineKeyboardMarkup: Keyboard with traffic plan options and a back button.
-    """
-    builder = InlineKeyboardBuilder()
-    plans = plans_service.plans
-
-    for plan in plans:
-        callback_data.traffic = plan.traffic
-        traffic = plans_service.convert_traffic_to_title(plan.traffic)
-        builder.row(
-            InlineKeyboardButton(
-                text=traffic,
-                callback_data=callback_data.pack(),
-            )
-        )
-
-    builder.adjust(2)
-    builder.row(back_button(Navigation.SUBSCRIPTION))
-    return builder.as_markup()
-
-
 def duration_keyboard(
     plans_service: PlansService,
     callback_data: SubscriptionCallback,
 ) -> InlineKeyboardMarkup:
     """
-    Generates a keyboard for selecting the subscription duration.
+    Generates a keyboard for selecting subscription duration.
 
-    Options include various duration periods, with dynamically fetched prices based on the
-    selected traffic plan. Buttons update the callback data with the chosen duration.
+    Options include various durations with dynamically fetched prices based on selected devices.
 
     Arguments:
         plans_service (PlansService): Service providing subscription plans and prices.
-        callback_data (SubscriptionCallback): Data to track the user's navigation and selections.
+        callback_data (SubscriptionCallback): Data to track the user's selections.
 
     Returns:
         InlineKeyboardMarkup: Keyboard with duration options and a back button.

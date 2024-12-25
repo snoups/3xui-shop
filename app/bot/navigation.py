@@ -33,7 +33,6 @@ class Navigation(str, Enum):
     SUBSCRIPTION = "subscription"
     PROCESS = "process"
     DEVICES = "devices"
-    TRAFFIC = "traffic"
     DURATION = "duration"
 
     PAY = "pay"
@@ -65,7 +64,6 @@ class SubscriptionCallback(CallbackData, prefix="subscription"):
     user_id: int
     message_id: int = 0
     devices: int = 0
-    traffic: int = 0
     duration: int = 0
     price: int = 0
 

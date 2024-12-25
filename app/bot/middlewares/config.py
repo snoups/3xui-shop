@@ -30,7 +30,7 @@ class ConfigMiddleware(BaseMiddleware):
                              handler data, making it globally available to all handlers.
         """
         self.config = config
-        logger.info("ConfigMiddleware initialized.")
+        logger.debug("ConfigMiddleware initialized.")
 
     async def __call__(
         self,

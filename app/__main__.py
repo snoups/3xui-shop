@@ -3,6 +3,7 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.i18n import I18n
 
@@ -69,7 +70,7 @@ async def main() -> None:
     # Initialize components
     db = Database(config.database)
     storage = MemoryStorage()  # TODO: REDIS
-    bot = Bot(token=config.bot.TOKEN, default=DefaultBotProperties(parse_mode="MarkDown"))
+    bot = Bot(token=config.bot.TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN))
     dp = Dispatcher(storage=storage, config=config, bot=bot, db=db)
     i18n = I18n(path="app/locales", default_locale="en", domain="bot")
     plans_service = PlansService()

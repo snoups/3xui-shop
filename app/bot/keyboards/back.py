@@ -25,7 +25,7 @@ def back_keyboard(callback: str) -> InlineKeyboardMarkup:
         callback (str): The callback data for the back button.
 
     Returns:
-        InlineKeyboardMarkup: Keyboard with the back button.
+        InlineKeyboardMarkup: Keyboard with a back button.
     """
     return InlineKeyboardMarkup(inline_keyboard=[[back_button(callback)]])
 

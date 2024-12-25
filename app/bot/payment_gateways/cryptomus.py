@@ -16,7 +16,7 @@ class Cryptomus:
         This method generates a payment link based on the provided subscription data.
 
         Arguments:
-            data (SubscriptionCallback): The subscription data, including traffic and duration.
+            data (SubscriptionCallback): The subscription data, including devices and duration.
 
         Returns:
             str: The payment link for the subscription.

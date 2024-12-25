@@ -10,9 +10,8 @@ def buy_subscription_keyboard() -> InlineKeyboardMarkup:
     """
     Generates a keyboard for purchasing a subscription.
 
-    This keyboard allows the user to navigate to the subscription purchase page.
-    It includes a button for subscription purchase and a back button for returning
-    to the main menu.
+    Allows users to navigate to the subscription page, with a button to buy a subscription
+    and a back button for returning to the main menu.
 
     Returns:
         InlineKeyboardMarkup: Keyboard with a subscription button and a back button.
@@ -34,8 +33,7 @@ def show_key_keyboard() -> InlineKeyboardMarkup:
     """
     Generates a keyboard to display the user's VPN access key.
 
-    This keyboard provides a button for showing the VPN key and a back button to return
-    to the main menu. It is intended for users to retrieve their key after subscription.
+    Provides a button to show the VPN key and a back button to return to the main menu.
 
     Returns:
         InlineKeyboardMarkup: Keyboard with options to show the key and go back.

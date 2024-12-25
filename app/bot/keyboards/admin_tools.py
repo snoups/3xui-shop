@@ -18,7 +18,9 @@ def admin_tools_button() -> InlineKeyboardButton:
 
 def admin_tools_keyboard() -> InlineKeyboardMarkup:
     """
-    Generates a keyboard with options for admin tools, such as statistics, user editor, and more.
+    Generates a keyboard with options for admin tools.
+
+    Includes statistics, user editor, and other management options.
 
     Returns:
         InlineKeyboardMarkup: Keyboard with admin tool options and a back button.
@@ -68,7 +70,9 @@ def admin_tools_keyboard() -> InlineKeyboardMarkup:
 
 def editor_promocodes() -> InlineKeyboardMarkup:
     """
-    Generates a keyboard with options for managing promocodes, including create, delete, and edit.
+    Generates a keyboard for managing promocodes.
+
+    Options include create, delete, and edit promocodes, with a back button.
 
     Returns:
         InlineKeyboardMarkup: Keyboard with promocode management options and a back button.
@@ -99,45 +103,15 @@ def editor_promocodes() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-def promocode_traffic_keyboard(callback_data: CreatePromocodeCallback) -> InlineKeyboardMarkup:
-    """
-    Generates a keyboard for selecting traffic options for a promocode.
-
-    Displays traffic options like 1GB, 5GB, etc., and updates the callback data with value.
-
-    Arguments:
-        callback_data (CreatePromocodeCallback): Data for tracking the promocode creation process.
-
-    Returns:
-        InlineKeyboardMarkup: Keyboard with traffic selection options and a back button.
-    """
-    builder = InlineKeyboardBuilder()
-    traffic_options = [1, 5, 10, 20, 50, 100]
-
-    for traffic in traffic_options:
-        callback_data.traffic = traffic
-        button = InlineKeyboardButton(
-            text=f"{traffic} " + _("GB"),
-            callback_data=callback_data.pack(),
-        )
-        builder.row(button)
-
-    builder.adjust(2)
-    builder.row(back_button(Navigation.EDITOR_PROMOCODES))
-    return builder.as_markup()
-
-
 def promocode_duration_keyboard(callback_data: CreatePromocodeCallback) -> InlineKeyboardMarkup:
     """
-    Generates a keyboard for selecting the duration of a promocode.
-
-    Displays duration options like 1 day, 7 days, etc., and updates callback data with value.
+    Generates a keyboard for selecting promocode duration.
 
     Arguments:
-        callback_data (CreatePromocodeCallback): Data for tracking the promocode creation process.
+        callback_data (CreatePromocodeCallback): Data for tracking promocode creation process.
 
     Returns:
-        InlineKeyboardMarkup: Keyboard with duration selection options and a back button.
+        InlineKeyboardMarkup: Keyboard for selecting duration options with a back button.
     """
     builder = InlineKeyboardBuilder()
     duration_options = [1, 7, 30, 90, 365]

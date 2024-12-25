@@ -11,9 +11,6 @@ def pay_keyboard(pay_url: str, callback_data: SubscriptionCallback) -> InlineKey
     """
     Generates a payment keyboard with a link to the payment URL and a back button.
 
-    This keyboard is designed for users to initiate a payment. It includes a button
-    with the specified payment URL and a back button to navigate to the duration selection menu.
-
     Arguments:
         pay_url (str): URL to redirect the user to the payment page.
         callback_data (SubscriptionCallback): Callback data to identify the navigation state.
@@ -37,17 +34,12 @@ def payment_method_keyboard(
     """
     Generates a keyboard for choosing a payment method.
 
-    The keyboard includes options for selecting a payment method, such as YooKassa,
-    TelegramStars, and Cryptomus. The prices are dynamically fetched from the subscription
-    service based on the selected traffic amount and duration.
-
     Arguments:
         callback_data (SubscriptionCallback): Data used to track user navigation and selections.
         plans_service (PlansService): Service providing subscription plans.
 
     Returns:
-        InlineKeyboardMarkup: A keyboard with buttons for each payment method,
-        along with a back button to return to the previous menu.
+        InlineKeyboardMarkup: A keyboard with buttons for each payment method.
     """
     builder = InlineKeyboardBuilder()
     plan = plans_service.get_plan(callback_data.devices)
@@ -86,11 +78,10 @@ def payment_success_keyboard() -> InlineKeyboardMarkup:
     """
     Generates a keyboard for the successful payment confirmation.
 
-    This keyboard provides a button for the user to download the app after completing
-    the payment process, along with a back button that redirects the user to the main menu.
+    Provides a button to download the app after payment, with a back button to the main menu.
 
     Returns:
-        InlineKeyboardMarkup: Inline keyboard with a download button and a back button to main menu.
+        InlineKeyboardMarkup: Inline keyboard with download and back-to-main-menu buttons.
     """
     builder = InlineKeyboardBuilder()
 

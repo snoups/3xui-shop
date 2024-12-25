@@ -10,7 +10,6 @@ from app.bot.keyboards.subscription import (
     devices_keyboard,
     duration_keyboard,
     subscription_keyboard,
-    traffic_keyboard,
 )
 from app.bot.navigation import Navigation, SubscriptionCallback
 from app.bot.services.client import ClientService
@@ -37,10 +36,12 @@ async def show_subscription(
     text = ""
     if client_service:
         if client_service.has_subscription_expired:
-            text = _("⚠️ *Subscription period has expired!*\n")
-        text += "\n" + _("Please renew your subscription to continue using our service.")
-
-        if client_service.has_valid_subscription:
+            text = _(
+                "⚠️ *Subscription period has expired!*\n"
+                "\n"
+                "Please renew your subscription to continue using our service."
+            )
+        else:
             text = _(
                 "✅ *You already have an active subscription:*\n"
                 "\n"

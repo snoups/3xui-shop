@@ -48,7 +48,7 @@ class ThrottlingMiddleware(BaseMiddleware):
 
         for name, ttl in ttl_map.items():
             self.caches[name] = TTLCache(maxsize=10_000, ttl=ttl)
-        logger.info("ThrottlingMiddleware initialized.")
+        logger.debug("ThrottlingMiddleware initialized.")
 
     async def __call__(
         self,

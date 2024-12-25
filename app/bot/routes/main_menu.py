@@ -1,6 +1,6 @@
 import logging
 
-from aiogram import F, Router
+from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, User
@@ -40,7 +40,7 @@ def prepare_message(user: User) -> str:
 
 
 @router.message(Command(Navigation.START), IsPrivate())
-async def command_main_menu(message: Message, state: FSMContext) -> None:
+async def command_main_menu(message: Message, state: FSMContext, bot: Bot) -> None:
     """
     Handler for the `/start` command, displays the main menu to the user.
 
@@ -48,6 +48,7 @@ async def command_main_menu(message: Message, state: FSMContext) -> None:
         message (Message): The incoming message from the user.
         state (FSMContext): The FSM context to manage user state.
     """
+    await message.delete()
     logger.info(f"User {message.from_user.id} opened main menu.")
     await state.clear()
     is_admin = await IsAdmin()(message)

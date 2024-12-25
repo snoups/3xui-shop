@@ -25,9 +25,6 @@ def support_keyboard(support_id: int) -> InlineKeyboardMarkup:
     """
     Generates a keyboard with support options, including common issues and direct contact.
 
-    Users can select predefined support topics or contact the support operator directly.
-    A back button allows navigation back to the main menu.
-
     Arguments:
         support_id (int): Telegram user ID of the support operator.
 
@@ -58,9 +55,6 @@ def how_to_connect_keyboard(support_id: int) -> InlineKeyboardMarkup:
     """
     Generates a keyboard with instructions for connecting to the VPN and contacting support.
 
-    Includes options to purchase a subscription, download the app, and contact the operator.
-    A back button navigates to the support menu.
-
     Arguments:
         support_id (int): Telegram user ID of the support operator.
 
@@ -90,8 +84,6 @@ def how_to_connect_keyboard(support_id: int) -> InlineKeyboardMarkup:
 def contact_keyboard(support_id: int) -> InlineKeyboardMarkup:
     """
     Generates a keyboard for contacting the support operator.
-
-    Displays a button to contact the operator directly and a back button to the support menu.
 
     Arguments:
         support_id (int): Telegram user ID of the support operator.

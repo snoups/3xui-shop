@@ -28,7 +28,7 @@ class ServicesMiddleware(BaseMiddleware):
                                        into handler data (e.g., VPN service, Plans service).
         """
         self.services = services
-        logger.info(f"ServicesMiddleware initialized with services: {list(services.keys())}")
+        logger.debug(f"ServicesMiddleware initialized with services: {list(services.keys())}")
 
     async def __call__(
         self,

@@ -32,7 +32,7 @@ class DBSessionMiddleware(BaseMiddleware):
         """
         super().__init__()
         self.session = session
-        logger.info("DBSessionMiddleware initialized.")
+        logger.debug("DBSessionMiddleware initialized.")
 
     async def __call__(
         self,

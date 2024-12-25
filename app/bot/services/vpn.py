@@ -289,21 +289,21 @@ class VPNService:
         logger.debug(f"Fetched key for {user_id}: {key}.")
         return key
 
-    async def create_subscription(self, user_id: int, traffic: int, duration: int) -> None:
+    async def create_subscription(self, user_id: int, devices: int, duration: int) -> None:
         """
         Create or update a subscription for the user.
 
         Arguments:
             user_id (int): The ID of the user for whom the subscription is being created or updated.
-            traffic (int): The amount of traffic allocated to the user in bytes.
+            devices (int): The number of devices (limit_ip).
             duration (int): The duration of the subscription in seconds.
         """
         async with self.session() as session:
             user: User = await User.get(session, user_id=user_id)
         if await self.is_client_exists(user.user_id):
-            await self.update_client(user, traffic, duration)
+            await self.update_client(user, devices, duration)
         else:
-            await self.create_client(user, traffic, duration)
+            await self.create_client(user, devices, duration)
 
     async def activate_promocode(self, user_id: int, promocode: Promocode) -> None:
         """

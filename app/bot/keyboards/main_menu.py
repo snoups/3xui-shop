@@ -10,9 +10,6 @@ def main_menu_keyboard(is_admin: bool) -> InlineKeyboardMarkup:
     """
     Generates the main menu keyboard with navigation options.
 
-    Includes options for the profile, subscription, referral program, support,
-    and admin tools if the user is an admin.
-
     Arguments:
         is_admin (bool): Whether the user is an admin.
 

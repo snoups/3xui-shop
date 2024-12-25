@@ -12,7 +12,6 @@ from app.bot.keyboards.admin_tools import (
     admin_tools_keyboard,
     editor_promocodes,
     promocode_duration_keyboard,
-    promocode_traffic_keyboard,
 )
 from app.bot.keyboards.back import back_keyboard
 from app.bot.navigation import CreatePromocodeCallback, Navigation
