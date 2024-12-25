@@ -7,6 +7,7 @@ from aiogram.utils.i18n import gettext as _
 from app.bot.filters import IsPrivate
 from app.bot.keyboards.payment import payment_method_keyboard
 from app.bot.keyboards.subscription import (
+    devices_keyboard,
     duration_keyboard,
     subscription_keyboard,
     traffic_keyboard,
@@ -35,11 +36,7 @@ async def show_subscription(
     """
     text = ""
     if client_service:
-        if client_service.has_subscription_expired and client_service.has_traffic_expired:
-            text = _("⚠️ *Your subscription period and traffic have expired!*\n")
-        elif client_service.has_traffic_expired:
-            text = _("⚠️ *Traffic limit reached!*\n")
-        elif client_service.has_subscription_expired:
+        if client_service.has_subscription_expired:
             text = _("⚠️ *Subscription period has expired!*\n")
         text += "\n" + _("Please renew your subscription to continue using our service.")
 
@@ -47,12 +44,10 @@ async def show_subscription(
             text = _(
                 "✅ *You already have an active subscription:*\n"
                 "\n"
-                "Plan: {plan}\n"
-                "Remaining Traffic: {traffic}\n"
+                "Devices: {devices}\n"
                 "Expires on: {expiry_time}"
             ).format(
-                plan=client_service.traffic_total,
-                traffic=client_service.traffic_remaining,
+                devices=client_service.max_devices,
                 expiry_time=client_service.expiry_time,
             )
     else:
@@ -66,7 +61,6 @@ async def show_subscription(
     await callback.message.edit_text(
         text=text, reply_markup=subscription_keyboard(client_service, callback_data)
     )  # TODO: Make subscription renewals and changes possible
-    # TODO: Make activation promocodes
 
 
 @router.callback_query(F.data == Navigation.SUBSCRIPTION, IsPrivate())
@@ -92,7 +86,7 @@ async def callback_subscription_process(
     plans_service: PlansService,
 ):
     """
-    Handler for starting the subscription process by selecting traffic.
+    Handler for starting the subscription process by selecting the number of devices.
 
     Arguments:
         callback (CallbackQuery): The callback query object containing user interaction.
@@ -100,28 +94,28 @@ async def callback_subscription_process(
         plans_service (PlansService): Service for retrieving available plans and prices.
     """
     logger.info(f"User {callback.from_user.id} started subscription process.")
-    callback_data.state = Navigation.TRAFFIC
-    text = _("🌐 *Select the traffic volume:*")
+    callback_data.state = Navigation.DEVICES
+    text = _("🌐 *Select the number of devices:*")
     await callback.message.edit_text(
-        text=text, reply_markup=traffic_keyboard(plans_service, callback_data)
+        text=text, reply_markup=devices_keyboard(plans_service, callback_data)
     )
 
 
-@router.callback_query(SubscriptionCallback.filter(F.state == Navigation.TRAFFIC), IsPrivate())
-async def callback_traffic_selected(
+@router.callback_query(SubscriptionCallback.filter(F.state == Navigation.DEVICES), IsPrivate())
+async def callback_devices_selected(
     callback: CallbackQuery,
     callback_data: SubscriptionCallback,
     plans_service: PlansService,
 ) -> None:
     """
-    Handler for selecting the traffic volume during subscription.
+    Handler for selecting the number of devices during the subscription process.
 
     Arguments:
         callback (CallbackQuery): The callback query object containing user interaction.
         callback_data (SubscriptionCallback): The data related to the subscription callback.
         plans_service (PlansService): Service for retrieving available plans and prices.
     """
-    logger.info(f"User {callback.from_user.id} selected traffic: {callback_data.traffic}")
+    logger.info(f"User {callback.from_user.id} selected devices: {callback_data.devices}")
     callback_data.state = Navigation.DURATION
     await callback.message.edit_text(
         text=_("⏳ *Specify the duration:*"),

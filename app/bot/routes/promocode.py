@@ -73,10 +73,9 @@ async def handle_promocode_input(
                 text=_(
                     "✅ Promocode {promocode} was successfully activated!\n"
                     "\n"
-                    "_You have received {traffic} and {duration}._"
+                    "_You have received {duration} to your subscription._"
                 ).format(
                     promocode=input_promocode,
-                    traffic=PlansService.convert_traffic_to_title(promocode.traffic),
                     duration=PlansService.convert_days_to_period(promocode.duration),
                 ),
                 reply_markup=back_keyboard(Navigation.SUBSCRIPTION),

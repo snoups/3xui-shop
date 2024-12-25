@@ -6,57 +6,31 @@
     // List of available subscription plans.
     "plans": [
         {
-            // Traffic limit in gigabytes (GB) provided by the plan.
-            // A value of -1 indicates unlimited traffic.
-            "traffic": 50,
+            // Number of devices included in the plan.
+            "devices": 1,
 
             // Plan prices based on currency and subscription duration.
             "prices": {
-                // Prices in USD for each subscription period.
-                "USD": {
-                    "30": 0.7, // Price for 30 days.
-                    "60": 1.2, // Price for 60 days.
-                    "180": 3, // Price for 180 days.
-                    "365": 6 // Price for 365 days.
-                },
-                // Prices in RUB for each subscription period.
+                // Prices in RUB.
                 "RUB": {
-                    "30": 70,
-                    "60": 120,
-                    "180": 300,
-                    "365": 600
+                    "30": 70, // Price for 30 days.
+                    "60": 120, // Price for 60 days.
+                    "180": 300, // Price for 180 days.
+                    "365": 600 // Price for 365 days.
                 },
-                // Prices in XTR for each subscription period.
+                // Prices in USD.
+                "USD": {
+                    "30": 0.7,
+                    "60": 1.2,
+                    "180": 3,
+                    "365": 6
+                },
+                // Prices in XTR.
                 "XTR": {
                     "30": 60,
                     "60": 100,
                     "180": 250,
                     "365": 500
-                }
-            }
-        },
-        {
-            // Plan with unlimited traffic.
-            "traffic": -1,
-
-            "prices": {
-                "USD": {
-                    "30": 2,
-                    "60": 3.5,
-                    "180": 8.8,
-                    "365": 17.5
-                },
-                "RUB": {
-                    "30": 200,
-                    "60": 350,
-                    "180": 880,
-                    "365": 1750
-                },
-                "XTR": {
-                    "30": 160,
-                    "60": 280,
-                    "180": 700,
-                    "365": 1400
                 }
             }
         }

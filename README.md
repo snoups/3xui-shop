@@ -14,7 +14,7 @@ Currently, the bot is under development and not fully functional. Some features 
 - [x] Telegram Stars payment
 - [ ] Yookassa payment
 - [ ] Cryptomus payment
-- [ ] Promocode system
+- [x] Promocode system
 - [ ] Referral system
 - [x] Support page
 - [x] Apps page

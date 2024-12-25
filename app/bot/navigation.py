@@ -32,6 +32,7 @@ class Navigation(str, Enum):
     # region: Subscription
     SUBSCRIPTION = "subscription"
     PROCESS = "process"
+    DEVICES = "devices"
     TRAFFIC = "traffic"
     DURATION = "duration"
 
@@ -63,6 +64,7 @@ class SubscriptionCallback(CallbackData, prefix="subscription"):
     state: Navigation
     user_id: int
     message_id: int = 0
+    devices: int = 0
     traffic: int = 0
     duration: int = 0
     price: int = 0
@@ -70,5 +72,4 @@ class SubscriptionCallback(CallbackData, prefix="subscription"):
 
 class CreatePromocodeCallback(CallbackData, prefix="create_promocode"):
     state: Navigation
-    traffic: int = 0
     duration: int = 0

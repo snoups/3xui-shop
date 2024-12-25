@@ -45,6 +45,19 @@ class ClientService:
         return exists
 
     @property
+    def max_devices(self) -> str:
+        """
+        Return the maximum number of devices allowed for the client.
+
+        Returns:
+            str: The maximum number of devices the client can use
+        """
+        devices = self.client_data.get("max_devices", 1)
+        if devices == -1:
+            return UNLIMITED
+        return devices
+
+    @property
     def traffic_total(self) -> str:
         """
         Return the total subscription traffic in a human-readable format.
@@ -205,7 +218,7 @@ class ClientService:
             if minutes > 0 or not result_parts:
                 result_parts.append(f"{int(minutes)}{_('m')}")
 
-            result = ", ".join(result_parts)
+            result = " ".join(result_parts)
             logger.debug(f"Time left to expiry: {result}")
             return result
         except Exception as exception:

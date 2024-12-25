@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timedelta, timezone
 
-from py3xui import AsyncApi, Client
+from py3xui import AsyncApi, Client, Inbound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.services.promocode import PromocodeService
@@ -62,6 +62,30 @@ class VPNService:
         await self.api.login()
         logger.info("Logged into 3XUI API successfully.")
 
+    async def get_limit_ip(self, client: Client) -> int | None:
+        """
+        Fetch the IP limit for a client from the list of inbounds.
+
+        Arguments:
+            client (Client): The client to find in the inbounds.
+
+        Returns:
+            int | None: The IP limit if found, otherwise None.
+        """
+        try:
+            inbounds: list[Inbound] = await self.api.inbound.get_list()
+        except Exception as exception:
+            logger.warning(f"Failed to fetch inbounds: {exception}")
+            return None
+
+        for inbound in inbounds:
+            for inbound_client in inbound.settings.clients:
+                if inbound_client.email == client.email:
+                    return inbound_client.limit_ip
+
+        logger.debug(f"Client {client.email} not found in inbounds.")
+        return None
+
     async def is_client_exists(self, user_id: int) -> Client | None:
         """
         Checks if a client exists in the 3XUI by their user ID.
@@ -98,6 +122,9 @@ class VPNService:
                 logger.debug(f"No client data found for {user_id}.")
                 return None
 
+            limit_ip = await self.get_limit_ip(client)
+            max_devices = -1 if limit_ip == 0 else limit_ip
+
             traffic_total = client.total
             if traffic_total <= 0:
                 traffic_remaining = -1
@@ -109,6 +136,7 @@ class VPNService:
 
             traffic_used = client.up + client.down
             client_data = {
+                "max_devices": max_devices,
                 "traffic_total": traffic_total,
                 "traffic_remaining": traffic_remaining,
                 "traffic_used": traffic_used,
@@ -125,38 +153,36 @@ class VPNService:
     async def update_client(
         self,
         user: User,
-        traffic: int,
-        duration: int,
-        replace_traffic: bool = False,
+        devices: int = 1,
+        duration: int = 1,
+        replace_devices: bool = False,
         replace_duration: bool = False,
     ) -> None:
         """
-        Updates the client’s traffic and subscription duration in the 3XUI.
+        Updates the client’s devices and subscription duration in the 3XUI.
 
-        This function can either replace the existing traffic and duration values or
-        add to them, based on the `replace_traffic` and `replace_duration` flags.
+        This function can either replace the existing device count and duration values or
+        add to them, based on the `replace_devices` and `replace_duration` flags.
 
         Arguments:
             user (User): The user whose client data is to be updated.
-            traffic (int): The traffic limit in GB to set or add for the client.
+            devices (int): The number of devices to set or add for the client.
             duration (int): The duration in days to set or add to the subscription.
-            replace_traffic (bool): If True, replaces the existing traffic limit.
+            replace_devices (bool): If True, replaces the existing device count.
             replace_duration (bool): If True, replaces the existing subscription duration.
         """
         logger.info(
-            f"Updating client {user.user_id} with traffic={traffic} GB "
-            f"and duration={duration} days."
+            f"Updating client {user.user_id} with devices={devices} and duration={duration} days."
         )
 
         try:
             client: Client = await self.api.client.get_by_email(str(user.user_id))
 
-            if replace_traffic:
-                new_traffic_bytes = self.gb_to_bytes(traffic)
+            if replace_devices:
+                new_device_limit = devices
             else:
-                current_traffic_bytes = client.total
-                additional_traffic_bytes = self.gb_to_bytes(traffic)
-                new_traffic_bytes = current_traffic_bytes + additional_traffic_bytes
+                current_device_limit = client.limit_ip
+                new_device_limit = current_device_limit + devices
 
             if replace_duration:
                 new_expiry_time = self.days_to_timestamp(duration)
@@ -166,28 +192,25 @@ class VPNService:
             client.id = user.vpn_id
             client.expiry_time = new_expiry_time
             client.flow = "xtls-rprx-vision"
-            client.limit_ip = 3
+            client.limit_ip = new_device_limit if devices != None else self.get_limit_ip(client)
             client.sub_id = user.vpn_id
-            client.total_gb = new_traffic_bytes
 
             await self.api.client.update(client.id, client)
-            await self.api.client.reset_stats(client.inbound_id, client.email)
             logger.info(f"Client {user.user_id} updated successfully.")
         except Exception as exception:
             logger.error(f"Error updating client {user.user_id}: {exception}")
 
-    async def create_client(self, user: User, traffic: int, duration: int) -> None:
+    async def create_client(self, user: User, devices: int = 1, duration: int = 1) -> None:
         """
         Creates a new client in the 3XUI.
 
         Arguments:
             user (User): The user for whom the client is to be created.
-            traffic (int): The traffic limit in GB to set for the new client.
+            devices (int): The number of devices to set for the new client.
             duration (int): The duration in days for which the subscription is valid.
         """
         logger.info(
-            f"Creating new client {user.user_id} with traffic={traffic} GB "
-            f"and duration={duration} days."
+            f"Creating new client {user.user_id} with devices={devices} and duration={duration} days."
         )
 
         new_client = Client(
@@ -196,9 +219,9 @@ class VPNService:
             id=user.vpn_id,
             expiryTime=self.days_to_timestamp(duration),
             flow="xtls-rprx-vision",
-            limitIp=3,  # TODO: Make a choice of the number of devices
+            limitIp=devices if devices != None else self.get_limit_ip(client),
             sub_id=user.vpn_id,
-            totalGB=self.gb_to_bytes(traffic),
+            totalGB=0,
         )
         inbound_id = 7  # TODO: Make a server config file
         try:
@@ -294,4 +317,7 @@ class VPNService:
         await self.promocode_service.activate_promocode(promocode.code, user_id)
         async with self.session() as session:
             user: User = await User.get(session, user_id=user_id)
-        await self.update_client(user, promocode.traffic, promocode.duration)
+        if await self.is_client_exists(user_id):
+            await self.update_client(user, duration=promocode.duration)
+        else:
+            await self.create_client(user, duration=promocode.duration)

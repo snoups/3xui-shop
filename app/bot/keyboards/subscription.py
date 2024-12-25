@@ -54,6 +54,27 @@ def subscription_keyboard(
     return builder.as_markup()
 
 
+def devices_keyboard(
+    plans_service: PlansService,
+    callback_data: SubscriptionCallback,
+) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    plans = plans_service.plans
+
+    for plan in plans:
+        callback_data.devices = plan.devices
+        builder.row(
+            InlineKeyboardButton(
+                text=plans_service.convert_devices_to_title(plan.devices),
+                callback_data=callback_data.pack(),
+            )
+        )
+
+    builder.adjust(2)
+    builder.row(back_button(Navigation.SUBSCRIPTION))
+    return builder.as_markup()
+
+
 def traffic_keyboard(
     plans_service: PlansService,
     callback_data: SubscriptionCallback,
@@ -112,7 +133,7 @@ def duration_keyboard(
     for duration in durations:
         callback_data.duration = duration
         period = plans_service.convert_days_to_period(duration)
-        price = plans_service.get_plan(callback_data.traffic).prices.rub[duration]
+        price = plans_service.get_plan(callback_data.devices).prices.rub[duration]
         builder.row(
             InlineKeyboardButton(
                 text=f"{period} | {price} ₽",

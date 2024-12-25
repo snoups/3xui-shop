@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-24 07:33+0500\n"
+"POT-Creation-Date: 2024-12-25 18:09+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -58,8 +58,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:120 app/bot/services/client.py:162
-#: app/bot/services/plans.py:196
+#: app/bot/keyboards/admin_tools.py:120 app/bot/services/client.py:175
 msgid "GB"
 msgstr ""
 
@@ -145,18 +144,15 @@ msgid "❓ VPN not working"
 msgstr ""
 
 #: app/bot/payment_gateways/telegram_stars.py:35
-msgid "Subscription | traffic: {traffic}, duration: {duration}"
-msgstr ""
-
 #: app/bot/payment_gateways/telegram_stars.py:38
-msgid "traffic: {traffic}, duration: {duration}"
+msgid "Subscription | {devices} for {duration}"
 msgstr ""
 
 #: app/bot/routes/admin_tools.py:43
 msgid "🛠 *Admin tools:*"
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:84 app/bot/routes/admin_tools.py:238
+#: app/bot/routes/admin_tools.py:84 app/bot/routes/admin_tools.py:240
 msgid "🎟️ *Editor promocodes:*"
 msgstr ""
 
@@ -193,7 +189,7 @@ msgstr ""
 msgid "✅ Promocode {promocode} deleted successfully."
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:244
+#: app/bot/routes/admin_tools.py:246
 msgid "❌ Failed to delete promocode. Please try again."
 msgstr ""
 
@@ -222,11 +218,11 @@ msgid ""
 "✅ GUARANTEE AND TRIAL PERIOD\n"
 msgstr ""
 
-#: app/bot/routes/payment.py:58
+#: app/bot/routes/payment.py:57
 msgid ""
 "✅ *You selected:*\n"
 "\n"
-"Plan: {plan}\n"
+"Devices: {devices}\n"
 "Duration: {duration}\n"
 "Price: {price} {currency}\n"
 "\n"
@@ -234,7 +230,7 @@ msgid ""
 " VPN. The key will be available in your profile._"
 msgstr ""
 
-#: app/bot/routes/payment.py:137
+#: app/bot/routes/payment.py:136
 msgid ""
 "✅ *Payment successful!*\n"
 "\n"
@@ -247,117 +243,90 @@ msgid ""
 "application."
 msgstr ""
 
-#: app/bot/routes/profile.py:31
+#: app/bot/routes/profile.py:30
 msgid ""
 "👤 *Your profile:*\n"
 "Name: {name}\n"
 "ID: {id}\n"
 msgstr ""
 
-#: app/bot/routes/profile.py:38
+#: app/bot/routes/profile.py:36
 msgid ""
-"_You don't have a subscription purchased yet, go to the subscription page"
-" to purchase or click the button below._"
+"_You don't have a subscription yet. To purchase one, go to the "
+"subscription page by clicking the button below._"
 msgstr ""
 
-#: app/bot/routes/profile.py:44
+#: app/bot/routes/profile.py:42
 msgid ""
 "📅 *Subscription:*\n"
-"Plan: {plan}\n"
+"Devices: {devices}\n"
 msgstr ""
 
 #: app/bot/routes/profile.py:47
-msgid "_Traffic limit reached._\n"
-msgstr ""
-
-#: app/bot/routes/profile.py:49
-msgid "Expires on: {expiry_time}\n"
-msgstr ""
-
-#: app/bot/routes/profile.py:54
-msgid "Remaining Traffic: {traffic}\n"
-msgstr ""
-
-#: app/bot/routes/profile.py:57
 msgid "_Subscription period has expired._\n"
 msgstr ""
 
-#: app/bot/routes/profile.py:61
-msgid ""
-"Remaining Traffic: {traffic}\n"
-"Expires on: {expiry_time}\n"
+#: app/bot/routes/profile.py:49
+msgid "Expires in: {expiry_time}\n"
 msgstr ""
 
-#: app/bot/routes/profile.py:70
+#: app/bot/routes/profile.py:55
 msgid ""
 "📊 *Statistics:*\n"
 "Total: {total}\n"
-"Sent: ↑ {up}\n"
-"Received: ↓ {down}"
+"Uploaded: ↑ {up}\n"
+"Downloaded: ↓ {down}"
 msgstr ""
 
-#: app/bot/routes/profile.py:115
+#: app/bot/routes/profile.py:100
 msgid "🔑 *Your key:* (Closes after {seconds_text}) ```{key}```"
 msgstr ""
 
-#: app/bot/routes/profile.py:116
+#: app/bot/routes/profile.py:101
 msgid "6 seconds"
 msgstr ""
 
-#: app/bot/routes/profile.py:119
+#: app/bot/routes/profile.py:104
 msgid "1 second"
 msgid_plural "{} seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/routes/promocode.py:36
+#: app/bot/routes/promocode.py:42
 msgid ""
 "🎟️ *Activate promocode:*\n"
 "\n"
 "_Send promocode to activation_"
 msgstr ""
 
-#: app/bot/routes/promocode.py:60
-msgid "✅ Promocode {promocode} was successfully activated!"
-msgstr ""
-
-#: app/bot/routes/promocode.py:67
+#: app/bot/routes/promocode.py:73
 msgid ""
 "✅ Promocode {promocode} was successfully activated!\n"
 "\n"
 "_You have received {traffic} and {duration}._"
 msgstr ""
 
-#: app/bot/routes/promocode.py:92 app/bot/routes/promocode.py:98
+#: app/bot/routes/promocode.py:88
 msgid "❌ Promocode is invalid or has already been activated!"
 msgstr ""
 
-#: app/bot/routes/subscription.py:39
-msgid "⚠️ *Your subscription period and traffic have expired!*\n"
-msgstr ""
-
-#: app/bot/routes/subscription.py:41
-msgid "⚠️ *Traffic limit reached!*\n"
-msgstr ""
-
-#: app/bot/routes/subscription.py:43
+#: app/bot/routes/subscription.py:40
 msgid "⚠️ *Subscription period has expired!*\n"
 msgstr ""
 
-#: app/bot/routes/subscription.py:44
+#: app/bot/routes/subscription.py:41
 msgid "Please renew your subscription to continue using our service."
 msgstr ""
 
-#: app/bot/routes/subscription.py:47
+#: app/bot/routes/subscription.py:44
 msgid ""
 "✅ *You already have an active subscription:*\n"
 "\n"
-"Plan: {plan}\n"
-"Remaining Traffic: {traffic}\n"
+"Devices: {devices}\n"
 "Expires on: {expiry_time}"
 msgstr ""
 
-#: app/bot/routes/subscription.py:59
+#: app/bot/routes/subscription.py:54
 msgid ""
 "⚠️ *You do not have an active subscription!*\n"
 "\n"
@@ -365,15 +334,15 @@ msgid ""
 "subscription to start using our service."
 msgstr ""
 
-#: app/bot/routes/subscription.py:104
-msgid "🌐 *Select the traffic volume:*"
+#: app/bot/routes/subscription.py:98
+msgid "🌐 *Select the number of devices:*"
 msgstr ""
 
-#: app/bot/routes/subscription.py:127
+#: app/bot/routes/subscription.py:121
 msgid "⏳ *Specify the duration:*"
 msgstr ""
 
-#: app/bot/routes/subscription.py:149
+#: app/bot/routes/subscription.py:143
 msgid "💳 *Choose a payment method:*"
 msgstr ""
 
@@ -408,42 +377,52 @@ msgid ""
 "If the issue persists, please contact support."
 msgstr ""
 
-#: app/bot/services/client.py:160 app/bot/services/client.py:162
-#: app/bot/services/client.py:176
+#: app/bot/services/client.py:173 app/bot/services/client.py:175
+#: app/bot/services/client.py:189
 msgid "MB"
 msgstr ""
 
-#: app/bot/services/client.py:162
+#: app/bot/services/client.py:175
 msgid "TB"
 msgstr ""
 
-#: app/bot/services/client.py:162
+#: app/bot/services/client.py:175
 msgid "PB"
 msgstr ""
 
-#: app/bot/services/client.py:162
+#: app/bot/services/client.py:175
 msgid "EB"
 msgstr ""
 
-#: app/bot/services/client.py:162
+#: app/bot/services/client.py:175
 msgid "ZB"
 msgstr ""
 
-#: app/bot/services/client.py:162
+#: app/bot/services/client.py:175
 msgid "YB"
 msgstr ""
 
-#: app/bot/services/client.py:202
+#: app/bot/services/client.py:215
 msgid "d"
 msgstr ""
 
-#: app/bot/services/client.py:204
+#: app/bot/services/client.py:217
 msgid "h"
 msgstr ""
 
-#: app/bot/services/client.py:206 app/bot/services/client.py:213
+#: app/bot/services/client.py:219 app/bot/services/client.py:226
 msgid "m"
 msgstr ""
+
+#: app/bot/services/plans.py:194
+msgid "devices"
+msgstr ""
+
+#: app/bot/services/plans.py:196
+msgid "1 device"
+msgid_plural "{} devices"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/bot/services/plans.py:216
 #, fuzzy
@@ -458,4 +437,3 @@ msgid "1 month"
 msgid_plural "{} months"
 msgstr[0] ""
 msgstr[1] ""
-

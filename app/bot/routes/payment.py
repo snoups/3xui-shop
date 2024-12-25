@@ -34,15 +34,14 @@ async def callback_payment_method_selected(
         plans_service (PlansService): Service for managing subscription plans.
         bot (Bot): The bot instance to send messages and interact with the user.
     """
-    print(callback.message.message_id)
     logger.info(f"User {callback.from_user.id} selected payment method: {callback_data.state}")
-    traffic = callback_data.traffic
+    devices = callback_data.devices
     duration = callback_data.duration
-    logger.info(f"User {callback.from_user.id} selected {traffic} GB and {duration} days.")
+    logger.info(f"User {callback.from_user.id} selected {devices} devices and {duration} days.")
 
     payment_service = PaymentService(callback_data.state)
     price = plans_service.get_price_for_duration(
-        plans_service.get_plan(traffic).prices.to_dict(),
+        plans_service.get_plan(devices).prices.to_dict(),
         duration,
         payment_service.method.code,
     )
@@ -58,14 +57,14 @@ async def callback_payment_method_selected(
         text=_(
             "✅ *You selected:*\n"
             "\n"
-            "Plan: {plan}\n"
+            "Devices: {devices}\n"
             "Duration: {duration}\n"
             "Price: {price} {currency}\n"
             "\n"
             "_After payment, a unique key will be generated for you, to connect to the VPN. "
             "The key will be available in your profile._"
         ).format(
-            plan=plans_service.convert_traffic_to_title(traffic),
+            devices=devices,
             duration=plans_service.convert_days_to_period(duration),
             price=price,
             currency=payment_service.method.symbol,
@@ -121,7 +120,7 @@ async def successful_payment(
     #     reply_markup=back_to_main_menu_keyboard(),
     # )
 
-    await vpn_service.create_subscription(data.user_id, data.traffic, data.duration)
+    await vpn_service.create_subscription(data.user_id, data.devices, data.duration)
     logger.info(f"Subscription created for user {data.user_id}")
 
     await Transaction.create_transaction(

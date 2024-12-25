@@ -17,7 +17,6 @@ class Promocode(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     code = Column(String(length=8), unique=True, nullable=False)
-    traffic = Column(BigInteger, nullable=False)
     duration = Column(BigInteger, nullable=False)
     is_activated = Column(Boolean, default=False, nullable=False)
     activated_by = Column(Integer, nullable=True)
@@ -75,10 +74,10 @@ class Promocode(Base):
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
             code (str): The unique promocode string (e.g., "ABC123").
-            kwargs (dict): Attributes to be updated (e.g., traffic=2000, is_activated=True).
+            kwargs (dict): Attributes to be updated (e.g., duration=30, is_activated=True).
 
         Example:
-            await Promocode.update(session, code="ABC123", traffic=2000, is_activated=True)
+            await Promocode.update(session, code="ABC123", duration=30, is_activated=True)
         """
         filters = [Promocode.code == code]
         await session.execute(update(Promocode).filter(*filters).values(**kwargs))

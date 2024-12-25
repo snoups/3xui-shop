@@ -41,12 +41,11 @@ class PromocodeService:
         logger.debug(f"Generated promocode: {code}")
         return code
 
-    async def create_promocode(self, traffic: int, duration: int) -> Promocode:
+    async def create_promocode(self, duration: int) -> Promocode:
         """
-        Create a new promocode with specified traffic and duration.
+        Create a new promocode with specified duration.
 
         Arguments:
-            traffic (int): The amount of traffic in GB for the promocode.
             duration (int): The duration in days for the promocode.
 
         Returns:
@@ -63,12 +62,9 @@ class PromocodeService:
             promocode = await Promocode.create(
                 session,
                 code=code,
-                traffic=traffic,
                 duration=duration,
             )
-            logger.info(
-                f"Promocode {code} created with {traffic} GB traffic and {duration} days duration."
-            )
+            logger.info(f"Promocode {code} created with {duration} days duration.")
             return promocode
 
     async def get_promocode(self, code: str) -> Promocode | None:

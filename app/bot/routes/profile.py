@@ -27,48 +27,33 @@ async def prepare_message(user: TelegramUser, client: ClientService) -> str:
     Returns:
         str: A formatted message with the user's profile, subscription, and statistics.
     """
-    header_text = (
-        _("👤 *Your profile:*\n" "Name: {name}\n" "ID: {id}\n").format(
-            name=user.first_name, id=user.id
-        )
-        + "\n"
+    header_text = _("👤 *Your profile:*\n" "Name: {name}\n" "ID: {id}\n").format(
+        name=user.first_name, id=user.id
     )
+    header_text += "\n"
 
     if not client:
         no_subscription_text = _(
-            "_You don't have a subscription purchased yet, go to the subscription page "
-            "to purchase or click the button below._"
+            "_You don't have a subscription yet. "
+            "To purchase one, go to the subscription page by clicking the button below._"
         )
         return header_text + no_subscription_text
 
-    subscription_text = _("📅 *Subscription:*\n" "Plan: {plan}\n").format(plan=client.traffic_total)
+    subscription_text = _("📅 *Subscription:*\n" "Devices: {devices}\n").format(
+        devices=client.max_devices
+    )
 
-    if client.has_traffic_expired:
-        subscription_text += _("_Traffic limit reached._\n")
-        if not client.has_subscription_expired:
-            subscription_text += _("Expires on: {expiry_time}\n").format(
-                expiry_time=client.expiry_time,
-            )
     if client.has_subscription_expired:
-        if not client.has_traffic_expired:
-            subscription_text += _("Remaining Traffic: {traffic}\n").format(
-                traffic=client.traffic_remaining,
-            )
         subscription_text += _("_Subscription period has expired._\n")
-
-    if client.has_valid_subscription:
-        subscription_text += (
-            _("Remaining Traffic: {traffic}\n" "Expires on: {expiry_time}\n").format(
-                traffic=client.traffic_remaining,
-                expiry_time=client.expiry_time,
-            )
-            + "\n"
-        )
     else:
-        subscription_text += "\n"
+        subscription_text += _("Expires in: {expiry_time}\n").format(
+            expiry_time=client.expiry_time,
+        )
+
+    subscription_text += "\n"
 
     statistics_text = _(
-        "📊 *Statistics:*\n" "Total: {total}\n" "Sent: ↑ {up}\n" "Received: ↓ {down}"
+        "📊 *Statistics:*\n" "Total: {total}\n" "Uploaded: ↑ {up}\n" "Downloaded: ↓ {down}"
     ).format(total=client.traffic_used, up=client.traffic_up, down=client.traffic_down)
 
     return header_text + subscription_text + statistics_text
@@ -88,7 +73,7 @@ async def callback_profile(callback: CallbackQuery, vpn_service: VPNService) -> 
     client = ClientService(client_data)
 
     if client:
-        if client.has_valid_subscription:
+        if not client.has_subscription_expired:
             reply_markup = show_key_keyboard()
         else:
             reply_markup = buy_subscription_keyboard()

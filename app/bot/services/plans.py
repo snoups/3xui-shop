@@ -63,11 +63,11 @@ class Plan:
     Represents a subscription plan.
 
     Attributes:
-        traffic (int): The amount of traffic included in the plan (in GB).
+        devices (int): The number of devices supported by the plan.
         prices (Prices): The pricing information for this plan.
     """
 
-    traffic: int
+    devices: int
     prices: Prices
 
     @classmethod
@@ -82,7 +82,7 @@ class Plan:
             Plan: An instance of Plan with parsed data.
         """
         return cls(
-            traffic=data["traffic"],
+            devices=data["devices"],
             prices=Prices.from_dict(data["prices"]),
         )
 
@@ -94,7 +94,7 @@ class Plan:
             dict: Dictionary representation of the Plan instance.
         """
         plan_dict = {
-            "traffic": self.traffic,
+            "devices": self.devices,
             "prices": self.prices.to_dict(),
         }
         return plan_dict
@@ -105,8 +105,8 @@ class PlansService:
     Provides plans data and utilities for handling subscription plans and pricing.
 
     Loads plans configurations from a JSON file and provides methods to interact with
-    the plan data, such as getting a plan by traffic amount, calculating prices,
-    and converting traffic/duration to readable formats.
+    the plan data, such as getting a plan by device count, calculating prices,
+    and converting device count/duration to readable formats.
     """
 
     def __init__(self) -> None:
@@ -143,22 +143,22 @@ class PlansService:
         self.durations: list[int] = self.data["durations"]
         logger.info("Plans and durations loaded successfully.")
 
-    def get_plan(self, traffic: int) -> Plan | None:
+    def get_plan(self, devices: int) -> Plan | None:
         """
-        Get the plan with a specific traffic amount.
+        Get the plan with a specific device count.
 
         Arguments:
-            traffic (int): The traffic value to search for.
+            devices (int): The device count to search for.
 
         Returns:
-            Plan | None: The plan matching the traffic value or None if not found.
+            Plan | None: The plan matching the device count or None if not found.
         """
-        logger.debug(f"Searching for plan with traffic: {traffic}")
-        plan = next((plan for plan in self.plans if plan.traffic == traffic), None)
+        logger.debug(f"Searching for plan with devices: {devices}")
+        plan = next((plan for plan in self.plans if plan.devices == devices), None)
         if plan:
-            logger.debug(f"Found plan with traffic {traffic}")
+            logger.debug(f"Found plan with {devices} devices")
         else:
-            logger.warning(f"Plan with traffic {traffic} not found.")
+            logger.warning(f"Plan with {devices} devices not found.")
         return plan
 
     @staticmethod
@@ -179,21 +179,21 @@ class PlansService:
         return price
 
     @staticmethod
-    def convert_traffic_to_title(traffic: int) -> str:
+    def convert_devices_to_title(devices: int) -> str:
         """
-        Convert the traffic value to a human-readable string.
+        Convert the device count to a human-readable string.
 
         Arguments:
-            traffic (int): The traffic value in GB.
+            devices (int): The number of devices supported by the plan.
 
         Returns:
-            str: The traffic value in a readable format, or 'Unlimited' if traffic is -1.
+            str: The device count in a readable format.
         """
-        if traffic == -1:
-            logger.debug("Traffic is unlimited.")
-            return UNLIMITED
-        logger.debug(f"Converted traffic {traffic} to string")
-        return f"{traffic} " + _("GB")
+        if devices == -1:
+            logger.debug("Devices count is unlimited.")
+            return UNLIMITED + _("devices")
+        logger.debug(f"Converted devices {devices} to string")
+        return _("1 device", "{} devices", devices).format(devices)
 
     @staticmethod
     def convert_days_to_period(days: int) -> str:

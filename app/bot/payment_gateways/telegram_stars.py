@@ -30,13 +30,13 @@ class TelegramStars:
         """
         prices = [LabeledPrice(label="XTR", amount=1)]
         # prices = [LabeledPrice(label="XTR", amount=data.price)]
-        traffic = PlansService.convert_traffic_to_title(data.traffic)
+        devices = PlansService.convert_devices_to_title(data.devices)
         duration = PlansService.convert_days_to_period(data.duration)
-        title = _("Subscription | traffic: {traffic}, duration: {duration}").format(
-            traffic=traffic, duration=duration
+        title = _("Subscription | {devices} for {duration}").format(
+            devices=devices, duration=duration
         )
-        description = _("traffic: {traffic}, duration: {duration}").format(
-            traffic=traffic, duration=duration
+        description = _("Subscription | {devices} for {duration}").format(
+            devices=devices, duration=duration
         )
         return await bot.create_invoice_link(
             title=title,

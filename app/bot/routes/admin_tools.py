@@ -132,28 +132,7 @@ async def callback_create_promocode(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The incoming callback query.
     """
     logger.info(f"Admin {callback.from_user.id} started creating promocode.")
-    callback_data = CreatePromocodeCallback(state=Navigation.TRAFFIC)
-    await callback.message.edit_text(
-        text=_("🎟️ *Editor promocodes:*\n" "\n" "_Select the traffic volume_"),
-        reply_markup=promocode_traffic_keyboard(callback_data),
-    )
-
-
-@router.callback_query(
-    CreatePromocodeCallback.filter(F.state == Navigation.TRAFFIC), IsPrivate(), IsAdmin()
-)
-async def callback_traffic_selected(
-    callback: CallbackQuery, callback_data: CreatePromocodeCallback
-) -> None:
-    """
-    Handler for selecting traffic volume for promocode creation.
-
-    Arguments:
-        callback (CallbackQuery): The incoming callback query.
-        callback_data (CreatePromocodeCallback): The callback data containing state info.
-    """
-    logger.info(f"Admin {callback.from_user.id} selected {callback_data.traffic} GB for promocode.")
-    callback_data.state = Navigation.DURATION
+    callback_data = CreatePromocodeCallback(state=Navigation.DURATION)
     await callback.message.edit_text(
         text=_("🎟️ *Editor promocodes:*\n" "\n" "_Specify the duration_"),
         reply_markup=promocode_duration_keyboard(callback_data),
@@ -179,9 +158,7 @@ async def callback_duration_selected(
     logger.info(
         f"Admin {callback.from_user.id} selected {callback_data.duration} days for promocode."
     )
-    promocode = await promocode_service.create_promocode(
-        callback_data.traffic, callback_data.duration
-    )
+    promocode = await promocode_service.create_promocode(callback_data.duration)
     await callback.message.edit_text(
         text=_("🎟️ *Editor promocodes:*\n"),
         reply_markup=editor_promocodes(),

@@ -50,7 +50,7 @@ def payment_method_keyboard(
         along with a back button to return to the previous menu.
     """
     builder = InlineKeyboardBuilder()
-    plan = plans_service.get_plan(callback_data.traffic)
+    plan = plans_service.get_plan(callback_data.devices)
 
     callback_data.state = Navigation.PAY_YOOKASSA
     price = plan.prices.rub[callback_data.duration]
@@ -77,7 +77,7 @@ def payment_method_keyboard(
         )
     )
 
-    callback_data.state = Navigation.TRAFFIC
+    callback_data.state = Navigation.DEVICES
     builder.row(back_button(callback_data.pack()))
     return builder.as_markup()
 
