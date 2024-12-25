@@ -18,13 +18,16 @@ def renew_subscription_button() -> InlineKeyboardButton:
 
 
 def subscription_keyboard(
-    has_subscription: bool, callback_data: SubscriptionCallback
+    has_subscription: bool,
+    callback_data: SubscriptionCallback,
 ) -> InlineKeyboardMarkup:
     """
     Generates a subscription keyboard with options based on the user's subscription status.
 
-    Displays a button to buy a subscription if not active, a promocode activation button,
-    and a back button.
+    If the user does not have an active subscription, the keyboard includes a button to
+    buy a subscription. If the user has an active subscription, the keyboard includes a
+    button to extend the subscription. Additionally, it includes a promocode activation
+    button and a back button to the main menu.
 
     Arguments:
         has_subscription (bool): Indicates whether the user has an active subscription.
@@ -42,6 +45,14 @@ def subscription_keyboard(
                 callback_data=callback_data.pack(),
             )
         )
+    else:
+        callback_data.state = Navigation.EXTEND
+        builder.row(
+            InlineKeyboardButton(
+                text=_("💳 Extend subscription"),
+                callback_data=callback_data.pack(),
+            )
+        )
 
     builder.row(
         InlineKeyboardButton(
@@ -55,7 +66,8 @@ def subscription_keyboard(
 
 
 def devices_keyboard(
-    plans_service: PlansService, callback_data: SubscriptionCallback
+    plans_service: PlansService,
+    callback_data: SubscriptionCallback,
 ) -> InlineKeyboardMarkup:
     """
     Generates a keyboard to select subscription devices.
@@ -117,6 +129,11 @@ def duration_keyboard(
         )
 
     builder.adjust(2)
-    callback_data.state = Navigation.PROCESS
-    builder.row(back_button(callback_data.pack()))
+
+    if callback_data.is_extend:
+        builder.row(back_button(Navigation.SUBSCRIPTION))
+    else:
+        callback_data.state = Navigation.PROCESS
+        builder.row(back_button(callback_data.pack()))
+
     return builder.as_markup()

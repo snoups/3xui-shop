@@ -28,7 +28,10 @@ class VPNService:
     """
 
     def __init__(
-        self, session: AsyncSession, config: Config, promocode_service: PromocodeService
+        self,
+        session: AsyncSession,
+        config: Config,
+        promocode_service: PromocodeService,
     ) -> None:
         """
         Initializes the VPNService instance with database session, API configuration,
@@ -181,11 +184,12 @@ class VPNService:
             if replace_devices:
                 new_device_limit = devices
             else:
-                current_device_limit = client.limit_ip
+                current_device_limit = await self.get_limit_ip(client)
                 new_device_limit = current_device_limit + devices
 
-            if replace_duration:
-                new_expiry_time = self.days_to_timestamp(duration)
+            current_time = self.current_timestamp()
+            if client.expiry_time < current_time:
+                new_expiry_time = self.add_days_to_timestamp(current_time, duration)
             else:
                 new_expiry_time = self.add_days_to_timestamp(client.expiry_time, duration)
 
@@ -219,7 +223,7 @@ class VPNService:
             id=user.vpn_id,
             expiryTime=self.days_to_timestamp(duration),
             flow="xtls-rprx-vision",
-            limitIp=devices if devices != None else self.get_limit_ip(client),
+            limitIp=devices,
             sub_id=user.vpn_id,
             totalGB=0,
         )
@@ -243,19 +247,27 @@ class VPNService:
         bytes_in_gb = 1024**3  # 1 GB = 1024^3 bytes
         return int(traffic_gb * bytes_in_gb)
 
-    def days_to_timestamp(self, days: int) -> int:
+    def current_timestamp(self) -> int:
         """
-        Convert a number of days from now to a Unix timestamp in milliseconds.
-
-        Arguments:
-            days (int): Number of days from now.
+        Returns the current timestamp in milliseconds.
 
         Returns:
             int: Unix timestamp in milliseconds.
         """
-        now = datetime.now(timezone.utc)
-        target_time = now + timedelta(days=days)
-        return int(target_time.timestamp() * 1000)
+        return int(datetime.now(timezone.utc).timestamp() * 1000)
+
+    def days_to_timestamp(self, days: int) -> int:
+        """
+        Convert a number of days from the current timestamp to a Unix timestamp in milliseconds.
+
+        Arguments:
+            days (int): Number of days to add from now.
+
+        Returns:
+            int: Unix timestamp in milliseconds.
+        """
+        current_time = self.current_timestamp()
+        return self.add_days_to_timestamp(current_time, days)
 
     def add_days_to_timestamp(self, timestamp: int, days: int) -> int:
         """
@@ -291,19 +303,45 @@ class VPNService:
 
     async def create_subscription(self, user_id: int, devices: int, duration: int) -> None:
         """
-        Create or update a subscription for the user.
+        Create or update a subscription for a user.
+
+        If the user already has a subscription, it updates the client's subscription
+        with the provided device limit and duration. Otherwise, it creates a new subscription.
 
         Arguments:
-            user_id (int): The ID of the user for whom the subscription is being created or updated.
+            user_id (int): The ID of the user.
             devices (int): The number of devices (limit_ip).
-            duration (int): The duration of the subscription in seconds.
+            duration (int): Subscription duration in seconds.
         """
         async with self.session() as session:
             user: User = await User.get(session, user_id=user_id)
         if await self.is_client_exists(user.user_id):
-            await self.update_client(user, devices, duration)
+            await self.update_client(
+                user,
+                devices,
+                duration,
+                replace_devices=True,
+                replace_duration=True,
+            )
         else:
             await self.create_client(user, devices, duration)
+
+    async def extend_subscription(self, user_id: int, devices: int, duration: int) -> None:
+        """
+        Extend an existing subscription for a user.
+
+        Updates the client's subscription with the new device limit and duration.
+        Only applicable for existing subscriptions.
+
+        Arguments:
+            user_id (int): The ID of the user.
+            devices (int): The number of devices to update (limit_ip).
+            duration (int): Additional subscription duration in seconds.
+        """
+        async with self.session() as session:
+            user: User = await User.get(session, user_id=user_id)
+        if await self.is_client_exists(user.user_id):
+            await self.update_client(user, devices, duration, replace_devices=True)
 
     async def activate_promocode(self, user_id: int, promocode: Promocode) -> None:
         """
@@ -313,11 +351,10 @@ class VPNService:
             user_id (int): The ID of the user to activate the promocode for.
             promocode (Promocode): The promocode object containing traffic and duration.
         """
-
         await self.promocode_service.activate_promocode(promocode.code, user_id)
         async with self.session() as session:
             user: User = await User.get(session, user_id=user_id)
         if await self.is_client_exists(user_id):
-            await self.update_client(user, duration=promocode.duration)
+            await self.update_client(user, devices=0, duration=promocode.duration)
         else:
             await self.create_client(user, duration=promocode.duration)

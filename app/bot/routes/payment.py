@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.filters import IsPrivate
 from app.bot.filters.is_admin import IsAdmin
+from app.bot.keyboards.back import back_to_main_menu_keyboard
 from app.bot.keyboards.payment import pay_keyboard, payment_success_keyboard
 from app.bot.navigation import Navigation, SubscriptionCallback
 from app.bot.services.payment import PaymentService
@@ -74,9 +75,7 @@ async def callback_payment_method_selected(
 
 
 @router.pre_checkout_query()
-async def pre_checkout_handler(
-    pre_checkout_query: PreCheckoutQuery,
-) -> None:
+async def pre_checkout_handler(pre_checkout_query: PreCheckoutQuery) -> None:
     """
     Handler for pre-checkout query to validate
 
@@ -93,7 +92,10 @@ async def pre_checkout_handler(
 
 @router.message(F.successful_payment)
 async def successful_payment(
-    message: Message, session: AsyncSession, vpn_service: VPNService, bot: Bot
+    message: Message,
+    session: AsyncSession,
+    vpn_service: VPNService,
+    bot: Bot,
 ) -> None:
     """
     Handler for successful payment. (create the subscription)
@@ -120,8 +122,12 @@ async def successful_payment(
     #     reply_markup=back_to_main_menu_keyboard(),
     # )
 
-    await vpn_service.create_subscription(data.user_id, data.devices, data.duration)
-    logger.info(f"Subscription created for user {data.user_id}")
+    if data.is_extend:
+        await vpn_service.extend_subscription(data.user_id, data.devices, data.duration)
+        logger.info(f"Subscription extented for user {data.user_id}")
+    else:
+        await vpn_service.create_subscription(data.user_id, data.devices, data.duration)
+        logger.info(f"Subscription created for user {data.user_id}")
 
     await Transaction.create_transaction(
         session=session,
@@ -131,18 +137,29 @@ async def successful_payment(
         status="success",
     )
 
-    key = await vpn_service.get_key(message.from_user.id)
-    await message.answer(
-        text=_(
-            "✅ *Payment successful!*\n"
-            "\n"
-            "🔑 *Your key:* ```{key}```\n"
-            "_The key will be saved in your profile._\n"
-            "\n"
-            "To start using our service, go to the download page of the application and "
-            "download it for your platform. Then you can manually enter the key or click "
-            "`🔌 Connect` and the key will be automatically added to the application."
-        ).format(key=key),
-        message_effect_id="5046509860389126442",  # TODO: Delete effect
-        reply_markup=payment_success_keyboard(),
-    )
+    if data.is_extend:
+        await message.answer(
+            text=_(
+                "✅ *Payment successful!*\n"
+                "\n"
+                "Your subscription has been extended for {duration}\n"
+            ).format(duration=PlansService.convert_days_to_period(data.duration)),
+            message_effect_id="5046509860389126442",
+            reply_markup=back_to_main_menu_keyboard(),
+        )
+    else:
+        key = await vpn_service.get_key(message.from_user.id)
+        await message.answer(
+            text=_(
+                "✅ *Payment successful!*\n"
+                "\n"
+                "🔑 *Your key:* ```{key}```\n"
+                "_The key will be saved in your profile._\n"
+                "\n"
+                "To start using our service, go to the download page of the application and "
+                "download it for your platform. Then you can manually enter the key or click "
+                "`🔌 Connect` and the key will be automatically added to the application."
+            ).format(key=key),
+            message_effect_id="5046509860389126442",  # TODO: Delete effect
+            reply_markup=payment_success_keyboard(),
+        )

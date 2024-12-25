@@ -39,7 +39,7 @@ class PaymentMethod:
         logger.debug(f"Initialized PaymentMethod with {callback_data}, {symbol}, {code}")
 
     @classmethod
-    def from_callback(cls, callback_data: str):
+    def from_callback(cls, callback_data: str) -> "PaymentMethod":
         """
         Create a PaymentMethod instance based on the callback data.
 

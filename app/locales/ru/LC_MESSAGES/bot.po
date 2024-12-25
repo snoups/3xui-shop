@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-25 20:04+0500\n"
+"POT-Creation-Date: 2024-12-25 22:22+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -110,7 +110,7 @@ msgstr "ЮKassa | {price} ₽"
 msgid "📥 Download app"
 msgstr "📥 Скачать приложение"
 
-#: app/bot/keyboards/profile.py:23 app/bot/keyboards/subscription.py:41
+#: app/bot/keyboards/profile.py:23 app/bot/keyboards/subscription.py:44
 #: app/bot/keyboards/support.py:68
 msgid "💳 Buy subscription"
 msgstr "💳 Купить подписку"
@@ -123,7 +123,11 @@ msgstr "🔑 Показать ключ"
 msgid "💳 Renew subscription"
 msgstr "💳 Продлить подписку"
 
-#: app/bot/keyboards/subscription.py:48
+#: app/bot/keyboards/subscription.py:52
+msgid "💳 Extend subscription"
+msgstr "💳 Продлить подписку"
+
+#: app/bot/keyboards/subscription.py:59
 msgid "🎟️ Activate promocode"
 msgstr "🎟️ Активировать промокод"
 
@@ -148,7 +152,7 @@ msgstr "Подписка | {devices} на {duration}"
 msgid "🛠 *Admin tools:*"
 msgstr "🛠 *Административные инструменты:*"
 
-#: app/bot/routes/admin_tools.py:83 app/bot/routes/admin_tools.py:216
+#: app/bot/routes/admin_tools.py:83 app/bot/routes/admin_tools.py:220
 msgid "🎟️ *Editor promocodes:*"
 msgstr "🎟️ *Редактор промокодов:*"
 
@@ -162,15 +166,15 @@ msgstr ""
 "\n"
 "_Укажите срок действия_"
 
-#: app/bot/routes/admin_tools.py:162
+#: app/bot/routes/admin_tools.py:164
 msgid "🎟️ *Editor promocodes:*\n"
 msgstr "🎟️ *Редактор промокодов:*\n"
 
-#: app/bot/routes/admin_tools.py:166
+#: app/bot/routes/admin_tools.py:168
 msgid "Your created promocode: ```{promocode}```"
 msgstr "Ваш созданный промокод: ```{promocode}```"
 
-#: app/bot/routes/admin_tools.py:187
+#: app/bot/routes/admin_tools.py:189
 msgid ""
 "🎟️ *Editor promocodes:*\n"
 "\n"
@@ -180,11 +184,11 @@ msgstr ""
 "\n"
 "_Отправьте промокод для удаления_"
 
-#: app/bot/routes/admin_tools.py:210
+#: app/bot/routes/admin_tools.py:214
 msgid "✅ Promocode {promocode} deleted successfully."
 msgstr "✅ Промокод {promocode} успешно удален."
 
-#: app/bot/routes/admin_tools.py:222
+#: app/bot/routes/admin_tools.py:226
 msgid "❌ Failed to delete promocode. Please try again."
 msgstr "❌ Не удалось удалить промокод. Пожалуйста, попробуйте еще раз."
 
@@ -227,7 +231,7 @@ msgstr ""
 "♾️ БЕЗЛИМИТ\n"
 "✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД\n"
 
-#: app/bot/routes/payment.py:57
+#: app/bot/routes/payment.py:58
 msgid ""
 "✅ *You selected:*\n"
 "\n"
@@ -247,7 +251,17 @@ msgstr ""
 "_После оплаты для вас сгенерируется уникальный ключ, для подключения к "
 "VPN. Ключ будет доступен в вашем профиле._"
 
-#: app/bot/routes/payment.py:136
+#: app/bot/routes/payment.py:142
+msgid ""
+"✅ *Payment successful!*\n"
+"\n"
+"Your subscription has been extended for {duration}\n"
+msgstr ""
+"✅ *Платеж прошел успешно!*\n"
+"\n"
+"Ваша подписка продлена на {duration}\n"
+
+#: app/bot/routes/payment.py:153
 msgid ""
 "✅ *Payment successful!*\n"
 "\n"
@@ -266,7 +280,7 @@ msgstr ""
 "\n"
 "Чтобы начать пользоваться нашим сервисом, перейдите на страницу загрузки "
 "приложения и загрузите его для своей платформы. Затем вы можете вручную "
-"ввести ключ или нажать \"🔌 Подключить\", и ключ будет автоматически "
+"ввести ключ или нажать `🔌 Подключить`, и ключ будет автоматически "
 "добавлен."
 
 #: app/bot/routes/profile.py:30
@@ -355,16 +369,17 @@ msgid "❌ Promocode is invalid or has already been activated!"
 msgstr "❌ Промокод недействителен или уже был активирован!"
 
 #: app/bot/routes/subscription.py:39
-msgid "⚠️ *Subscription period has expired!*\n"
-msgstr "⚠️ *Срок вашей подписки истек!*\n"
-
-#: app/bot/routes/subscription.py:40
-msgid "Please renew your subscription to continue using our service."
+msgid ""
+"⚠️ *Subscription period has expired!*\n"
+"\n"
+"Please renew your subscription to continue using our service."
 msgstr ""
+"⚠️ *Срок вашей подписки истек!*\n"
+"\n"
 "Пожалуйста, возобновите подписку, чтобы продолжить пользоваться нашим "
 "сервисом."
 
-#: app/bot/routes/subscription.py:43
+#: app/bot/routes/subscription.py:45
 msgid ""
 "✅ *You already have an active subscription:*\n"
 "\n"
@@ -376,7 +391,7 @@ msgstr ""
 "Количество устройств: {devices}\n"
 "Заканчивается через: {expiry_time}"
 
-#: app/bot/routes/subscription.py:53
+#: app/bot/routes/subscription.py:55
 msgid ""
 "⚠️ *You do not have an active subscription!*\n"
 "\n"
@@ -388,15 +403,15 @@ msgstr ""
 "Похоже, что вы еще не приобрели подписку. Пожалуйста, купите подписку, "
 "чтобы начать пользоваться нашим сервисом."
 
-#: app/bot/routes/subscription.py:97
-msgid "🌐 *Select the number of devices:*"
-msgstr "🌐 *Выберите количество устройств:*"
-
-#: app/bot/routes/subscription.py:120
+#: app/bot/routes/subscription.py:105 app/bot/routes/subscription.py:149
 msgid "⏳ *Specify the duration:*"
 msgstr "⏳ *Укажите срок действия:*"
 
-#: app/bot/routes/subscription.py:142
+#: app/bot/routes/subscription.py:127
+msgid "🌐 *Select the number of devices:*"
+msgstr "🌐 *Выберите количество устройств:*"
+
+#: app/bot/routes/subscription.py:171
 msgid "💳 *Choose a payment method:*"
 msgstr "💳 *Выберите способ оплаты:*"
 
@@ -515,3 +530,4 @@ msgid_plural "{} months"
 msgstr[0] "1 месяц"
 msgstr[1] "{} месяца"
 msgstr[2] "{} месяцев"
+

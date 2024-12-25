@@ -40,7 +40,7 @@ def prepare_message(user: User) -> str:
 
 
 @router.message(Command(Navigation.START), IsPrivate())
-async def command_main_menu(message: Message, state: FSMContext, bot: Bot) -> None:
+async def command_main_menu(message: Message, state: FSMContext) -> None:
     """
     Handler for the `/start` command, displays the main menu to the user.
 

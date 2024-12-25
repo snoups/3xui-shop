@@ -80,12 +80,39 @@ async def callback_subscription(callback: CallbackQuery, vpn_service: VPNService
     await show_subscription(callback, client_service, callback_data)
 
 
+@router.callback_query(SubscriptionCallback.filter(F.state == Navigation.EXTEND), IsPrivate())
+async def callback_subscription_extend(
+    callback: CallbackQuery,
+    callback_data: SubscriptionCallback,
+    plans_service: PlansService,
+    vpn_service: VPNService,
+) -> None:
+    """
+    Handler for initiating the subscription extension process.
+
+    Arguments:
+        callback (CallbackQuery): The callback query object containing user interaction.
+        callback_data (SubscriptionCallback): The data related to the subscription callback.
+        plans_service (PlansService): Service for retrieving available plans and prices.
+        vpn_service (VPNService): Service for VPN client management and validation.
+    """
+    logger.info(f"User {callback.from_user.id} started extend subscription.")
+    client = await vpn_service.is_client_exists(callback.from_user.id)
+    callback_data.devices = await vpn_service.get_limit_ip(client)
+    callback_data.state = Navigation.DURATION
+    callback_data.is_extend = True
+    await callback.message.edit_text(
+        text=_("⏳ *Specify the duration:*"),
+        reply_markup=duration_keyboard(plans_service, callback_data),
+    )
+
+
 @router.callback_query(SubscriptionCallback.filter(F.state == Navigation.PROCESS), IsPrivate())
 async def callback_subscription_process(
     callback: CallbackQuery,
     callback_data: SubscriptionCallback,
     plans_service: PlansService,
-):
+) -> None:
     """
     Handler for starting the subscription process by selecting the number of devices.
 
@@ -96,9 +123,9 @@ async def callback_subscription_process(
     """
     logger.info(f"User {callback.from_user.id} started subscription process.")
     callback_data.state = Navigation.DEVICES
-    text = _("🌐 *Select the number of devices:*")
     await callback.message.edit_text(
-        text=text, reply_markup=devices_keyboard(plans_service, callback_data)
+        text=_("🌐 *Select the number of devices:*"),
+        reply_markup=devices_keyboard(plans_service, callback_data),
     )
 
 

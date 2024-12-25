@@ -139,7 +139,9 @@ async def callback_create_promocode(callback: CallbackQuery) -> None:
 
 
 @router.callback_query(
-    CreatePromocodeCallback.filter(F.state == Navigation.DURATION), IsPrivate(), IsAdmin()
+    CreatePromocodeCallback.filter(F.state == Navigation.DURATION),
+    IsPrivate(),
+    IsAdmin(),
 )
 async def callback_duration_selected(
     callback: CallbackQuery,
@@ -191,7 +193,9 @@ async def callback_delete_promocode(callback: CallbackQuery, state: FSMContext) 
 
 @router.message(DeletePromocodeStates.waiting_for_promocode, IsPrivate(), IsAdmin())
 async def handle_promocode_input(
-    message: Message, promocode_service: PromocodeService, state: FSMContext
+    message: Message,
+    promocode_service: PromocodeService,
+    state: FSMContext,
 ) -> None:
     """
     Handler for processing the input of a promocode to delete.

@@ -31,6 +31,7 @@ class Navigation(str, Enum):
 
     # region: Subscription
     SUBSCRIPTION = "subscription"
+    EXTEND = "extend"
     PROCESS = "process"
     DEVICES = "devices"
     DURATION = "duration"
@@ -61,6 +62,7 @@ class Navigation(str, Enum):
 
 class SubscriptionCallback(CallbackData, prefix="subscription"):
     state: Navigation
+    is_extend: bool = False
     user_id: int
     message_id: int = 0
     devices: int = 0
