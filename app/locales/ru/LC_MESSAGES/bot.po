@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-25 22:22+0500\n"
+"POT-Creation-Date: 2024-12-26 18:48+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -44,27 +44,39 @@ msgid "💾 Create backup"
 msgstr "💾 Создать бэкап"
 
 #: app/bot/keyboards/admin_tools.py:62
+msgid "🚧 Maintenance mode"
+msgstr "🚧 Режим обслуживания"
+
+#: app/bot/keyboards/admin_tools.py:68
 msgid "🔄 Restart bot"
 msgstr "🔄 Перезапустить бота"
 
-#: app/bot/keyboards/admin_tools.py:84
-msgid "Create"
-msgstr "Создать"
-
 #: app/bot/keyboards/admin_tools.py:90
-msgid "Delete"
-msgstr "Удалить"
+msgid "🆕 Create"
+msgstr "🆕 Создать"
 
 #: app/bot/keyboards/admin_tools.py:96
-msgid "Edit"
-msgstr "Изменить"
+msgid "🗑️ Delete"
+msgstr "🗑️ Удалить"
 
-#: app/bot/keyboards/admin_tools.py:120 app/bot/services/plans.py:224
+#: app/bot/keyboards/admin_tools.py:102
+msgid "✏️ Edit"
+msgstr "✏️ Изменить"
+
+#: app/bot/keyboards/admin_tools.py:126 app/bot/services/plans.py:224
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] "1 день"
 msgstr[1] "{} дня"
 msgstr[2] "{} дней"
+
+#: app/bot/keyboards/admin_tools.py:144
+msgid "🟢 Turn on"
+msgstr "🟢 Включить"
+
+#: app/bot/keyboards/admin_tools.py:151
+msgid "🔴 Turn off"
+msgstr "🔴 Выключить"
 
 #: app/bot/keyboards/back.py:17
 msgid "◀️ Back"
@@ -148,15 +160,27 @@ msgstr "❓ VPN не работает"
 msgid "Subscription | {devices} for {duration}"
 msgstr "Подписка | {devices} на {duration}"
 
-#: app/bot/routes/admin_tools.py:42
+#: app/bot/routes/admin_tools.py:43
 msgid "🛠 *Admin tools:*"
 msgstr "🛠 *Административные инструменты:*"
 
-#: app/bot/routes/admin_tools.py:83 app/bot/routes/admin_tools.py:220
+#: app/bot/routes/admin_tools.py:84 app/bot/routes/admin_tools.py:237
 msgid "🎟️ *Editor promocodes:*"
 msgstr "🎟️ *Редактор промокодов:*"
 
-#: app/bot/routes/admin_tools.py:136
+#: app/bot/routes/admin_tools.py:122
+msgid "enabled"
+msgstr "включен"
+
+#: app/bot/routes/admin_tools.py:122
+msgid "disabled"
+msgstr "выключен"
+
+#: app/bot/routes/admin_tools.py:124
+msgid "🚧 *Maintenance mode:*"
+msgstr "🚧 *Режим обслуживания:*"
+
+#: app/bot/routes/admin_tools.py:153
 msgid ""
 "🎟️ *Editor promocodes:*\n"
 "\n"
@@ -166,15 +190,15 @@ msgstr ""
 "\n"
 "_Укажите срок действия_"
 
-#: app/bot/routes/admin_tools.py:164
+#: app/bot/routes/admin_tools.py:181
 msgid "🎟️ *Editor promocodes:*\n"
 msgstr "🎟️ *Редактор промокодов:*\n"
 
-#: app/bot/routes/admin_tools.py:168
+#: app/bot/routes/admin_tools.py:185
 msgid "Your created promocode: ```{promocode}```"
 msgstr "Ваш созданный промокод: ```{promocode}```"
 
-#: app/bot/routes/admin_tools.py:189
+#: app/bot/routes/admin_tools.py:206
 msgid ""
 "🎟️ *Editor promocodes:*\n"
 "\n"
@@ -184,13 +208,33 @@ msgstr ""
 "\n"
 "_Отправьте промокод для удаления_"
 
-#: app/bot/routes/admin_tools.py:214
+#: app/bot/routes/admin_tools.py:231
 msgid "✅ Promocode {promocode} deleted successfully."
 msgstr "✅ Промокод {promocode} успешно удален."
 
-#: app/bot/routes/admin_tools.py:226
+#: app/bot/routes/admin_tools.py:243
 msgid "❌ Failed to delete promocode. Please try again."
 msgstr "❌ Не удалось удалить промокод. Пожалуйста, попробуйте еще раз."
+
+#: app/bot/routes/admin_tools.py:266
+msgid ""
+"🚧 *Maintenance mode:* enabled.\n"
+"\n"
+"_The bot is temporarily unavailable for users._"
+msgstr ""
+"🚧 *Режим обслуживания:* включен.\n"
+"\n"
+"_Бот временно недоступен для пользователей._"
+
+#: app/bot/routes/admin_tools.py:286
+msgid ""
+"🚧 *Maintenance mode:* disabled.\n"
+"\n"
+"_The bot is available for users._"
+msgstr ""
+"🚧 *Режим обслуживания:* выключен.\n"
+"\n"
+"_Бот доступен для пользователей._"
 
 #: app/bot/routes/download.py:26
 msgid "📲 *Choose your platform:*"
@@ -230,6 +274,10 @@ msgstr ""
 "📱 ПОДДЕРЖКА ВСЕХ ПЛАТФОРМ\n"
 "♾️ БЕЗЛИМИТ\n"
 "✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД\n"
+
+#: app/bot/routes/maintenance_mode.py:24 app/bot/routes/maintenance_mode.py:36
+msgid "The bot is in maintenance mode. Please wait."
+msgstr "Бот находится в режиме обслуживания. Пожалуйста, подождите."
 
 #: app/bot/routes/payment.py:58
 msgid ""

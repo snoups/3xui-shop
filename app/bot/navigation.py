@@ -14,7 +14,7 @@ class Navigation(str, Enum):
     SHOW_KEY = "show_key"
     # endregion
 
-    # region: Subscription
+    # region: Admin Tools
     ADMIN_TOOLS = "admin_tools"
     STATISTICS = "statistics"
     EDITOR_USERS = "editor_users"
@@ -26,6 +26,11 @@ class Navigation(str, Enum):
 
     SEND_NOTIFICATION = "send_notification"
     CREATE_BACKUP = "create_backup"
+
+    MAINTENANCE_MODE = "maintenance_mode"
+    MAINTENANCE_ON = "maintenance_on"
+    MAINTENANCE_OFF = "maintenance_off"
+
     RESTART_BOT = "restart_bot"
     # endregion
 

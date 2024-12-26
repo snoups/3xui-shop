@@ -8,6 +8,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.i18n import I18n
 
 from app.bot import commands, filters, middlewares, routes
+from app.bot.filters import IsMaintenanceMode
 from app.bot.services.plans import PlansService
 from app.bot.services.promocode import PromocodeService
 from app.bot.services.vpn import VPNService
@@ -83,6 +84,9 @@ async def main() -> None:
 
     # Register admins in IsAdmin filter
     filters.register_admins(config.bot.ADMINS)
+
+    # Enable Maintenance mode for developing
+    IsMaintenanceMode.set_mode(True)
 
     # Register middlewares
     middlewares.register(

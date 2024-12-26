@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-25 22:22+0500\n"
+"POT-Creation-Date: 2024-12-26 18:48+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -43,27 +43,39 @@ msgid "💾 Create backup"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:62
+msgid "🚧 Maintenance mode"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:68
 msgid "🔄 Restart bot"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:84
-msgid "Create"
-msgstr ""
-
 #: app/bot/keyboards/admin_tools.py:90
-msgid "Delete"
+msgid "🆕 Create"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:96
-msgid "Edit"
+msgid "🗑️ Delete"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:120 app/bot/services/plans.py:224
+#: app/bot/keyboards/admin_tools.py:102
+msgid "✏️ Edit"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:126 app/bot/services/plans.py:224
 #, fuzzy
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] ""
 msgstr[1] ""
+
+#: app/bot/keyboards/admin_tools.py:144
+msgid "🟢 Turn on"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:151
+msgid "🔴 Turn off"
+msgstr ""
 
 #: app/bot/keyboards/back.py:17
 msgid "◀️ Back"
@@ -148,42 +160,68 @@ msgstr ""
 msgid "Subscription | {devices} for {duration}"
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:42
+#: app/bot/routes/admin_tools.py:43
 msgid "🛠 *Admin tools:*"
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:83 app/bot/routes/admin_tools.py:220
+#: app/bot/routes/admin_tools.py:84 app/bot/routes/admin_tools.py:237
 msgid "🎟️ *Editor promocodes:*"
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:136
+#: app/bot/routes/admin_tools.py:122
+msgid "enabled"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:122
+msgid "disabled"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:124
+msgid "🚧 *Maintenance mode:*"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:153
 msgid ""
 "🎟️ *Editor promocodes:*\n"
 "\n"
 "_Specify the duration_"
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:164
+#: app/bot/routes/admin_tools.py:181
 msgid "🎟️ *Editor promocodes:*\n"
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:168
+#: app/bot/routes/admin_tools.py:185
 msgid "Your created promocode: ```{promocode}```"
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:189
+#: app/bot/routes/admin_tools.py:206
 msgid ""
 "🎟️ *Editor promocodes:*\n"
 "\n"
 "_Send promocode to delete_"
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:214
+#: app/bot/routes/admin_tools.py:231
 msgid "✅ Promocode {promocode} deleted successfully."
 msgstr ""
 
-#: app/bot/routes/admin_tools.py:226
+#: app/bot/routes/admin_tools.py:243
 msgid "❌ Failed to delete promocode. Please try again."
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:266
+msgid ""
+"🚧 *Maintenance mode:* enabled.\n"
+"\n"
+"_The bot is temporarily unavailable for users._"
+msgstr ""
+
+#: app/bot/routes/admin_tools.py:286
+msgid ""
+"🚧 *Maintenance mode:* disabled.\n"
+"\n"
+"_The bot is available for users._"
 msgstr ""
 
 #: app/bot/routes/download.py:26
@@ -209,6 +247,10 @@ msgid ""
 "📱 SUPPORT FOR ALL PLATFORMS\n"
 "♾️ UNLIMITED\n"
 "✅ GUARANTEE AND TRIAL PERIOD\n"
+msgstr ""
+
+#: app/bot/routes/maintenance_mode.py:24 app/bot/routes/maintenance_mode.py:36
+msgid "The bot is in maintenance mode. Please wait."
 msgstr ""
 
 #: app/bot/routes/payment.py:58

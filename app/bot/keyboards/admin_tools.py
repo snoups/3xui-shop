@@ -59,6 +59,12 @@ def admin_tools_keyboard() -> InlineKeyboardMarkup:
     )
     builder.row(
         InlineKeyboardButton(
+            text=_("🚧 Maintenance mode"),
+            callback_data=Navigation.MAINTENANCE_MODE,
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(
             text=_("🔄 Restart bot"),
             callback_data=Navigation.RESTART_BOT,
         )
@@ -81,19 +87,19 @@ def editor_promocodes() -> InlineKeyboardMarkup:
 
     builder.row(
         InlineKeyboardButton(
-            text=_("Create"),
+            text=_("🆕 Create"),
             callback_data=Navigation.CREATE_PROMOCODE,
         )
     )
     builder.row(
         InlineKeyboardButton(
-            text=_("Delete"),
+            text=_("🗑️ Delete"),
             callback_data=Navigation.DELETE_PROMOCODE,
         )
     )
     builder.row(
         InlineKeyboardButton(
-            text=_("Edit"),
+            text=_("✏️ Edit"),
             callback_data=Navigation.EDIT_PROMOCODE,
         )
     )
@@ -127,4 +133,25 @@ def promocode_duration_keyboard(callback_data: CreatePromocodeCallback) -> Inlin
 
     builder.adjust(2)
     builder.row(back_button(Navigation.CREATE_PROMOCODE))
+    return builder.as_markup()
+
+
+def maintenance_mode_keyboard() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("🟢 Turn on"),
+            callback_data=Navigation.MAINTENANCE_ON,
+        )
+    )
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("🔴 Turn off"),
+            callback_data=Navigation.MAINTENANCE_OFF,
+        )
+    )
+    builder.adjust(2)
+    builder.row(back_button(Navigation.ADMIN_TOOLS))
     return builder.as_markup()

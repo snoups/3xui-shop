@@ -5,6 +5,7 @@ from . import (
     download,
     error,
     main_menu,
+    maintenance_mode,
     payment,
     profile,
     promocode,
@@ -26,6 +27,7 @@ def include(dp: Dispatcher) -> None:
     dp.include_routers(
         *[
             error.router,
+            maintenance_mode.router,
             main_menu.router,
             profile.router,
             subscription.router,

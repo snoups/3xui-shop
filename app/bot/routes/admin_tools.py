@@ -7,10 +7,11 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.i18n import gettext as _
 
-from app.bot.filters import IsAdmin, IsPrivate
+from app.bot.filters import IsAdmin, IsMaintenanceMode, IsPrivate
 from app.bot.keyboards.admin_tools import (
     admin_tools_keyboard,
     editor_promocodes,
+    maintenance_mode_keyboard,
     promocode_duration_keyboard,
 )
 from app.bot.keyboards.back import back_keyboard
@@ -107,6 +108,22 @@ async def callback_create_backup(callback: CallbackQuery) -> None:
     """
     logger.info(f"Admin {callback.from_user.id} created backup.")
     pass
+
+
+@router.callback_query(F.data == Navigation.MAINTENANCE_MODE, IsPrivate(), IsAdmin())
+async def callback_maintenance_mode(callback: CallbackQuery) -> None:
+    """
+    Handler to display the option for enabling or disabling maintenance mode.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
+    logger.info(f"Admin {callback.from_user.id} navigated to maintenance mode options.")
+    status = _("enabled") if IsMaintenanceMode.active else _("disabled")
+    await callback.message.edit_text(
+        text=_("🚧 *Maintenance mode:*") + " " + status,
+        reply_markup=maintenance_mode_keyboard(),
+    )
 
 
 @router.callback_query(F.data == Navigation.RESTART_BOT, IsPrivate(), IsAdmin())
@@ -228,6 +245,47 @@ async def handle_promocode_input(
 
     await asyncio.sleep(5)
     await notification.delete()
+
+
+# endregion
+
+# region: Maintenance Mode
+
+
+@router.callback_query(F.data == Navigation.MAINTENANCE_ON, IsPrivate(), IsAdmin())
+async def callback_maintenance_on(callback: CallbackQuery) -> None:
+    """
+    Handler to enable the maintenance mode.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
+    logger.info(f"Admin {callback.from_user.id} enabled maintenance mode.")
+    IsMaintenanceMode.set_mode(True)
+    await callback.message.edit_text(
+        text=_(
+            "🚧 *Maintenance mode:* enabled.\n"
+            "\n"
+            "_The bot is temporarily unavailable for users._"
+        ),
+        reply_markup=back_keyboard(Navigation.MAINTENANCE_MODE),
+    )
+
+
+@router.callback_query(F.data == Navigation.MAINTENANCE_OFF, IsPrivate(), IsAdmin())
+async def callback_maintenance_off(callback: CallbackQuery) -> None:
+    """
+    Handler to disable the maintenance mode.
+
+    Arguments:
+        callback (CallbackQuery): The incoming callback query.
+    """
+    logger.info(f"Admin {callback.from_user.id} disabled maintenance mode.")
+    IsMaintenanceMode.set_mode(False)
+    await callback.message.edit_text(
+        text=_("🚧 *Maintenance mode:* disabled.\n" "\n" "_The bot is available for users._"),
+        reply_markup=back_keyboard(Navigation.MAINTENANCE_MODE),
+    )
 
 
 # endregion

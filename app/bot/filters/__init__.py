@@ -1,8 +1,9 @@
 from .is_admin import IsAdmin
+from .is_maintenance_mode import IsMaintenanceMode
 from .is_private import IsPrivate
 
 
-def register_admins(admins: list[int]) -> None:
+def register_admins(admins_ids: list[int]) -> None:
     """
     Registers the list of bot administrators.
 
@@ -13,10 +14,11 @@ def register_admins(admins: list[int]) -> None:
     Arguments:
         admins (list[int]): List of administrator IDs.
     """
-    IsAdmin.set_admins(admins)
+    IsAdmin.set_admins(admins_ids)
 
 
 __all__ = [
     "IsAdmin",
+    "IsMaintenanceMode",
     "IsPrivate",
 ]
