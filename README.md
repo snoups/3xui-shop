@@ -33,12 +33,12 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/3xui-shop.git
+   git clone https://github.com/snoups/3xui-shop.git
    cd 3xui-shop
    ```
 
 2. **Set up environment variables and plans:**
-- Copy .env.example to .env:
+- Copy plans.example.json to plans.json and .env.example to .env:
     ```bash
     cp plans.example.json plans.json
     cp .env.example .env
@@ -47,15 +47,15 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
     > Update .env file with your configuration. [(Environment Variables Configuration)](#environment-variables-configuration)
 
-    1. **Build the Docker image:**
-    ```bash
-    docker compose build
-    ```
+3. **Build the Docker image:**
+   ```bash
+   docker compose build
+   ```
 
-1. **Run the Docker container::**
-    ```bash
-    docker compose up -d
-    ```
+4. **Run the Docker container::**
+   ```bash
+   docker compose up -d
+   ```
 
 ### Environment Variables Configuration
 
