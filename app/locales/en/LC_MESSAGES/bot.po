@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-26 18:48+0500\n"
+"POT-Creation-Date: 2024-12-27 15:46+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,63 +18,63 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: app/bot/keyboards/admin_tools.py:16
+#: app/bot/keyboards/admin_tools.py:17
 msgid "🛠 Admin tools"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:32
+#: app/bot/keyboards/admin_tools.py:33
 msgid "📊 Statistics"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:38
+#: app/bot/keyboards/admin_tools.py:39
 msgid "👤 Editor users"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:44
+#: app/bot/keyboards/admin_tools.py:45
 msgid "🎟️ Editor promocodes"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:50
+#: app/bot/keyboards/admin_tools.py:51
 msgid "📢 Send notification"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:56
+#: app/bot/keyboards/admin_tools.py:57
 msgid "💾 Create backup"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:62
+#: app/bot/keyboards/admin_tools.py:63
 msgid "🚧 Maintenance mode"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:68
+#: app/bot/keyboards/admin_tools.py:69
 msgid "🔄 Restart bot"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:90
+#: app/bot/keyboards/admin_tools.py:91
 msgid "🆕 Create"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:96
+#: app/bot/keyboards/admin_tools.py:97
 msgid "🗑️ Delete"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:102
+#: app/bot/keyboards/admin_tools.py:103
 msgid "✏️ Edit"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:126 app/bot/services/plans.py:224
+#: app/bot/keyboards/admin_tools.py:127 app/bot/services/plans.py:225
 #, fuzzy
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/keyboards/admin_tools.py:144
-msgid "🟢 Turn on"
+#: app/bot/keyboards/admin_tools.py:146
+msgid "🔴 Turn off"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:151
-msgid "🔴 Turn off"
+#: app/bot/keyboards/admin_tools.py:153
+msgid "🟢 Turn on"
 msgstr ""
 
 #: app/bot/keyboards/back.py:17
@@ -157,6 +157,7 @@ msgstr ""
 
 #: app/bot/payment_gateways/telegram_stars.py:36
 #: app/bot/payment_gateways/telegram_stars.py:39
+#: app/bot/payment_gateways/yookassa.py:44
 msgid "Subscription | {devices} for {duration}"
 msgstr ""
 
@@ -459,24 +460,24 @@ msgstr ""
 msgid "m"
 msgstr ""
 
-#: app/bot/services/plans.py:194
+#: app/bot/services/plans.py:195
 msgid "devices"
 msgstr ""
 
-#: app/bot/services/plans.py:196
+#: app/bot/services/plans.py:197
 msgid "1 device"
 msgid_plural "{} devices"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/services/plans.py:216
+#: app/bot/services/plans.py:217
 #, fuzzy
 msgid "1 year"
 msgid_plural "{} years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/services/plans.py:221
+#: app/bot/services/plans.py:222
 #, fuzzy
 msgid "1 month"
 msgid_plural "{} months"

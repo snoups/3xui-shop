@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.services.client import UNLIMITED
+from app.config import DEFAULT_PLANS_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +118,7 @@ class PlansService:
             FileNotFoundError: If the 'plans.json' file does not exist.
             ValueError: If the JSON data is malformed or missing expected keys.
         """
-        file_path = "plans.json"
+        file_path = DEFAULT_PLANS_DIR
 
         if not os.path.isfile(file_path):
             logger.error(f"The file '{file_path}' does not exist.")

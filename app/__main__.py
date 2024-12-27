@@ -12,7 +12,7 @@ from app.bot.filters import IsMaintenanceMode
 from app.bot.services.plans import PlansService
 from app.bot.services.promocode import PromocodeService
 from app.bot.services.vpn import VPNService
-from app.config import Config, load_config
+from app.config import DEFAULT_LOCALES_DIR, Config, load_config
 from app.db.database import Database
 from app.logger import setup_logging
 
@@ -73,7 +73,7 @@ async def main() -> None:
     storage = MemoryStorage()  # TODO: REDIS
     bot = Bot(token=config.bot.TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN))
     dp = Dispatcher(storage=storage, config=config, bot=bot, db=db)
-    i18n = I18n(path="app/locales", default_locale="en", domain="bot")
+    i18n = I18n(path=DEFAULT_LOCALES_DIR, default_locale="en", domain="bot")
     plans_service = PlansService()
     promocode_service = PromocodeService(db.session)
     vpn_service = VPNService(db.session, config, promocode_service)

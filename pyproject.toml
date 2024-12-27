@@ -12,10 +12,8 @@ environs = "^11.2.1"
 sqlalchemy = "^2.0.36"
 cachetools = "^5.5.0"
 aiosqlite = "^0.20.0"
-greenlet = "^3.1.1"
 py3xui = "^0.3.2"
-
-[tool.poetry.group.dev.dependencies]
+yookassa = "^3.4.3"
 babel = "^2.16.0"
 
 [build-system]

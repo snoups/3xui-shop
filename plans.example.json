@@ -1,31 +1,22 @@
 {
-    // List of available subscription durations in days.
-    // Each value represents a selectable subscription period.
     "durations": [30, 60, 180, 365],
 
-    // List of available subscription plans.
     "plans": [
         {
-            // Number of devices included in the plan.
             "devices": 1,
-
-            // Plan prices based on currency and subscription duration.
             "prices": {
-                // Prices in RUB.
                 "RUB": {
-                    "30": 70, // Price for 30 days.
-                    "60": 120, // Price for 60 days.
-                    "180": 300, // Price for 180 days.
-                    "365": 600 // Price for 365 days.
+                    "30": 70,
+                    "60": 120,
+                    "180": 300,
+                    "365": 600
                 },
-                // Prices in USD.
                 "USD": {
                     "30": 0.7,
                     "60": 1.2,
                     "180": 3,
                     "365": 6
                 },
-                // Prices in XTR.
                 "XTR": {
                     "30": 60,
                     "60": 100,

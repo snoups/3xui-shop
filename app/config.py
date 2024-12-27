@@ -5,14 +5,15 @@ from environs import Env
 from marshmallow.validate import OneOf
 
 BASE_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_DIR = BASE_DIR / "data"
+DEFAULT_LOCALES_DIR = BASE_DIR / "locales"
+DEFAULT_PLANS_DIR = DEFAULT_DATA_DIR / "plans.json"
 
-# Default values for database
 DEFAULT_DB_NAME = "bot_database"
 
-# Default values for logging configurations
 DEFAULT_LOG_LEVEL = "INFO"
 DEFAULT_LOG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
-DEFAULT_LOG_DIR = "./logs"
+DEFAULT_LOG_DIR = "logs"
 DEFAULT_LOG_ARCHIVE_FORMAT = "zip"
 
 
@@ -85,7 +86,7 @@ class DatabaseConfig:  # TODO: Add support for different drivers
             str: Generated connection URL.
         """
         if driver.startswith("sqlite"):
-            return f"{driver}:///./{self.NAME}.db"
+            return f"{driver}:////{DEFAULT_DATA_DIR}/{self.NAME}.db"
         return f"{driver}://{self.USERNAME}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.NAME}"
 
 
@@ -145,30 +146,30 @@ def load_config() -> Config:
         bot=BotConfig(
             TOKEN=env.str("BOT_TOKEN"),
             ADMINS=env.list("BOT_ADMINS", subcast=int, default=[]),
-            DEV_ID=env.int("BOT_DEV_ID", None),
+            DEV_ID=env.int("BOT_DEV_ID", default=None),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
         ),
         xui=XUIConfig(
             HOST=env.str("XUI_HOST"),
             USERNAME=env.str("XUI_USERNAME"),
             PASSWORD=env.str("XUI_PASSWORD"),
-            TOKEN=env.str("XUI_TOKEN", None),
+            TOKEN=env.str("XUI_TOKEN", default=None),
             SUBSCRIPTION=env.str("XUI_SUBSCRIPTION"),
         ),
         database=DatabaseConfig(
-            HOST=env.str("DB_HOST", None),
-            PORT=env.int("DB_PORT", None),
-            USERNAME=env.str("DB_USERNAME", None),
-            PASSWORD=env.str("DB_PASSWORD", None),
-            NAME=env.str("DB_NAME", DEFAULT_DB_NAME),
+            HOST=env.str("DB_HOST", default=None),
+            PORT=env.int("DB_PORT", default=None),
+            USERNAME=env.str("DB_USERNAME", default=None),
+            PASSWORD=env.str("DB_PASSWORD", default=None),
+            NAME=env.str("DB_NAME", default=DEFAULT_DB_NAME),
         ),
         logging=LoggingConfig(
-            LEVEL=env.str("LOG_LEVEL", DEFAULT_LOG_LEVEL),
-            FORMAT=env.str("LOG_FORMAT", DEFAULT_LOG_FORMAT),
-            DIR=env.str("LOG_DIR", DEFAULT_LOG_DIR),
+            LEVEL=env.str("LOG_LEVEL", default=DEFAULT_LOG_LEVEL),
+            FORMAT=env.str("LOG_FORMAT", default=DEFAULT_LOG_FORMAT),
+            DIR=BASE_DIR / env.path("LOG_DIR", default=DEFAULT_LOG_DIR),
             ARCHIVE_FORMAT=env.str(
                 "LOG_ARCHIVE_FORMAT",
-                DEFAULT_LOG_ARCHIVE_FORMAT,
+                default=DEFAULT_LOG_ARCHIVE_FORMAT,
                 validate=OneOf(["zip", "gz"], error="LOG_ARCHIVE_FORMAT must be one of: {choices}"),
             ),
         ),

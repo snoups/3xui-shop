@@ -163,7 +163,11 @@ cython_debug/
 .DS_Store
 
 # Database
-bot_database.db
+*.db
+
+# Archive logs
+*.zip
+*.gz
 
 # Plans
 plans.json

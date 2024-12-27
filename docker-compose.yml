@@ -1,0 +1,8 @@
+services:
+  bot:
+    build: .
+    container_name: 3xui-shop-bot
+    env_file:
+      - ./.env
+    restart: always
+    stop_signal: SIGINT
