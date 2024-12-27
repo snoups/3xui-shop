@@ -12,9 +12,7 @@ from app.bot.keyboards.subscription import (
     subscription_keyboard,
 )
 from app.bot.navigation import Navigation, SubscriptionCallback
-from app.bot.services.client import ClientService
-from app.bot.services.plans import PlansService
-from app.bot.services.vpn import VPNService
+from app.bot.services import ClientService, PlansService, VPNService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)

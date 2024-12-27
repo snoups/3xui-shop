@@ -1,10 +1,8 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import TelegramObject
 
-from app.bot.filters.is_dev import IsDev
 
-
-class IsAdmin(BaseFilter):
+class IsDev(BaseFilter):
     """
     Filter to check if a user is an admin.
 
@@ -15,17 +13,17 @@ class IsAdmin(BaseFilter):
         admins_ids (list[int]): List of admin user IDs.
     """
 
-    admins_ids: list[int] = []
+    developer_id: int
 
     @classmethod
-    def set_admins(cls, admins_ids: list[int]) -> None:
+    def set_developer(cls, developer_id: int) -> None:
         """
         Set the list of admin user IDs.
 
         Arguments:
             admins_ids (list[int]): List of admin IDs.
         """
-        cls.admins_ids = admins_ids
+        cls.developer_id = developer_id
 
     async def __call__(self, event: TelegramObject) -> bool:
         """
@@ -39,6 +37,4 @@ class IsAdmin(BaseFilter):
         """
         if not hasattr(event, "from_user") or not event.from_user:
             return False
-
-        is_dev = await IsDev()(event)
-        return event.from_user.id in self.admins_ids or is_dev
+        return event.from_user.id == self.developer_id

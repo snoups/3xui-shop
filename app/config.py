@@ -25,13 +25,13 @@ class BotConfig:
     Attributes:
         TOKEN (str): API token for the Telegram bot.
         ADMINS (list[int]): List of admin IDs (user IDs) for admin tools.
-        DEV_ID (int | None): Developer ID (user ID) for notifications.
+        DEV_ID (int): Developer ID (user ID) for notifications.
         SUPPORT_ID (int): Support ID (user ID) for support.
     """
 
     TOKEN: str
     ADMINS: list[int]
-    DEV_ID: int | None
+    DEV_ID: int
     SUPPORT_ID: int
 
 
@@ -146,7 +146,7 @@ def load_config() -> Config:
         bot=BotConfig(
             TOKEN=env.str("BOT_TOKEN"),
             ADMINS=env.list("BOT_ADMINS", subcast=int, default=[]),
-            DEV_ID=env.int("BOT_DEV_ID", default=None),
+            DEV_ID=env.int("BOT_DEV_ID"),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
         ),
         xui=XUIConfig(

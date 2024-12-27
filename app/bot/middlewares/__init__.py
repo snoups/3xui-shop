@@ -3,30 +3,32 @@ from aiogram.utils.i18n import SimpleI18nMiddleware
 
 from .config import ConfigMiddleware
 from .database import DBSessionMiddleware
+from .maintenance import MaintenanceMiddleware
 from .services import ServicesMiddleware
 from .throttling import ThrottlingMiddleware
 
 
 def register(dp: Dispatcher, **kwargs) -> None:
     """
-    Registers multiple middlewares for the bot to handle various tasks such as
-    configuration, database session, internationalization, services, and throttling.
+    Register middlewares to extend the bot's functionality.
 
-    This function registers the following middlewares:
-    - ConfigMiddleware: Injects configuration into handlers.
-    - DBSessionMiddleware: Provides a database session for each handler.
-    - SimpleI18nMiddleware: Handles internationalization.
-    - ServicesMiddleware: Injects various services like VPN and Plans.
-    - ThrottlingMiddleware: Manages rate limiting for user requests.
+    This function sets up the following middlewares:
+    - ConfigMiddleware: Injects configuration settings.
+    - DBSessionMiddleware: Provides a database session.
+    - SimpleI18nMiddleware: Adds internationalization support.
+    - MaintenanceMiddleware: Handles maintenance mode logic.
+    - ServicesMiddleware: Supplies services like VPN, plans, and promocodes.
+    - ThrottlingMiddleware: Implements rate limiting.
 
     Arguments:
-        dp (Dispatcher): The main dispatcher instance.
-        kwargs (Any): Arbitrary keyword arguments containing middleware dependencies
-                      such as config, session, services, and throttling parameters.
+        dp (Dispatcher): Dispatcher instance to register middlewares on.
+        kwargs (Any): Middleware dependencies such as config, session, services, and throttling.
     """
+    dp.update.outer_middleware.register(ThrottlingMiddleware())
     dp.update.outer_middleware.register(ConfigMiddleware(kwargs["config"]))
     dp.update.outer_middleware.register(DBSessionMiddleware(kwargs["session"]))
     dp.update.outer_middleware.register(SimpleI18nMiddleware(kwargs["i18n"]))
+    dp.update.outer_middleware.register(MaintenanceMiddleware())
     dp.update.outer_middleware.register(
         ServicesMiddleware(
             vpn_service=kwargs["vpn"],
@@ -34,7 +36,6 @@ def register(dp: Dispatcher, **kwargs) -> None:
             promocode_service=kwargs["promocode"],
         )
     )
-    dp.update.outer_middleware.register(ThrottlingMiddleware())
 
 
 __all__ = [

@@ -7,7 +7,7 @@ from aiogram.utils.i18n import gettext as _
 from app.bot.filters import IsPrivate
 from app.bot.keyboards.download import download_keyboard, platforms_keyboard
 from app.bot.navigation import Navigation
-from app.bot.services.vpn import VPNService
+from app.bot.services import VPNService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)

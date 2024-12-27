@@ -10,9 +10,7 @@ from aiogram.utils.i18n import gettext as _
 from app.bot.filters import IsPrivate
 from app.bot.keyboards.back import back_keyboard
 from app.bot.navigation import Navigation
-from app.bot.services.plans import PlansService
-from app.bot.services.promocode import PromocodeService
-from app.bot.services.vpn import VPNService
+from app.bot.services import PlansService, PromocodeService, VPNService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)

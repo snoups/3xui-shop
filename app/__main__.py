@@ -8,10 +8,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.i18n import I18n
 
 from app.bot import commands, filters, middlewares, routes
-from app.bot.filters import IsMaintenanceMode
-from app.bot.services.plans import PlansService
-from app.bot.services.promocode import PromocodeService
-from app.bot.services.vpn import VPNService
+from app.bot.middlewares import MaintenanceMiddleware
+from app.bot.services import PlansService, PromocodeService, VPNService
 from app.config import DEFAULT_LOCALES_DIR, Config, load_config
 from app.db.database import Database
 from app.logger import setup_logging
@@ -82,11 +80,14 @@ async def main() -> None:
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
 
+    # Register developer in IsDev filter
+    filters.register_developer(config.bot.DEV_ID)
+
     # Register admins in IsAdmin filter
     filters.register_admins(config.bot.ADMINS)
 
     # Enable Maintenance mode for developing
-    IsMaintenanceMode.set_mode(True)
+    MaintenanceMiddleware.set_mode(True)
 
     # Register middlewares
     middlewares.register(

@@ -5,15 +5,12 @@ from aiogram.types import CallbackQuery, Message, PreCheckoutQuery
 from aiogram.utils.i18n import gettext as _
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.bot.filters import IsPrivate
-from app.bot.filters.is_admin import IsAdmin
+from app.bot.filters import IsAdmin, IsPrivate
 from app.bot.keyboards.back import back_to_main_menu_keyboard
 from app.bot.keyboards.payment import pay_keyboard, payment_success_keyboard
 from app.bot.navigation import Navigation, SubscriptionCallback
-from app.bot.services.payment import PaymentService
-from app.bot.services.plans import PlansService
-from app.bot.services.vpn import VPNService
-from app.db.models.transaction import Transaction
+from app.bot.services import PaymentService, PlansService, VPNService
+from app.db.models import Transaction
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)

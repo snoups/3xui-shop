@@ -2,8 +2,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from app.bot.filters.is_maintenance_mode import IsMaintenanceMode
 from app.bot.keyboards.back import back_button
+from app.bot.middlewares import MaintenanceMiddleware
 from app.bot.navigation import CreatePromocodeCallback, Navigation
 
 
@@ -140,7 +140,7 @@ def promocode_duration_keyboard(callback_data: CreatePromocodeCallback) -> Inlin
 def maintenance_mode_keyboard() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
-    if IsMaintenanceMode.active:
+    if MaintenanceMiddleware.active:
         builder.row(
             InlineKeyboardButton(
                 text=_("🔴 Turn off"),

@@ -7,7 +7,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.i18n import gettext as _
 
-from app.bot.filters import IsAdmin, IsMaintenanceMode, IsPrivate
+from app.bot.filters import IsAdmin, IsPrivate
 from app.bot.keyboards.admin_tools import (
     admin_tools_keyboard,
     editor_promocodes,
@@ -15,8 +15,9 @@ from app.bot.keyboards.admin_tools import (
     promocode_duration_keyboard,
 )
 from app.bot.keyboards.back import back_keyboard
+from app.bot.middlewares import MaintenanceMiddleware
 from app.bot.navigation import CreatePromocodeCallback, Navigation
-from app.bot.services.promocode import PromocodeService
+from app.bot.services import PromocodeService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -119,7 +120,7 @@ async def callback_maintenance_mode(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The incoming callback query.
     """
     logger.info(f"Admin {callback.from_user.id} navigated to maintenance mode options.")
-    status = _("enabled") if IsMaintenanceMode.active else _("disabled")
+    status = _("enabled") if MaintenanceMiddleware.active else _("disabled")
     await callback.message.edit_text(
         text=_("🚧 *Maintenance mode:*") + " " + status,
         reply_markup=maintenance_mode_keyboard(),
@@ -261,7 +262,7 @@ async def callback_maintenance_on(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The incoming callback query.
     """
     logger.info(f"Admin {callback.from_user.id} enabled maintenance mode.")
-    IsMaintenanceMode.set_mode(True)
+    MaintenanceMiddleware.set_mode(True)
     await callback.message.edit_text(
         text=_(
             "🚧 *Maintenance mode:* enabled.\n"
@@ -281,7 +282,7 @@ async def callback_maintenance_off(callback: CallbackQuery) -> None:
         callback (CallbackQuery): The incoming callback query.
     """
     logger.info(f"Admin {callback.from_user.id} disabled maintenance mode.")
-    IsMaintenanceMode.set_mode(False)
+    MaintenanceMiddleware.set_mode(False)
     await callback.message.edit_text(
         text=_("🚧 *Maintenance mode:* disabled.\n" "\n" "_The bot is available for users._"),
         reply_markup=back_keyboard(Navigation.MAINTENANCE_MODE),

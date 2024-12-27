@@ -4,10 +4,9 @@ from datetime import datetime, timedelta, timezone
 from py3xui import AsyncApi, Client, Inbound
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.bot.services.promocode import PromocodeService
+from app.bot.services import PromocodeService
 from app.config import Config
-from app.db.models.promocode import Promocode
-from app.db.models.user import User
+from app.db.models import Promocode, User
 
 logger = logging.getLogger(__name__)
 
