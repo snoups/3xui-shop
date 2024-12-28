@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from sqlalchemy import *
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Mapped, mapped_column
 
 from ._base import Base
 
@@ -15,11 +18,12 @@ class Promocode(Base):
 
     __tablename__ = "promocodes"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    code = Column(String(length=8), unique=True, nullable=False)
-    duration = Column(BigInteger, nullable=False)
-    is_activated = Column(Boolean, default=False, nullable=False)
-    activated_by = Column(Integer, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    code: Mapped[str] = mapped_column(String(length=8), unique=True, nullable=False)
+    duration: Mapped[int] = mapped_column(nullable=False)
+    is_activated: Mapped[bool] = mapped_column(default=False, nullable=False)
+    activated_by: Mapped[int | None] = mapped_column(nullable=True)
+    created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
 
     @classmethod
     async def get(cls, session: AsyncSession, **kwargs) -> "Promocode | None":

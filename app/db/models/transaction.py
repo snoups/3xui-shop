@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from sqlalchemy import *
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ._base import Base
+from .user import User
 
 
 class Transaction(Base):
@@ -14,15 +17,17 @@ class Transaction(Base):
 
     __tablename__ = "transactions"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    payment_id = Column(String, unique=True, nullable=False)
-    amount = Column(Float, nullable=False)  # Amount for the transaction
-    status = Column(String(length=32), nullable=False)  # e.g., "completed", "pending", "failed"
-    created_at = Column(DateTime, default=func.now(), nullable=False)
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    payment_id: Mapped[str] = mapped_column(String(length=64), unique=True, nullable=False)
+    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    status: Mapped[str] = mapped_column(String(length=16), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        default=func.now(), onupdate=func.now(), nullable=False
+    )
 
-    user = relationship("User", back_populates="transactions")
+    user: Mapped["User"] = relationship("User", back_populates="transactions")
 
     @classmethod
     async def get_by_user(cls, session: AsyncSession, user_id: int) -> list["Transaction"]:

@@ -60,7 +60,7 @@ class DBSessionMiddleware(BaseMiddleware):
             user: TelegramUser | None = data.get("event_from_user", None)
             if user is not None and not user.is_bot:
                 vpn_id = str(uuid.uuid4())
-                logger.debug(f"Processing user with ID: {user.id}, VPN ID: {vpn_id}")
+                logger.debug(f"Processing user {user.id} | {vpn_id}")
                 user = await User.get_or_create(
                     session,
                     vpn_id=vpn_id,
@@ -68,7 +68,7 @@ class DBSessionMiddleware(BaseMiddleware):
                     first_name=user.first_name,
                     username=user.username,
                 )
-                logger.debug(f"User with ID: {user.id} created or fetched from the database.")
+                logger.debug(f"User {user.id} created or fetched from the database.")
             else:
                 logger.debug("No user found in event data.")
 

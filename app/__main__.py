@@ -91,6 +91,7 @@ async def main() -> None:
 
     # Register middlewares
     middlewares.register(
+        bot,
         dp,
         config=config,
         session=db.session,

@@ -183,7 +183,9 @@ async def callback_duration_selected(
         reply_markup=editor_promocodes(),
     )
     await callback.message.answer(
-        text=_("Your created promocode: ```{promocode}```").format(promocode=promocode.code)
+        text=_("Your created promocode: ```{promocode}```").format(
+            promocode=promocode.code
+        )  # TODO: show the promo code duration
     )
 
 

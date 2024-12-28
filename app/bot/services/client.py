@@ -31,7 +31,7 @@ class ClientService:
             client_data (dict): A dictionary containing client data.
         """
         self.client_data = client_data
-        logger.debug(f"ClientService initialized with client_data: {client_data}")
+        logger.debug(f"ClientService initialized with data: {client_data}")
 
     def __bool__(self) -> bool:
         """

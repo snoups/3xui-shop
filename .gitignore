@@ -164,6 +164,7 @@ cython_debug/
 
 # Database
 *.db
+*.sqlite3
 
 # Archive logs
 *.zip

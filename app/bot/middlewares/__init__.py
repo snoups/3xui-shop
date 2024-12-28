@@ -1,4 +1,4 @@
-from aiogram import Dispatcher
+from aiogram import Bot, Dispatcher
 from aiogram.utils.i18n import SimpleI18nMiddleware
 
 from .config import ConfigMiddleware
@@ -8,7 +8,7 @@ from .services import ServicesMiddleware
 from .throttling import ThrottlingMiddleware
 
 
-def register(dp: Dispatcher, **kwargs) -> None:
+def register(bot: Bot, dp: Dispatcher, **kwargs) -> None:
     """
     Register middlewares to extend the bot's functionality.
 
@@ -28,7 +28,7 @@ def register(dp: Dispatcher, **kwargs) -> None:
     dp.update.outer_middleware.register(ConfigMiddleware(kwargs["config"]))
     dp.update.outer_middleware.register(DBSessionMiddleware(kwargs["session"]))
     dp.update.outer_middleware.register(SimpleI18nMiddleware(kwargs["i18n"]))
-    dp.update.outer_middleware.register(MaintenanceMiddleware())
+    dp.update.outer_middleware.register(MaintenanceMiddleware(bot))
     dp.update.outer_middleware.register(
         ServicesMiddleware(
             vpn_service=kwargs["vpn"],

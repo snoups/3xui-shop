@@ -86,7 +86,7 @@ class DatabaseConfig:  # TODO: Add support for different drivers
             str: Generated connection URL.
         """
         if driver.startswith("sqlite"):
-            return f"{driver}:////{DEFAULT_DATA_DIR}/{self.NAME}.db"
+            return f"{driver}:////{DEFAULT_DATA_DIR}/{self.NAME}.sqlite3"
         return f"{driver}://{self.USERNAME}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.NAME}"
 
 

@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from sqlalchemy import *
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ._base import Base
+from .transaction import Transaction
 
 
 class User(Base):
@@ -16,14 +19,16 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    vpn_id = Column(String(length=32), unique=True, nullable=False)
-    user_id = Column(BigInteger, unique=True, nullable=False)
-    first_name = Column(String(length=128), nullable=False)
-    username = Column(String(length=64), nullable=True)
-    created_at = Column(DateTime, default=func.now(), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    vpn_id: Mapped[str] = mapped_column(String(36), unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    first_name: Mapped[str] = mapped_column(String(length=32), nullable=False)
+    username: Mapped[str | None] = mapped_column(String(length=32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
 
-    transactions = relationship("Transaction", back_populates="user", cascade="all, delete-orphan")
+    transactions: Mapped[list["Transaction"]] = relationship(
+        "Transaction", back_populates="user", cascade="all, delete-orphan"
+    )
 
     @classmethod
     async def get(cls, session: AsyncSession, **kwargs) -> "User | None":

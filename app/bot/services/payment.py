@@ -53,9 +53,9 @@ class PaymentMethod:
             ValueError: If the callback data is invalid.
         """
         methods = {
-            Navigation.PAY_YOOKASSA: ("₽", "RUB", Yookassa()),
+            # Navigation.PAY_YOOKASSA: ("₽", "RUB", Yookassa()),
             Navigation.PAY_TELEGRAM_STARS: ("★", "XTR", TelegramStars()),
-            Navigation.PAY_CRYPTOMUS: ("$", "USD", Cryptomus()),
+            # Navigation.PAY_CRYPTOMUS: ("$", "USD", Cryptomus()),
         }
 
         if callback_data not in methods:

@@ -173,9 +173,7 @@ class VPNService:
             replace_devices (bool): If True, replaces the existing device count.
             replace_duration (bool): If True, replaces the existing subscription duration.
         """
-        logger.info(
-            f"Updating client {user.user_id} with devices={devices} and duration={duration} days."
-        )
+        logger.info(f"Updating client {user.user_id} with {devices} devices and {duration} days.")
 
         try:
             client: Client = await self.api.client.get_by_email(str(user.user_id))
@@ -213,7 +211,7 @@ class VPNService:
             duration (int): The duration in days for which the subscription is valid.
         """
         logger.info(
-            f"Creating new client {user.user_id} with devices={devices} and duration={duration} days."
+            f"Creating new client {user.user_id} with {devices} devices and {duration} days."
         )
 
         new_client = Client(

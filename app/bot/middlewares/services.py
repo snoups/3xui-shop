@@ -50,6 +50,5 @@ class ServicesMiddleware(BaseMiddleware):
         Returns:
             Any: The result of calling the next handler with the updated data containing services.
         """
-        logger.debug(f"Injecting services into handler data: {list(self.services.keys())}")
         data.update(self.services)
         return await handler(event, data)
