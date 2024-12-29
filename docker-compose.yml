@@ -4,12 +4,14 @@ services:
     container_name: 3xui-shop-bot
     volumes:
       - ./app/data:/app/data
+      - ./plans.json:/app/data/plans.json
       - ./app/locales:/app/locales
       - ./app/logs:/app/logs
     env_file:
       - .env
-    environment:
-      - MIGRATION_PATH=/db/migration
     restart: always
     stop_signal: SIGINT
-    command: sh -c "poetry run alembic -c /app/db/alembic.ini upgrade head && poetry run python /app/__main__.py"
+    command: sh -c "
+      poetry run pybabel compile -d /app/locales -D bot &&
+      poetry run alembic -c /app/db/alembic.ini upgrade head &&
+      poetry run python /app/__main__.py"
