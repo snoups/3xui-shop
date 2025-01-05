@@ -47,8 +47,10 @@ class CompressingFileHandler(TimedRotatingFileHandler):
             ValueError: If `archive_format` is not "zip" or "gz".
         """
         super().__init__(filename, when, interval, backupCount, encoding, delay, utc, atTime)
+
         if archive_format not in {"zip", "gz"}:
             raise ValueError("archive_format must be either 'zip' or 'gz'")
+
         self.archive_format = archive_format
 
     def doRollover(self) -> None:
@@ -80,6 +82,7 @@ class CompressingFileHandler(TimedRotatingFileHandler):
         """
         zip_file = f"{log_file}.zip"
         logging.info(f"Archiving {log_file} to {zip_file}")
+
         with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as archive:
             archive.write(log_file, os.path.basename(log_file))
 
@@ -92,6 +95,7 @@ class CompressingFileHandler(TimedRotatingFileHandler):
         """
         gz_file = f"{log_file}.gz"
         logging.info(f"Archiving {log_file} to {gz_file}")
+
         with open(log_file, "rb") as log:
             with gzip.open(gz_file, "wb") as archive:
                 shutil.copyfileobj(log, archive)

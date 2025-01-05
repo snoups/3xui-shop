@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 
-from app.bot.navigation import Navigation
+from app.bot.navigation import NavMain
 
 
 async def setup(bot: Bot) -> None:
@@ -16,7 +16,7 @@ async def setup(bot: Bot) -> None:
         bot (Bot): The bot instance that will be configured with commands.
     """
     commands = [
-        BotCommand(command=Navigation.START, description="Открыть главное меню"),
+        BotCommand(command=NavMain.START, description="Открыть главное меню"),
     ]
 
     await bot.set_my_commands(

@@ -5,9 +5,9 @@ from . import (
     download,
     error,
     main_menu,
-    payment,
+    notification,
     profile,
-    promocode,
+    referral,
     subscription,
     support,
 )
@@ -17,23 +17,20 @@ def include(dp: Dispatcher) -> None:
     """
     Includes all necessary routers into the main Dispatcher.
 
-    This function registers all the routers for handling different parts of the bot's functionality,
-    including error handling, main menu, payment, profile, and subscription management.
-
     Arguments:
         dp (Dispatcher): The main Dispatcher instance that will handle the routing of updates.
     """
     dp.include_routers(
         *[
             error.router,
-            main_menu.router,
-            profile.router,
-            subscription.router,
-            payment.router,
-            download.router,
-            support.router,
             admin_tools.router,
-            promocode.router,
+            download.router,
+            main_menu.router,
+            notification.router,
+            profile.router,
+            referral.router,
+            subscription.router,
+            support.router,
         ]
     )
 

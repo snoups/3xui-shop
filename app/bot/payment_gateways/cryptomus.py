@@ -1,4 +1,4 @@
-from app.bot.navigation import SubscriptionCallback
+# from app.bot.navigation import SubscriptionCallback
 
 
 class Cryptomus:
@@ -9,7 +9,7 @@ class Cryptomus:
     payment links or processing payment requests for subscriptions.
     """
 
-    def create_payment(self, data: SubscriptionCallback) -> str:
+    def create_payment(self, data) -> str:
         """
         Create a payment link for the subscription using Cryptomus.
 

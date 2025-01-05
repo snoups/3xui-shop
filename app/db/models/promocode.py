@@ -13,7 +13,8 @@ class Promocode(Base):
     Model representing the Promocode table in the database.
 
     This model is used to store and manage promocodes, which can be associated with
-    subscription traffic and duration.
+    subscription traffic and duration. Promocodes can also track whether they have
+    been activated and by whom.
     """
 
     __tablename__ = "promocodes"
@@ -26,13 +27,13 @@ class Promocode(Base):
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
 
     @classmethod
-    async def get(cls, session: AsyncSession, **kwargs) -> "Promocode | None":
+    async def get(cls, session: AsyncSession, code: str) -> "Promocode | None":
         """
-        Get a promocode from the database based on the specified filters.
+        Get a promocode from the database based on the provided code.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            kwargs (dict): The filters for selecting the promocode (e.g., code="ABC123").
+            code (str): The promocode code to search for.
 
         Returns:
             Promocode | None: The promocode object if found, or None if not found.
@@ -40,33 +41,39 @@ class Promocode(Base):
         Example:
             promocode = await Promocode.get(session, code="ABC123")
         """
-        filters = [*[getattr(Promocode, key) == value for key, value in kwargs.items()]]
-        query = await session.execute(select(Promocode).where(*filters))
-        return query.scalar()
+        filter = [Promocode.code == code]
+        query = await session.execute(select(Promocode).where(*filter))
+        return query.scalar_one_or_none()
 
     @classmethod
-    async def create(cls, session: AsyncSession, **kwargs) -> "Promocode | None":
+    async def create(cls, session: AsyncSession, code: str, **kwargs) -> "Promocode | None":
         """
         Create a new promocode in the database.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            kwargs (dict): Attributes for the new promocode.
+            code (str): The unique promocode code.
+            kwargs (dict): Additional attributes for the new promocode (e.g., duration).
 
         Returns:
             Promocode | None: The created promocode if successful, None if creation failed.
 
         Example:
-            promocode = await Promocode.create(session, code="ABC123", traffic=1000, duration=3600)
+            promocode = await Promocode.create(session, code="ABC123", duration=3600)
         """
-        promocode = Promocode(**kwargs)
-        session.add(promocode)
+        filter = [Promocode.code == code]
+        query = await session.execute(select(Promocode).where(*filter))
+        promocode = query.scalar_one_or_none()
 
-        try:
-            await session.commit()
-        except IntegrityError:
-            await session.rollback()
-            return None
+        if promocode is None:
+            promocode = Promocode(code=code, **kwargs)
+            session.add(promocode)
+
+            try:
+                await session.commit()
+            except IntegrityError:
+                await session.rollback()
+                return None
 
         return promocode
 
@@ -77,24 +84,24 @@ class Promocode(Base):
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            code (str): The unique promocode string (e.g., "ABC123").
+            code (str): The unique promocode code (e.g., "ABC123").
             kwargs (dict): Attributes to be updated (e.g., duration=30, is_activated=True).
 
         Example:
             await Promocode.update(session, code="ABC123", duration=30, is_activated=True)
         """
-        filters = [Promocode.code == code]
-        await session.execute(update(Promocode).filter(*filters).values(**kwargs))
+        filter = [Promocode.code == code]
+        await session.execute(update(Promocode).where(*filter).values(**kwargs))
         await session.commit()
 
     @classmethod
-    async def exists(cls, session: AsyncSession, **kwargs) -> bool:
+    async def exists(cls, session: AsyncSession, code: str) -> bool:
         """
-        Check if a promocode exists in the database based on the provided filters.
+        Check if a promocode with the given code exists in the database.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            kwargs (dict): The filters for checking the promocode (e.g., code="ABC123").
+            code (str): The promocode code to check for existence.
 
         Returns:
             bool: True if the promocode exists, otherwise False.
@@ -102,6 +109,33 @@ class Promocode(Base):
         Example:
             exists = await Promocode.exists(session, code="ABC123")
         """
-        filters = [*[getattr(Promocode, key) == value for key, value in kwargs.items()]]
-        query = await session.execute(select(Promocode).filter(*filters))
-        return query.scalar() is not None
+        filter = [Promocode.code == code]
+        query = await session.execute(select(Promocode).where(*filter))
+        return query.scalar_one_or_none() is not None
+
+    @classmethod
+    async def delete(cls, session: AsyncSession, code: str) -> bool:
+        """
+        Delete a promocode from the database based on the promocode's code.
+
+        Arguments:
+            session (AsyncSession): The asynchronous SQLAlchemy session.
+            code (str): The promocode code to delete.
+
+        Returns:
+            bool: True if the promocode was successfully deleted, False otherwise.
+
+        Example:
+            deleted = await Promocode.delete(session, code="ABC123")
+        """
+        filter = [Promocode.code == code]
+        async with session.begin():
+            query = await session.execute(select(Promocode).where(*filter))
+            promocode = query.scalar_one_or_none()
+
+            if promocode:
+                await session.delete(promocode)
+                await session.commit()
+                return True
+            else:
+                return False

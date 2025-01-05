@@ -17,16 +17,6 @@ class IsAdmin(BaseFilter):
 
     admins_ids: list[int] = []
 
-    @classmethod
-    def set_admins(cls, admins_ids: list[int]) -> None:
-        """
-        Set the list of admin user IDs.
-
-        Arguments:
-            admins_ids (list[int]): List of admin IDs.
-        """
-        cls.admins_ids = admins_ids
-
     async def __call__(self, event: TelegramObject) -> bool:
         """
         Check if the user is an admin.
@@ -42,3 +32,13 @@ class IsAdmin(BaseFilter):
 
         is_dev = await IsDev()(event)
         return event.from_user.id in self.admins_ids or is_dev
+
+    @classmethod
+    def set_admins(cls, admins_ids: list[int]) -> None:
+        """
+        Set the list of admin user IDs.
+
+        Arguments:
+            admins_ids (list[int]): List of admin IDs.
+        """
+        cls.admins_ids = admins_ids

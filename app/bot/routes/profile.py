@@ -8,14 +8,14 @@ from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsPrivate
 from app.bot.keyboards.profile import buy_subscription_keyboard, show_key_keyboard
-from app.bot.navigation import Navigation
-from app.bot.services import ClientService, VPNService
+from app.bot.navigation import NavProfile
+from app.bot.services import ClientData, VPNService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-async def prepare_message(user: TelegramUser, client: ClientService) -> str:
+async def prepare_message(user: TelegramUser, client_data: ClientData) -> str:
     """
     Prepares the user's profile message, including subscription and statistics details.
 
@@ -26,39 +26,42 @@ async def prepare_message(user: TelegramUser, client: ClientService) -> str:
     Returns:
         str: A formatted message with the user's profile, subscription, and statistics.
     """
-    header_text = _("👤 *Your profile:*\n" "Name: {name}\n" "ID: {id}\n").format(
-        name=user.first_name, id=user.id
+    profile = (
+        _("👤 *Your profile:*\n" "Name: {name}\n" "ID: {id}\n").format(
+            name=user.first_name, id=user.id
+        )
+        + "\n"
     )
-    header_text += "\n"
 
-    if not client:
-        no_subscription_text = _(
+    if not client_data:
+        subscription = _(
             "_You don't have a subscription yet. "
             "To purchase one, go to the subscription page by clicking the button below._"
         )
-        return header_text + no_subscription_text
+        return profile + subscription
 
-    subscription_text = _("📅 *Subscription:*\n" "Devices: {devices}\n").format(
-        devices=client.max_devices
+    subscription = _("📅 *Subscription:*\n" "Devices: {devices}\n").format(
+        devices=client_data.max_devices
+    )
+    subscription += (
+        _("_Subscription period has expired._\n")
+        if client_data.has_subscription_expired
+        else _("Expires in: {expiry_time}\n").format(expiry_time=client_data.expiry_time)
+    )
+    subscription += "\n"
+
+    statistics = _(
+        "📊 *Statistics:*\n" "Total: {total}\n" "Uploaded: ↑ {up}\n" "Downloaded: ↓ {down}"
+    ).format(
+        total=client_data.traffic_used,
+        up=client_data.traffic_up,
+        down=client_data.traffic_down,
     )
 
-    if client.has_subscription_expired:
-        subscription_text += _("_Subscription period has expired._\n")
-    else:
-        subscription_text += _("Expires in: {expiry_time}\n").format(
-            expiry_time=client.expiry_time,
-        )
-
-    subscription_text += "\n"
-
-    statistics_text = _(
-        "📊 *Statistics:*\n" "Total: {total}\n" "Uploaded: ↑ {up}\n" "Downloaded: ↓ {down}"
-    ).format(total=client.traffic_used, up=client.traffic_up, down=client.traffic_down)
-
-    return header_text + subscription_text + statistics_text
+    return profile + subscription + statistics
 
 
-@router.callback_query(F.data == Navigation.PROFILE, IsPrivate())
+@router.callback_query(F.data == NavProfile.MAIN, IsPrivate())
 async def callback_profile(callback: CallbackQuery, vpn_service: VPNService) -> None:
     """
     Handler for opening the user's profile.
@@ -67,25 +70,20 @@ async def callback_profile(callback: CallbackQuery, vpn_service: VPNService) -> 
         callback (CallbackQuery): The callback query object containing user interaction.
         vpn_service (VPNService): Service for managing VPN subscriptions and data retrieval.
     """
-    logger.info(f"User {callback.from_user.id} opened profile.")
+    logger.info(f"User {callback.from_user.id} opened profile page.")
     client_data = await vpn_service.get_client_data(callback.from_user.id)
-    client = ClientService(client_data)
-
-    if client:
-        if not client.has_subscription_expired:
-            reply_markup = show_key_keyboard()
-        else:
-            reply_markup = buy_subscription_keyboard()
-    else:
-        reply_markup = buy_subscription_keyboard()
-
+    reply_markup = (
+        show_key_keyboard()
+        if client_data and not client_data.has_subscription_expired
+        else buy_subscription_keyboard()
+    )
     await callback.message.edit_text(
-        text=await prepare_message(callback.from_user, client),
+        text=await prepare_message(callback.from_user, client_data),
         reply_markup=reply_markup,
     )
 
 
-@router.callback_query(F.data == Navigation.SHOW_KEY, IsPrivate())
+@router.callback_query(F.data == NavProfile.SHOW_KEY, IsPrivate())
 async def callback_show_key(callback: CallbackQuery, vpn_service: VPNService) -> None:
     """
     Handler for showing the user's VPN key.

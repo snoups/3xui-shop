@@ -101,13 +101,23 @@ class Plan:
         return plan_dict
 
 
-class PlansService:
+class PlanService:
     """
-    Provides plans data and utilities for handling subscription plans and pricing.
+    Service for managing subscription plans and pricing.
 
-    Loads plans configurations from a JSON file and provides methods to interact with
-    the plan data, such as getting a plan by device count, calculating prices,
-    and converting device count/duration to readable formats.
+    Loads plans from a JSON file and provides methods to interact with plans data,
+    such as getting a plan by device count, calculating prices, and converting
+    durations to readable formats.
+
+    Attributes:
+        plans (list[Plan]): A list of available plans.
+        durations (list[int]): A list of available durations in days.
+
+    Methods:
+        get_plan(devices): Get a plan by device count.
+        get_price_for_duration(prices, duration, currency): Get price for a given duration.
+        convert_devices_to_title(devices): Convert devices count to a human-readable string.
+        convert_days_to_period(days): Convert duration in days to a human-readable period.
     """
 
     def __init__(self) -> None:
@@ -149,17 +159,18 @@ class PlansService:
         Get the plan with a specific device count.
 
         Arguments:
-            devices (int): The device count to search for.
+            devices (int): The number of devices the plan supports.
 
         Returns:
-            Plan | None: The plan matching the device count or None if not found.
+            Plan | None: The plan with the specified device count, or None if not found.
         """
-        logger.debug(f"Searching for plan with devices: {devices}")
         plan = next((plan for plan in self.plans if plan.devices == devices), None)
+
         if plan:
             logger.debug(f"Found plan with {devices} devices")
         else:
-            logger.warning(f"Plan with {devices} devices not found.")
+            logger.error(f"Plan with {devices} devices not found.")
+
         return plan
 
     @staticmethod
@@ -168,12 +179,12 @@ class PlansService:
         Get the price for a specific duration and currency.
 
         Arguments:
-            prices (dict): The prices dictionary.
-            duration (int): The duration in days.
-            currency (str): The currency to get the price for (default is 'RUB').
+            prices (dict): Prices dictionary.
+            duration (int): Duration in days.
+            currency (str): The currency for the price (default 'RUB').
 
         Returns:
-            float: The price for the specified duration and currency.
+            float: The price for the given duration and currency.
         """
         price = prices.get(currency, {}).get(str(duration), 0.0)
         logger.debug(f"Price for {duration} days in {currency} currency: {price}")
@@ -182,13 +193,13 @@ class PlansService:
     @staticmethod
     def convert_devices_to_title(devices: int) -> str:
         """
-        Convert the device count to a human-readable string.
+        Convert device count to a human-readable format.
 
         Arguments:
-            devices (int): The number of devices supported by the plan.
+            devices (int): Number of devices the plan supports.
 
         Returns:
-            str: The device count in a readable format.
+            str: Human-readable device count.
         """
         if devices == -1:
             logger.debug("Devices count is unlimited.")
@@ -202,10 +213,10 @@ class PlansService:
         Convert the number of days to a human-readable period.
 
         Arguments:
-            days (int): The duration in days.
+            days (int): Duration in days.
 
         Returns:
-            str: The duration in a readable format, such as "1 year", "3 months", etc.
+            str: Human-readable duration (e.g., "1 year", "3 months", etc.).
         """
         if days == -1:
             logger.debug("Duration is unlimited.")

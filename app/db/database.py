@@ -11,6 +11,10 @@ class Database:
     This class is responsible for creating and managing the database connection engine,
     initializing the database schema, and handling asynchronous sessions for interacting
     with the database.
+
+    Attributes:
+        engine: The SQLAlchemy async engine used for database connections.
+        session: The session maker for creating async database sessions.
     """
 
     def __init__(self, config: DatabaseConfig) -> None:

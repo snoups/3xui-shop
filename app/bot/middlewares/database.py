@@ -30,7 +30,6 @@ class DBSessionMiddleware(BaseMiddleware):
         Arguments:
             session (async_sessionmaker): A session maker that creates async database sessions.
         """
-        super().__init__()
         self.session = session
         logger.debug("DBSessionMiddleware initialized.")
 
@@ -75,4 +74,4 @@ class DBSessionMiddleware(BaseMiddleware):
             data["user"] = user
             data["session"] = session
             logger.debug("Session and user added to handler data.")
-            return await handler(event, data)
+        return await handler(event, data)

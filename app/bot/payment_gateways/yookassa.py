@@ -6,7 +6,7 @@ from yookassa.domain.models.confirmation.request.confirmation_redirect import (
 )
 from yookassa.domain.response import PaymentResponse
 
-from app.bot.navigation import SubscriptionCallback
+# from app.bot.navigation import SubscriptionCallback
 
 
 class Yookassa:
@@ -27,7 +27,7 @@ class Yookassa:
         """
         Configuration.configure(shop_id, secret_key)
 
-    def create_payment(self, data: SubscriptionCallback) -> str:
+    def create_payment(self, data) -> str:
         """
         Create a payment link for the subscription using Yookassa.
 

@@ -5,13 +5,12 @@ from datetime import datetime, timezone
 
 from aiogram.utils.i18n import ngettext as _
 
+logger = logging.getLogger(__name__)
+
 UNLIMITED = "∞"
 
 
-logger = logging.getLogger(__name__)
-
-
-class ClientService:
+class ClientData:
     """
     Service for managing client data related to traffic, number of devices and subscription expiry.
 
@@ -23,26 +22,38 @@ class ClientService:
         client_data (dict): Dictionary containing client-related data such as traffic and expiry.
     """
 
-    def __init__(self, client_data: dict) -> None:
-        """
-        Initialize the ClientService instance.
+    def __init__(
+        self,
+        max_devices: int,
+        traffic_total: int,
+        traffic_remaining: int,
+        traffic_used: int,
+        traffic_up: int,
+        traffic_down: int,
+        expiry_time: str,
+    ) -> None:
+        self._max_devices = max_devices
+        self._traffic_total = traffic_total
+        self._traffic_remaining = traffic_remaining
+        self._traffic_used = traffic_used
+        self._traffic_up = traffic_up
+        self._traffic_down = traffic_down
+        self._expiry_time = expiry_time
+        logger.debug(f"ClientData initialized: {self.__str__()}")
 
-        Arguments:
-            client_data (dict): A dictionary containing client data.
+    def __str__(self) -> str:
         """
-        self.client_data = client_data
-        logger.debug(f"ClientService initialized with data: {client_data}")
-
-    def __bool__(self) -> bool:
-        """
-        Return whether the client data exists.
+        Return a string representation of the ClientData instance.
 
         Returns:
-            bool: True if client data exists, False otherwise.
+            str: Formatted string with client data.
         """
-        exists = bool(self.client_data)
-        logger.debug(f"Client data existence check: {exists}")
-        return exists
+        return (
+            f"ClientData(max_devices={self._max_devices}, traffic_total={self._traffic_total}, "
+            f"traffic_remaining={self._traffic_remaining}, traffic_used={self._traffic_used}, "
+            f"traffic_up={self._traffic_up}, traffic_down={self._traffic_down}, "
+            f"expiry_time={self._expiry_time})"
+        )
 
     @property
     def max_devices(self) -> str:
@@ -50,9 +61,9 @@ class ClientService:
         Return the maximum number of devices allowed for the client.
 
         Returns:
-            str: The maximum number of devices the client can use
+            str: The maximum number of devices the client can use.
         """
-        devices = self.client_data.get("max_devices", 1)
+        devices = self._max_devices
         if devices == -1:
             return UNLIMITED
         return devices
@@ -65,7 +76,7 @@ class ClientService:
         Returns:
             str: Total traffic in a human-readable format.
         """
-        return self._convert_size(self.client_data.get("traffic_total", 0))
+        return self._convert_size(self._traffic_total)
 
     @property
     def traffic_remaining(self) -> str:
@@ -75,7 +86,7 @@ class ClientService:
         Returns:
             str: Remaining traffic in a human-readable format.
         """
-        return self._convert_size(self.client_data.get("traffic_remaining", 0))
+        return self._convert_size(self._traffic_remaining)
 
     @property
     def traffic_used(self) -> str:
@@ -85,7 +96,7 @@ class ClientService:
         Returns:
             str: Used traffic in a human-readable format.
         """
-        return self._convert_size(self.client_data.get("traffic_used", 0))
+        return self._convert_size(self._traffic_used)
 
     @property
     def traffic_up(self) -> str:
@@ -95,7 +106,7 @@ class ClientService:
         Returns:
             str: Uploaded traffic in a human-readable format.
         """
-        return self._convert_size(self.client_data.get("traffic_up", 0))
+        return self._convert_size(self._traffic_up)
 
     @property
     def traffic_down(self) -> str:
@@ -105,7 +116,7 @@ class ClientService:
         Returns:
             str: Downloaded traffic in a human-readable format.
         """
-        return self._convert_size(self.client_data.get("traffic_down", 0))
+        return self._convert_size(self._traffic_down)
 
     @property
     def expiry_time(self) -> str:
@@ -115,7 +126,7 @@ class ClientService:
         Returns:
             str: Time left until subscription expiry.
         """
-        return self._time_left_to_expiry(self.client_data.get("expiry_time", 0))
+        return self._time_left_to_expiry(self._expiry_time)
 
     @property
     def has_subscription_expired(self) -> bool:
@@ -125,9 +136,8 @@ class ClientService:
         Returns:
             bool: True if the subscription expired, False otherwise.
         """
-        expiry_time = self.client_data.get("expiry_time", -1)
         current_time = time.time() * 1000
-        expired = expiry_time != -1 and current_time > expiry_time
+        expired = self._expiry_time != -1 and current_time > self._expiry_time
         logger.debug(f"Subscription expired: {expired}")
         return expired
 

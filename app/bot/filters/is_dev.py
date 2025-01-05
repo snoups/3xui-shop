@@ -15,16 +15,6 @@ class IsDev(BaseFilter):
 
     developer_id: int
 
-    @classmethod
-    def set_developer(cls, developer_id: int) -> None:
-        """
-        Set the list of admin user IDs.
-
-        Arguments:
-            admins_ids (list[int]): List of admin IDs.
-        """
-        cls.developer_id = developer_id
-
     async def __call__(self, event: TelegramObject) -> bool:
         """
         Check if the user is an admin.
@@ -37,4 +27,15 @@ class IsDev(BaseFilter):
         """
         if not hasattr(event, "from_user") or not event.from_user:
             return False
+
         return event.from_user.id == self.developer_id
+
+    @classmethod
+    def set_developer(cls, developer_id: int) -> None:
+        """
+        Set the list of admin user IDs.
+
+        Arguments:
+            admins_ids (list[int]): List of admin IDs.
+        """
+        cls.developer_id = developer_id

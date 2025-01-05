@@ -3,11 +3,11 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button, back_to_main_menu_button
-from app.bot.navigation import Navigation, SubscriptionCallback
-from app.bot.services.plans import PlansService
+from app.bot.navigation import NavDownload, NavSubscription, SubscriptionData
+from app.bot.services import PlanService
 
 
-def pay_keyboard(pay_url: str, callback_data: SubscriptionCallback) -> InlineKeyboardMarkup:
+def pay_keyboard(pay_url: str, callback_data: SubscriptionData) -> InlineKeyboardMarkup:
     """
     Generates a payment keyboard with a link to the payment URL and a back button.
 
@@ -22,29 +22,29 @@ def pay_keyboard(pay_url: str, callback_data: SubscriptionCallback) -> InlineKey
 
     builder.row(InlineKeyboardButton(text=_("💸 Pay"), url=pay_url))
 
-    callback_data.state = Navigation.DURATION
+    callback_data.state = NavSubscription.DURATION
     builder.row(back_button(callback_data.pack()))
     return builder.as_markup()
 
 
 def payment_method_keyboard(
-    callback_data: SubscriptionCallback,
-    plans_service: PlansService,
+    callback_data: SubscriptionData,
+    plan_service: PlanService,
 ) -> InlineKeyboardMarkup:
     """
     Generates a keyboard for choosing a payment method.
 
     Arguments:
         callback_data (SubscriptionCallback): Data used to track user navigation and selections.
-        plans_service (PlansService): Service providing subscription plans.
+        plans_service (PlanService): Service providing subscription plans.
 
     Returns:
         InlineKeyboardMarkup: A keyboard with buttons for each payment method.
     """
     builder = InlineKeyboardBuilder()
-    plan = plans_service.get_plan(callback_data.devices)
+    plan = plan_service.get_plan(callback_data.devices)
 
-    callback_data.state = Navigation.PAY_YOOKASSA
+    callback_data.state = NavSubscription.PAY_YOOKASSA
     price = plan.prices.rub[callback_data.duration]
     builder.row(
         InlineKeyboardButton(
@@ -52,7 +52,7 @@ def payment_method_keyboard(
             callback_data=callback_data.pack(),
         )
     )
-    callback_data.state = Navigation.PAY_TELEGRAM_STARS
+    callback_data.state = NavSubscription.PAY_TELEGRAM_STARS
     price = plan.prices.xtr[callback_data.duration]
     builder.row(
         InlineKeyboardButton(
@@ -60,7 +60,7 @@ def payment_method_keyboard(
             callback_data=callback_data.pack(),
         )
     )
-    callback_data.state = Navigation.PAY_CRYPTOMUS
+    callback_data.state = NavSubscription.PAY_CRYPTOMUS
     price = plan.prices.usd[callback_data.duration]
     builder.row(
         InlineKeyboardButton(
@@ -69,7 +69,7 @@ def payment_method_keyboard(
         )
     )
 
-    callback_data.state = Navigation.DEVICES
+    callback_data.state = NavSubscription.DEVICES
     builder.row(back_button(callback_data.pack()))
     return builder.as_markup()
 
@@ -88,7 +88,7 @@ def payment_success_keyboard() -> InlineKeyboardMarkup:
     builder.row(
         InlineKeyboardButton(
             text=_("📥 Download app"),
-            callback_data=Navigation.DOWNLOAD,
+            callback_data=NavDownload.MAIN,
         )
     )
 

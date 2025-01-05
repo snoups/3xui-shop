@@ -3,7 +3,7 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.admin_tools import admin_tools_button
-from app.bot.navigation import Navigation
+from app.bot.navigation import NavProfile, NavRefferal, NavSubscription, NavSupport
 
 
 def main_menu_keyboard(is_admin: bool) -> InlineKeyboardMarkup:
@@ -19,12 +19,12 @@ def main_menu_keyboard(is_admin: bool) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.row(
-        InlineKeyboardButton(text=_("👤 Profile"), callback_data=Navigation.PROFILE),
-        InlineKeyboardButton(text=_("💳 Subscription"), callback_data=Navigation.SUBSCRIPTION),
+        InlineKeyboardButton(text=_("👤 Profile"), callback_data=NavProfile.MAIN),
+        InlineKeyboardButton(text=_("💳 Subscription"), callback_data=NavSubscription.MAIN),
     )
     builder.row(
-        InlineKeyboardButton(text=_("👥 Referral Program"), callback_data=Navigation.REFERRAL),
-        InlineKeyboardButton(text=_("🆘 Support"), callback_data=Navigation.SUPPORT),
+        InlineKeyboardButton(text=_("👥 Referral Program"), callback_data=NavRefferal.MAIN),
+        InlineKeyboardButton(text=_("🆘 Support"), callback_data=NavSupport.MAIN),
     )
 
     if is_admin:

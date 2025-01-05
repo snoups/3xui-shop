@@ -9,7 +9,13 @@ from aiogram.utils.i18n import I18n
 
 from app.bot import commands, filters, middlewares, routes
 from app.bot.middlewares import MaintenanceMiddleware
-from app.bot.services import PlansService, PromocodeService, VPNService
+from app.bot.services import (
+    NotificationService,
+    PlanService,
+    PromocodeService,
+    ServerService,
+    VPNService,
+)
 from app.config import DEFAULT_LOCALES_DIR, Config, load_config
 from app.db.database import Database
 from app.logger import setup_logging
@@ -25,19 +31,20 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
         dispatcher (Dispatcher): The dispatcher instance.
         bot (Bot): The bot instance.
     """
-    logger.info("Bot stopped.")
     db: Database = dispatcher.get("db")
     config: Config = dispatcher.get("config")
+    notification_service: NotificationService = dispatcher.get("notification_service")
 
     # Notify developer about bot stop
     if config.bot.DEV_ID:
-        await bot.send_message(chat_id=config.bot.DEV_ID, text="#BotStopped")
+        await notification_service.notify_by_id(config.bot.DEV_ID, "#BotStopped")
 
     # Cleanup resources
     await commands.delete(bot)
     await bot.delete_webhook()
     await bot.session.close()
     await db.close()
+    logger.info("Bot stopped.")
 
 
 async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
@@ -50,10 +57,11 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
     """
     logger.info("Bot started.")
     config: Config = dispatcher.get("config")
+    notification_service: NotificationService = dispatcher.get("notification_service")
 
     # Notify developer about bot start
     if config.bot.DEV_ID:
-        await bot.send_message(chat_id=config.bot.DEV_ID, text="#BotStarted")
+        await notification_service.notify_by_id(config.bot.DEV_ID, "#BotStarted")
 
 
 async def main() -> None:
@@ -70,10 +78,19 @@ async def main() -> None:
     db = Database(config.database)
     storage = MemoryStorage()  # TODO: REDIS
     bot = Bot(token=config.bot.TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN))
-    dp = Dispatcher(storage=storage, config=config, bot=bot, db=db)
+    notification_service = NotificationService(bot)
+    dp = Dispatcher(
+        storage=storage,
+        config=config,
+        bot=bot,
+        db=db,
+        notification_service=notification_service,
+    )
     i18n = I18n(path=DEFAULT_LOCALES_DIR, default_locale="en", domain="bot")
-    plans_service = PlansService()
+    I18n.set_current(i18n)
+    plan_service = PlanService()
     promocode_service = PromocodeService(db.session)
+    server_service = ServerService(db.session)
     vpn_service = VPNService(db.session, config, promocode_service)
 
     # Register event handlers
@@ -91,13 +108,14 @@ async def main() -> None:
 
     # Register middlewares
     middlewares.register(
-        bot,
         dp,
         config=config,
         session=db.session,
         i18n=i18n,
-        plans=plans_service,
+        plan=plan_service,
+        notification=notification_service,
         promocode=promocode_service,
+        server=server_service,
         vpn=vpn_service,
     )
 

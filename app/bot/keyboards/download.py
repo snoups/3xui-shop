@@ -3,14 +3,12 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
-from app.bot.navigation import Navigation
+from app.bot.navigation import NavDownload, NavSupport
 
 
 def platforms_keyboard() -> InlineKeyboardMarkup:
     """
     Generates a keyboard for selecting the platform to download the app.
-
-    Options include iOS, Android, and Windows with a back button to connection instructions.
 
     Returns:
         InlineKeyboardMarkup: Keyboard with platform selection options.
@@ -18,21 +16,21 @@ def platforms_keyboard() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.row(
-        InlineKeyboardButton(text="🍏 IOS", callback_data=Navigation.PLATFORM_IOS),
-        InlineKeyboardButton(text="🤖 Android", callback_data=Navigation.PLATFORM_ANDROID),
-        InlineKeyboardButton(text="💻 Windows", callback_data=Navigation.PLATFORM_WINDOWS),
+        InlineKeyboardButton(text="🍏 IOS", callback_data=NavDownload.PLATFORM_IOS),
+        InlineKeyboardButton(text="🤖 Android", callback_data=NavDownload.PLATFORM_ANDROID),
+        InlineKeyboardButton(text="💻 Windows", callback_data=NavDownload.PLATFORM_WINDOWS),
     )
 
-    builder.row(back_button(Navigation.HOW_TO_CONNECT))
+    builder.row(back_button(NavSupport.HOW_TO_CONNECT))
     return builder.as_markup()
 
 
-def download_keyboard(platform: Navigation, key: str) -> InlineKeyboardMarkup:
+def download_keyboard(platform: NavDownload, key: str) -> InlineKeyboardMarkup:
     """
     Generates a keyboard with download and connection options based on the selected platform.
 
     Arguments:
-        platform (Navigation): The selected platform for download.
+        platform (NavDownload): The selected platform for download.
         key (str): Unique identifier used in the connection URL.
 
     Returns:
@@ -41,10 +39,10 @@ def download_keyboard(platform: Navigation, key: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     # v2raytun://import/ | hiddify://import/ #TODO: TinyUrl not work in Russia
-    if platform == Navigation.PLATFORM_IOS:
+    if platform == NavDownload.PLATFORM_IOS:
         download = "https://apps.apple.com/ru/app/v2raytun/id6476628951"
         connect = f"https://tinyurl.com/bbpy5bx7/{key}"
-    elif platform == Navigation.PLATFORM_ANDROID:
+    elif platform == NavDownload.PLATFORM_ANDROID:
         download = "https://play.google.com/store/apps/details?id=com.v2raytun.android"
         connect = f"https://tinyurl.com/bbpy5bx7/{key}"
     else:
@@ -59,5 +57,5 @@ def download_keyboard(platform: Navigation, key: str) -> InlineKeyboardMarkup:
         InlineKeyboardButton(text=_("🔌 Connect"), url=connect),
     )
 
-    builder.row(back_button(Navigation.DOWNLOAD))
+    builder.row(back_button(NavDownload.MAIN))
     return builder.as_markup()

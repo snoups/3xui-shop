@@ -3,7 +3,7 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
-from app.bot.navigation import Navigation
+from app.bot.navigation import NavDownload, NavMain, NavSubscription, NavSupport
 
 
 def contact_button(support_id: int) -> InlineKeyboardButton:
@@ -36,18 +36,18 @@ def support_keyboard(support_id: int) -> InlineKeyboardMarkup:
     builder.row(
         InlineKeyboardButton(
             text=_("❓ How to connect"),
-            callback_data=Navigation.HOW_TO_CONNECT,
+            callback_data=NavSupport.HOW_TO_CONNECT,
         )
     )
     builder.row(
         InlineKeyboardButton(
             text=_("❓ VPN not working"),
-            callback_data=Navigation.VPN_NOT_WORKING,
+            callback_data=NavSupport.VPN_NOT_WORKING,
         )
     )
     builder.row(contact_button(support_id))
 
-    builder.row(back_button(Navigation.MAIN_MENU))
+    builder.row(back_button(NavMain.MAIN_MENU))
     return builder.as_markup()
 
 
@@ -66,18 +66,18 @@ def how_to_connect_keyboard(support_id: int) -> InlineKeyboardMarkup:
     builder.row(
         InlineKeyboardButton(
             text=_("💳 Buy subscription"),
-            callback_data=Navigation.SUBSCRIPTION,
+            callback_data=NavSubscription.MAIN,
         )
     )
     builder.row(
         InlineKeyboardButton(
             text=_("📥 Download app"),
-            callback_data=Navigation.DOWNLOAD,
+            callback_data=NavDownload.MAIN,
         )
     )
     builder.row(contact_button(support_id))
 
-    builder.row(back_button(Navigation.SUPPORT))
+    builder.row(back_button(NavSupport.MAIN))
     return builder.as_markup()
 
 
@@ -95,5 +95,5 @@ def contact_keyboard(support_id: int) -> InlineKeyboardMarkup:
 
     builder.row(contact_button(support_id))
 
-    builder.row(back_button(Navigation.SUPPORT))
+    builder.row(back_button(NavSupport.MAIN))
     return builder.as_markup()

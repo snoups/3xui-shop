@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Awaitable, Callable
 
-from aiogram import BaseMiddleware, Bot
+from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Update
 from aiogram.utils.i18n import gettext as _
 
@@ -17,20 +17,8 @@ class MaintenanceMiddleware(BaseMiddleware):
 
     active: bool = False
 
-    @classmethod
-    def set_mode(cls, active: bool) -> None:
-        """
-        Enable or disable maintenance mode.
-
-        Arguments:
-            active (bool): True to enable, False to disable maintenance mode.
-        """
-        logger.info(f"Maintenance Mode: {'enabled' if active else 'disabled'}")
-        cls.active = active
-
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self) -> None:
         """Initialize the middleware."""
-        self.bot = bot
         logger.debug("MaintenanceMiddleware initialized.")
 
     async def __call__(
@@ -51,24 +39,31 @@ class MaintenanceMiddleware(BaseMiddleware):
             Any: Handler result if maintenance mode allows processing, else None.
         """
         if isinstance(event, Update):
-
             if event.message:
                 user_id = event.message.from_user.id
-                is_admin = await IsAdmin()(event.message)
             elif event.callback_query:
                 user_id = event.callback_query.from_user.id
-                is_admin = await IsAdmin()(event.callback_query)
-            else:
-                return await handler(event, data)
 
-            if self.active and not (is_admin, user_id == self.bot.id):
+            is_admin = await IsAdmin()(event.message or event.callback_query)
+
+            if self.active and not is_admin and user_id != event.bot.id:
                 logger.info(f"User {user_id} tried to interact with the bot during maintenance.")
+                text = _("🚧 The bot is in maintenance mode. Please wait.")
                 if event.message:
-                    await event.message.answer(_("The bot is in maintenance mode. Please wait."))
+                    await event.message.answer(text=text, show_alert=True)
                 elif event.callback_query:
-                    await event.callback_query.answer(
-                        _("The bot is in maintenance mode. Please wait."), show_alert=True
-                    )
+                    await event.callback_query.answer(text=text, show_alert=True)
                 return None
-            else:
-                return await handler(event, data)
+
+        return await handler(event, data)
+
+    @classmethod
+    def set_mode(cls, active: bool) -> None:
+        """
+        Enable or disable maintenance mode.
+
+        Arguments:
+            active (bool): True to enable, False to disable maintenance mode.
+        """
+        logger.info(f"Maintenance Mode: {'enabled' if active else 'disabled'}")
+        cls.active = active

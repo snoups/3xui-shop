@@ -2,8 +2,8 @@ from aiogram import Bot
 from aiogram.types import LabeledPrice
 from aiogram.utils.i18n import gettext as _
 
-from app.bot.navigation import SubscriptionCallback
-from app.bot.services.plans import PlansService
+# from app.bot.navigation import SubscriptionCallback
+from app.bot.services.plan import PlanService
 
 
 class TelegramStars:
@@ -15,7 +15,7 @@ class TelegramStars:
     via Telegram's invoice system with specified prices.
     """
 
-    async def create_payment(self, data: SubscriptionCallback, bot: Bot) -> str:
+    async def create_payment(self, data, bot: Bot) -> str:
         """
         Create a payment link for the subscription.
 
@@ -31,8 +31,8 @@ class TelegramStars:
         """
         prices = [LabeledPrice(label="XTR", amount=1)]
         # prices = [LabeledPrice(label="XTR", amount=data.price)]
-        devices = PlansService.convert_devices_to_title(data.devices)
-        duration = PlansService.convert_days_to_period(data.duration)
+        devices = PlanService.convert_devices_to_title(data.devices)
+        duration = PlanService.convert_days_to_period(data.duration)
         title = _("Subscription | {devices} for {duration}").format(
             devices=devices, duration=duration
         )

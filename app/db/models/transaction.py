@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import *
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -12,7 +13,8 @@ class Transaction(Base):
     """
     Model representing the Transaction table in the database.
 
-    This model is used to store transaction details related to a user's subscription or payment.
+    This model stores transaction details for a user's subscription or payment,
+    linking to a specific user and including payment info, amount, status, and timestamps.
     """
 
     __tablename__ = "transactions"
@@ -30,65 +32,74 @@ class Transaction(Base):
     user: Mapped["User"] = relationship("User", back_populates="transactions")
 
     @classmethod
+    async def get(cls, session: AsyncSession, payment_id: int) -> "Transaction | None":
+        """
+        Get a transaction by its payment ID.
+
+        Arguments:
+            session (AsyncSession): The asynchronous SQLAlchemy session.
+            payment_id (str): The unique payment ID.
+
+        Returns:
+            Transaction | None: The transaction object if found, or None if not found.
+
+        Example:
+            transaction = await Transaction.get(session, payment_id="abc123")
+        """
+        filter = [Transaction.payment_id == payment_id]
+        query = await session.execute(select(Transaction).where(*filter))
+        return query.scalar_one_or_none()
+
+    @classmethod
     async def get_by_user(cls, session: AsyncSession, user_id: int) -> list["Transaction"]:
         """
         Get all transactions for a specific user.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            user_id (int): The user's unique ID.
+            user_id (int): The unique user ID to fetch transactions for.
 
         Returns:
             list[Transaction]: A list of transactions for the user.
+
+        Example:
+            transactions = await Transaction.get_by_user(session, user_id=123456)
         """
-        result = await session.execute(select(Transaction).filter(Transaction.user_id == user_id))
-        return result.scalars().all()
+        filter = [Transaction.user_id == user_id]
+        query = await session.execute(select(Transaction).where(*filter))
+        return query.scalars().all()
 
     @classmethod
-    async def create_transaction(
-        cls,
-        session: AsyncSession,
-        user_id: int,
-        payment_id: str,
-        amount: float,
-        status: str,
-    ) -> "Transaction":
+    async def create(cls, session: AsyncSession, payment_id: str, **kwargs) -> "Transaction | None":
         """
         Create a new transaction in the database.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            user_id (int): The unique user ID.
-            payment_id (str): The unique payment ID for this transaction.
-            amount (float): The amount of the transaction.
-            status (str): The status of the transaction (e.g., "completed").
+            payment_id (str): The unique payment ID for the transaction.
+            kwargs (dict): Additional attributes for the transaction
+                (e.g., user_id, amount, status).
 
         Returns:
-            Transaction: The created transaction object.
+            Transaction | None: The created transaction object if successful,
+                or None if creation failed.
+
+        Example:
+            transaction = await Transaction.create(session, payment_id="abc123",
+                user_id=123, amount=50.0, status="completed")
         """
-        transaction = Transaction(
-            user_id=user_id,
-            payment_id=payment_id,
-            amount=amount,
-            status=status,
-        )
-        session.add(transaction)
-        await session.commit()
+        filter = [Transaction.payment_id == payment_id]
+        query = await session.execute(select(Transaction).where(*filter))
+        transaction = query.scalar_one_or_none()
+
+        if transaction is None:
+            transaction = Transaction(payment_id=payment_id, **kwargs)
+            session.add(transaction)
+
+            try:
+                await session.commit()
+            except IntegrityError:
+                await session.rollback()
+                return None
+
         return transaction
-
-    @classmethod
-    async def get(cls, session: AsyncSession, transaction_id: int) -> "Transaction | None":
-        """
-        Get a transaction by its ID.
-
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            transaction_id (int): The unique transaction ID.
-
-        Returns:
-            Transaction | None: The transaction object if found, or None if not found.
-        """
-        result = await session.execute(
-            select(Transaction).filter(Transaction.payment_id == transaction_id)
-        )
-        return result.scalar_one_or_none()

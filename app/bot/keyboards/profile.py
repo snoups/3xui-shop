@@ -3,7 +3,7 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button
-from app.bot.navigation import Navigation
+from app.bot.navigation import NavMain, NavProfile, NavSubscription
 
 
 def buy_subscription_keyboard() -> InlineKeyboardMarkup:
@@ -21,11 +21,11 @@ def buy_subscription_keyboard() -> InlineKeyboardMarkup:
     builder.row(
         InlineKeyboardButton(
             text=_("💳 Buy subscription"),
-            callback_data=Navigation.SUBSCRIPTION,
+            callback_data=NavSubscription.MAIN,
         )
     )
 
-    builder.row(back_button(Navigation.MAIN_MENU))
+    builder.row(back_button(NavMain.MAIN_MENU))
     return builder.as_markup()
 
 
@@ -43,9 +43,9 @@ def show_key_keyboard() -> InlineKeyboardMarkup:
     builder.row(
         InlineKeyboardButton(
             text=_("🔑 Show key"),
-            callback_data=Navigation.SHOW_KEY,
+            callback_data=NavProfile.SHOW_KEY,
         )
     )
 
-    builder.row(back_button(Navigation.MAIN_MENU))
+    builder.row(back_button(NavMain.MAIN_MENU))
     return builder.as_markup()

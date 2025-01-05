@@ -10,14 +10,14 @@ from app.bot.keyboards.support import (
     how_to_connect_keyboard,
     support_keyboard,
 )
-from app.bot.navigation import Navigation
+from app.bot.navigation import NavSupport
 from app.config import Config
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-@router.callback_query(F.data == Navigation.SUPPORT, IsPrivate())
+@router.callback_query(F.data == NavSupport.MAIN, IsPrivate())
 async def callback_support(callback: CallbackQuery, config: Config) -> None:
     """
     Handler for opening the support page.
@@ -26,7 +26,7 @@ async def callback_support(callback: CallbackQuery, config: Config) -> None:
         callback (CallbackQuery): The callback query object containing user interaction.
         config (Config): Configuration object containing bot settings.
     """
-    logger.info(f"User {callback.from_user.id} opened support.")
+    logger.info(f"User {callback.from_user.id} opened support page.")
     await callback.message.edit_text(
         text=_(
             "🆘 *Support:*\n"
@@ -38,7 +38,7 @@ async def callback_support(callback: CallbackQuery, config: Config) -> None:
     )
 
 
-@router.callback_query(F.data == Navigation.HOW_TO_CONNECT, IsPrivate())
+@router.callback_query(F.data == NavSupport.HOW_TO_CONNECT, IsPrivate())
 async def callback_how_to_connect(callback: CallbackQuery, config: Config) -> None:
     """
     Handler for opening the "How to Connect" page.
@@ -47,7 +47,7 @@ async def callback_how_to_connect(callback: CallbackQuery, config: Config) -> No
         callback (CallbackQuery): The callback query object containing user interaction.
         config (Config): Configuration object containing bot settings.
     """
-    logger.info(f"User {callback.from_user.id} opened how to connect.")
+    logger.info(f"User {callback.from_user.id} opened how to connect page.")
     await callback.message.edit_text(
         text=_(
             "ℹ️ *How to connect:*\n"
@@ -60,7 +60,7 @@ async def callback_how_to_connect(callback: CallbackQuery, config: Config) -> No
     )
 
 
-@router.callback_query(F.data == Navigation.VPN_NOT_WORKING, IsPrivate())
+@router.callback_query(F.data == NavSupport.VPN_NOT_WORKING, IsPrivate())
 async def callback_vpn_not_working(callback: CallbackQuery, config: Config) -> None:
     """
     Handler for opening the "VPN Not Working" troubleshooting page.
@@ -69,7 +69,7 @@ async def callback_vpn_not_working(callback: CallbackQuery, config: Config) -> N
         callback (CallbackQuery): The callback query object containing user interaction.
         config (Config): Configuration object containing bot settings.
     """
-    logger.info(f"User {callback.from_user.id} opened vpn_not_working.")
+    logger.info(f"User {callback.from_user.id} opened vpn not working page.")
     await callback.message.edit_text(
         text=_(
             "ℹ️ *VPN not working:*\n"

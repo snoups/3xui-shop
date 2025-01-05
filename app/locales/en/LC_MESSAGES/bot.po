@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-27 15:46+0500\n"
+"POT-Creation-Date: 2025-01-05 12:18+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,63 +18,75 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: app/bot/keyboards/admin_tools.py:17
+#: app/bot/keyboards/admin_tools.py:18
 msgid "🛠 Admin tools"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:33
-msgid "📊 Statistics"
-msgstr ""
-
-#: app/bot/keyboards/admin_tools.py:39
-msgid "👤 Editor users"
+#: app/bot/keyboards/admin_tools.py:38
+msgid "🌐 Server management"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:45
-msgid "🎟️ Editor promocodes"
+msgid "📊 Statistics"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:51
-msgid "📢 Send notification"
+msgid "👤 User editor"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:57
-msgid "💾 Create backup"
+msgid "🎟️ Promocode editor"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:63
-msgid "🚧 Maintenance mode"
+msgid "📢 Send notification"
 msgstr ""
 
 #: app/bot/keyboards/admin_tools.py:69
+msgid "💾 Create backup"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:75
+msgid "🚧 Maintenance mode"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:81
 msgid "🔄 Restart bot"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:91
+#: app/bot/keyboards/admin_tools.py:103
 msgid "🆕 Create"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:97
+#: app/bot/keyboards/admin_tools.py:109 app/bot/keyboards/admin_tools.py:219
 msgid "🗑️ Delete"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:103
+#: app/bot/keyboards/admin_tools.py:115 app/bot/keyboards/admin_tools.py:225
 msgid "✏️ Edit"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:127 app/bot/services/plans.py:225
+#: app/bot/keyboards/admin_tools.py:139 app/bot/services/plan.py:236
 #, fuzzy
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/keyboards/admin_tools.py:146
+#: app/bot/keyboards/admin_tools.py:163
 msgid "🔴 Turn off"
 msgstr ""
 
-#: app/bot/keyboards/admin_tools.py:153
+#: app/bot/keyboards/admin_tools.py:170
 msgid "🟢 Turn on"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:193
+msgid "🆕 Add"
+msgstr ""
+
+#: app/bot/keyboards/admin_tools.py:239
+msgid "✅ Confirm"
 msgstr ""
 
 #: app/bot/keyboards/back.py:17
@@ -85,11 +97,15 @@ msgstr ""
 msgid "◀️ Back to main menu"
 msgstr ""
 
-#: app/bot/keyboards/download.py:58
+#: app/bot/keyboards/back.py:63
+msgid "◀️ Cancel"
+msgstr ""
+
+#: app/bot/keyboards/download.py:56
 msgid "📥 Download"
 msgstr ""
 
-#: app/bot/keyboards/download.py:59
+#: app/bot/keyboards/download.py:57
 msgid "🔌 Connect"
 msgstr ""
 
@@ -109,6 +125,10 @@ msgstr ""
 msgid "🆘 Support"
 msgstr ""
 
+#: app/bot/keyboards/notification.py:19
+msgid "💥 Close"
+msgstr ""
+
 #: app/bot/keyboards/payment.py:23
 #, fuzzy
 msgid "💸 Pay"
@@ -122,7 +142,7 @@ msgstr ""
 msgid "📥 Download app"
 msgstr ""
 
-#: app/bot/keyboards/profile.py:23 app/bot/keyboards/subscription.py:44
+#: app/bot/keyboards/profile.py:23 app/bot/keyboards/subscription.py:46
 #: app/bot/keyboards/support.py:68
 msgid "💳 Buy subscription"
 msgstr ""
@@ -131,15 +151,15 @@ msgstr ""
 msgid "🔑 Show key"
 msgstr ""
 
-#: app/bot/keyboards/subscription.py:17
+#: app/bot/keyboards/subscription.py:18
 msgid "💳 Renew subscription"
 msgstr ""
 
-#: app/bot/keyboards/subscription.py:52
+#: app/bot/keyboards/subscription.py:54
 msgid "💳 Extend subscription"
 msgstr ""
 
-#: app/bot/keyboards/subscription.py:59
+#: app/bot/keyboards/subscription.py:61
 msgid "🎟️ Activate promocode"
 msgstr ""
 
@@ -155,74 +175,14 @@ msgstr ""
 msgid "❓ VPN not working"
 msgstr ""
 
+#: app/bot/middlewares/maintenance.py:51
+msgid "🚧 The bot is in maintenance mode. Please wait."
+msgstr ""
+
 #: app/bot/payment_gateways/telegram_stars.py:36
 #: app/bot/payment_gateways/telegram_stars.py:39
 #: app/bot/payment_gateways/yookassa.py:44
 msgid "Subscription | {devices} for {duration}"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:43
-msgid "🛠 *Admin tools:*"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:84 app/bot/routes/admin_tools.py:237
-msgid "🎟️ *Editor promocodes:*"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:122
-msgid "enabled"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:122
-msgid "disabled"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:124
-msgid "🚧 *Maintenance mode:*"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:153
-msgid ""
-"🎟️ *Editor promocodes:*\n"
-"\n"
-"_Specify the duration_"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:181
-msgid "🎟️ *Editor promocodes:*\n"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:185
-msgid "Your created promocode: ```{promocode}```"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:206
-msgid ""
-"🎟️ *Editor promocodes:*\n"
-"\n"
-"_Send promocode to delete_"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:231
-msgid "✅ Promocode {promocode} deleted successfully."
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:243
-msgid "❌ Failed to delete promocode. Please try again."
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:266
-msgid ""
-"🚧 *Maintenance mode:* enabled.\n"
-"\n"
-"_The bot is temporarily unavailable for users._"
-msgstr ""
-
-#: app/bot/routes/admin_tools.py:286
-msgid ""
-"🚧 *Maintenance mode:* disabled.\n"
-"\n"
-"_The bot is available for users._"
 msgstr ""
 
 #: app/bot/routes/download.py:26
@@ -250,11 +210,7 @@ msgid ""
 "✅ GUARANTEE AND TRIAL PERIOD\n"
 msgstr ""
 
-#: app/bot/routes/maintenance_mode.py:24 app/bot/routes/maintenance_mode.py:36
-msgid "The bot is in maintenance mode. Please wait."
-msgstr ""
-
-#: app/bot/routes/payment.py:58
+#: app/bot/routes/payment.py:63
 msgid ""
 "✅ *You selected:*\n"
 "\n"
@@ -266,14 +222,14 @@ msgid ""
 " VPN. The key will be available in your profile._"
 msgstr ""
 
-#: app/bot/routes/payment.py:142
+#: app/bot/routes/payment.py:148
 msgid ""
 "✅ *Payment successful!*\n"
 "\n"
 "Your subscription has been extended for {duration}\n"
 msgstr ""
 
-#: app/bot/routes/payment.py:153
+#: app/bot/routes/payment.py:159
 msgid ""
 "✅ *Payment successful!*\n"
 "\n"
@@ -293,13 +249,13 @@ msgid ""
 "ID: {id}\n"
 msgstr ""
 
-#: app/bot/routes/profile.py:36
+#: app/bot/routes/profile.py:37
 msgid ""
 "_You don't have a subscription yet. To purchase one, go to the "
 "subscription page by clicking the button below._"
 msgstr ""
 
-#: app/bot/routes/profile.py:42
+#: app/bot/routes/profile.py:43
 msgid ""
 "📅 *Subscription:*\n"
 "Devices: {devices}\n"
@@ -313,7 +269,7 @@ msgstr ""
 msgid "Expires in: {expiry_time}\n"
 msgstr ""
 
-#: app/bot/routes/profile.py:55
+#: app/bot/routes/profile.py:53
 msgid ""
 "📊 *Statistics:*\n"
 "Total: {total}\n"
@@ -321,21 +277,21 @@ msgid ""
 "Downloaded: ↓ {down}"
 msgstr ""
 
-#: app/bot/routes/profile.py:100
+#: app/bot/routes/profile.py:97
 msgid "🔑 *Your key:* (Closes after {seconds_text}) ```{key}```"
 msgstr ""
 
-#: app/bot/routes/profile.py:101
+#: app/bot/routes/profile.py:98
 msgid "6 seconds"
 msgstr ""
 
-#: app/bot/routes/profile.py:104
+#: app/bot/routes/profile.py:101
 msgid "1 second"
 msgid_plural "{} seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/routes/promocode.py:42
+#: app/bot/routes/promocode.py:44
 msgid ""
 "🎟️ *Activate promocode:*\n"
 "\n"
@@ -376,15 +332,15 @@ msgid ""
 "subscription to start using our service."
 msgstr ""
 
-#: app/bot/routes/subscription.py:105 app/bot/routes/subscription.py:149
+#: app/bot/routes/subscription.py:104 app/bot/routes/subscription.py:148
 msgid "⏳ *Specify the duration:*"
 msgstr ""
 
-#: app/bot/routes/subscription.py:127
+#: app/bot/routes/subscription.py:126
 msgid "🌐 *Select the number of devices:*"
 msgstr ""
 
-#: app/bot/routes/subscription.py:171
+#: app/bot/routes/subscription.py:170
 msgid "💳 *Choose a payment method:*"
 msgstr ""
 
@@ -419,68 +375,270 @@ msgid ""
 "If the issue persists, please contact support."
 msgstr ""
 
-#: app/bot/services/client.py:148 app/bot/services/client.py:150
-#: app/bot/services/client.py:164
+#: app/bot/routes/admin_tools/__init__.py:46
+msgid "🛠 *Admin tools:*"
+msgstr ""
+
+#: app/bot/routes/admin_tools/create_backup.py:33
+msgid "✅ Backup sent successfully!"
+msgstr ""
+
+#: app/bot/routes/admin_tools/create_backup.py:37
+msgid "❌ Database file not found!"
+msgstr ""
+
+#: app/bot/routes/admin_tools/create_backup.py:40
+msgid "❌ Failed to send backup!"
+msgstr ""
+
+#: app/bot/routes/admin_tools/create_backup.py:43
+msgid "❌ An error occurred during backup."
+msgstr ""
+
+#: app/bot/routes/admin_tools/maintenance_mode.py:27
+msgid "enabled."
+msgstr ""
+
+#: app/bot/routes/admin_tools/maintenance_mode.py:27
+msgid "disabled."
+msgstr ""
+
+#: app/bot/routes/admin_tools/maintenance_mode.py:29
+msgid "🚧 *Maintenance mode:*"
+msgstr ""
+
+#: app/bot/routes/admin_tools/maintenance_mode.py:45
+msgid "🚧 *Maintenance mode:* enabled."
+msgstr ""
+
+#: app/bot/routes/admin_tools/maintenance_mode.py:50
+msgid ""
+"🟢 Maintenance mode enabled.\n"
+"_The bot is temporarily unavailable for users._"
+msgstr ""
+
+#: app/bot/routes/admin_tools/maintenance_mode.py:66
+msgid "🚧 *Maintenance mode:* disabled."
+msgstr ""
+
+#: app/bot/routes/admin_tools/maintenance_mode.py:71
+msgid ""
+"🔴 Maintenance mode disabled.\n"
+"_The bot is available for users._"
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:61
+#: app/bot/routes/admin_tools/promocode_editor.py:154
+msgid "🎟️ *Promocode editor:*"
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:78
+#: app/bot/routes/admin_tools/promocode_editor.py:218
+msgid ""
+"🎟️ *Promocode editor:*\n"
+"\n"
+"_Specify the duration_"
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:99
+#: app/bot/routes/admin_tools/promocode_editor.py:246
+msgid "🎟️ *Promocode editor:*\n"
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:104
+msgid ""
+"Your created promocode:\n"
+"```{promocode}```\n"
+"Duration: {duration}"
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:129
+msgid ""
+"🎟️ *Promocode editor:*\n"
+"\n"
+"_Send promocode to delete_"
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:160
+msgid "✅ Promocode {promocode} deleted successfully."
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:168
+msgid "❌ Failed to delete promocode. Please try again."
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:190
+msgid ""
+"🎟️ *Promocode editor:*\n"
+"\n"
+"_Send promocode to edit_"
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:224
+msgid "❌ Promocode not found or already activated."
+msgstr ""
+
+#: app/bot/routes/admin_tools/promocode_editor.py:251
+msgid ""
+"Your edited promocode:\n"
+"```{promocode}```\n"
+"New duration: {duration}"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:53
+#: app/bot/routes/admin_tools/server_management.py:94
+#: app/bot/routes/admin_tools/server_management.py:103
+#: app/bot/routes/admin_tools/server_management.py:113
+#: app/bot/routes/admin_tools/server_management.py:174
+#: app/bot/routes/admin_tools/server_management.py:199
+#: app/bot/routes/admin_tools/server_management.py:226
+#: app/bot/routes/admin_tools/server_management.py:269
+#: app/bot/routes/admin_tools/server_management.py:307
+msgid "🌐 *Server management:*\n"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:58
+#: app/bot/routes/admin_tools/server_management.py:312
+msgid "- {name} ({status})\n"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:60
+#: app/bot/routes/admin_tools/server_management.py:314
+msgid "_The list of servers is empty._"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:88
+#: app/bot/routes/admin_tools/server_management.py:140
+msgid ""
+"🌐 *Server management:*\n"
+"\n"
+"_Please provide the server name_"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:96
+#: app/bot/routes/admin_tools/server_management.py:105
+#: app/bot/routes/admin_tools/server_management.py:115
+#: app/bot/routes/admin_tools/server_management.py:176
+#: app/bot/routes/admin_tools/server_management.py:201
+#: app/bot/routes/admin_tools/server_management.py:228
+#: app/bot/routes/admin_tools/server_management.py:271
+msgid "- name: {server_name}\n"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:97
+#: app/bot/routes/admin_tools/server_management.py:177
+msgid "_Please provide the server host_"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:106
+#: app/bot/routes/admin_tools/server_management.py:116
+#: app/bot/routes/admin_tools/server_management.py:202
+#: app/bot/routes/admin_tools/server_management.py:229
+#: app/bot/routes/admin_tools/server_management.py:272
+msgid "- host: {server_host}\n"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:107
+#: app/bot/routes/admin_tools/server_management.py:203
+msgid "_Please provide the server subscription_"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:118
+#: app/bot/routes/admin_tools/server_management.py:231
+#: app/bot/routes/admin_tools/server_management.py:274
+msgid "- subscription: {server_subscription}\n"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:122
+#: app/bot/routes/admin_tools/server_management.py:235
+msgid "_Please provide the maximum number of clients_"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:166
+msgid "❌ A server with this name already exists. Please provide a different name."
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:255
+msgid "❌ Please enter a valid number."
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:278
+msgid "- max clients: {server_max_clients}\n"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:280
+msgid "_Press confirm to add the server._"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:319
+msgid "✅ _Server added successfully._"
+msgstr ""
+
+#: app/bot/routes/admin_tools/server_management.py:326
+msgid "❌ _Failed to add the server._"
+msgstr ""
+
+#: app/bot/services/client.py:158 app/bot/services/client.py:160
+#: app/bot/services/client.py:174
 msgid "MB"
 msgstr ""
 
-#: app/bot/services/client.py:150
+#: app/bot/services/client.py:160
 msgid "GB"
 msgstr ""
 
-#: app/bot/services/client.py:150
+#: app/bot/services/client.py:160
 msgid "TB"
 msgstr ""
 
-#: app/bot/services/client.py:150
+#: app/bot/services/client.py:160
 msgid "PB"
 msgstr ""
 
-#: app/bot/services/client.py:150
+#: app/bot/services/client.py:160
 msgid "EB"
 msgstr ""
 
-#: app/bot/services/client.py:150
+#: app/bot/services/client.py:160
 msgid "ZB"
 msgstr ""
 
-#: app/bot/services/client.py:150
+#: app/bot/services/client.py:160
 msgid "YB"
 msgstr ""
 
-#: app/bot/services/client.py:190
+#: app/bot/services/client.py:200
 msgid "d"
 msgstr ""
 
-#: app/bot/services/client.py:192
+#: app/bot/services/client.py:202
 msgid "h"
 msgstr ""
 
-#: app/bot/services/client.py:194 app/bot/services/client.py:201
+#: app/bot/services/client.py:204 app/bot/services/client.py:211
 msgid "m"
 msgstr ""
 
-#: app/bot/services/plans.py:195
+#: app/bot/services/plan.py:206
 msgid "devices"
 msgstr ""
 
-#: app/bot/services/plans.py:197
+#: app/bot/services/plan.py:208
 msgid "1 device"
 msgid_plural "{} devices"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/services/plans.py:217
+#: app/bot/services/plan.py:228
 #, fuzzy
 msgid "1 year"
 msgid_plural "{} years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/services/plans.py:222
+#: app/bot/services/plan.py:233
 #, fuzzy
 msgid "1 month"
 msgid_plural "{} months"
 msgstr[0] ""
 msgstr[1] ""
-

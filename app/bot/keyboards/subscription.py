@@ -3,8 +3,8 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button, back_to_main_menu_button
-from app.bot.navigation import Navigation, SubscriptionCallback
-from app.bot.services.plans import PlansService
+from app.bot.navigation import NavSubscription, SubscriptionData
+from app.bot.services.plan import PlanService
 
 
 def renew_subscription_button() -> InlineKeyboardButton:
@@ -14,12 +14,14 @@ def renew_subscription_button() -> InlineKeyboardButton:
     Returns:
         InlineKeyboardButton: Button to renew the subscription.
     """
-    return InlineKeyboardButton(text=_("💳 Renew subscription"), callback_data=Navigation.PROCESS)
+    return InlineKeyboardButton(
+        text=_("💳 Renew subscription"), callback_data=NavSubscription.PROCESS
+    )
 
 
 def subscription_keyboard(
     has_subscription: bool,
-    callback_data: SubscriptionCallback,
+    callback_data: SubscriptionData,
 ) -> InlineKeyboardMarkup:
     """
     Generates a subscription keyboard with options based on the user's subscription status.
@@ -46,7 +48,7 @@ def subscription_keyboard(
             )
         )
     else:
-        callback_data.state = Navigation.EXTEND
+        callback_data.state = NavSubscription.EXTEND
         builder.row(
             InlineKeyboardButton(
                 text=_("💳 Extend subscription"),
@@ -57,7 +59,7 @@ def subscription_keyboard(
     builder.row(
         InlineKeyboardButton(
             text=_("🎟️ Activate promocode"),
-            callback_data=Navigation.PROMOCODE,
+            callback_data=NavSubscription.PROMOCODE,
         )
     )
 
@@ -66,8 +68,8 @@ def subscription_keyboard(
 
 
 def devices_keyboard(
-    plans_service: PlansService,
-    callback_data: SubscriptionCallback,
+    plan_service: PlanService,
+    callback_data: SubscriptionData,
 ) -> InlineKeyboardMarkup:
     """
     Generates a keyboard to select subscription devices.
@@ -75,32 +77,32 @@ def devices_keyboard(
     Displays a row of device options based on available plans, each updating the callback data.
 
     Arguments:
-        plans_service (PlansService): Service providing available plans.
+        plan_service (PlanService): Service providing available plans.
         callback_data (SubscriptionCallback): Data for tracking the user's selection.
 
     Returns:
         InlineKeyboardMarkup: Keyboard with device options and a back button.
     """
     builder = InlineKeyboardBuilder()
-    plans = plans_service.plans
+    plans = plan_service.plans
 
     for plan in plans:
         callback_data.devices = plan.devices
         builder.row(
             InlineKeyboardButton(
-                text=plans_service.convert_devices_to_title(plan.devices),
+                text=plan_service.convert_devices_to_title(plan.devices),
                 callback_data=callback_data.pack(),
             )
         )
 
     builder.adjust(2)
-    builder.row(back_button(Navigation.SUBSCRIPTION))
+    builder.row(back_button(NavSubscription.MAIN))
     return builder.as_markup()
 
 
 def duration_keyboard(
-    plans_service: PlansService,
-    callback_data: SubscriptionCallback,
+    plan_service: PlanService,
+    callback_data: SubscriptionData,
 ) -> InlineKeyboardMarkup:
     """
     Generates a keyboard for selecting subscription duration.
@@ -115,12 +117,12 @@ def duration_keyboard(
         InlineKeyboardMarkup: Keyboard with duration options and a back button.
     """
     builder = InlineKeyboardBuilder()
-    durations = plans_service.durations
+    durations = plan_service.durations
 
     for duration in durations:
         callback_data.duration = duration
-        period = plans_service.convert_days_to_period(duration)
-        price = plans_service.get_plan(callback_data.devices).prices.rub[duration]
+        period = plan_service.convert_days_to_period(duration)
+        price = plan_service.get_plan(callback_data.devices).prices.rub[duration]
         builder.row(
             InlineKeyboardButton(
                 text=f"{period} | {price} ₽",
@@ -131,9 +133,9 @@ def duration_keyboard(
     builder.adjust(2)
 
     if callback_data.is_extend:
-        builder.row(back_button(Navigation.SUBSCRIPTION))
+        builder.row(back_button(NavSubscription.MAIN))
     else:
-        callback_data.state = Navigation.PROCESS
+        callback_data.state = NavSubscription.PROCESS
         builder.row(back_button(callback_data.pack()))
 
     return builder.as_markup()

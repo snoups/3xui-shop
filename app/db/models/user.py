@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import *
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -13,8 +13,8 @@ class User(Base):
     """
     Model representing the User table in the database.
 
-    This model is used to store user information related to the bot, including their
-    unique ID, VPN ID, and other personal details.
+    This model stores user information related to the bot, including their unique ID, VPN ID, and
+    other personal details.
     """
 
     __tablename__ = "users"
@@ -31,33 +31,33 @@ class User(Base):
     )
 
     @classmethod
-    async def get(cls, session: AsyncSession, **kwargs) -> "User | None":
+    async def get(cls, session: AsyncSession, user_id: int) -> "User | None":
         """
-        Get a user from the database based on the specified filters.
-
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            kwargs (dict): The filters for selecting the user (e.g., user_id=123456).
-
-        Returns:
-            User | None: The user object if found, or None if not found.
-
-        Example:
-            user = await User.get(session, user_id=123456)
-        """
-        filters = [*[getattr(User, key) == value for key, value in kwargs.items()]]
-        query = await session.execute(select(User).where(*filters))
-        return query.scalar()
-
-    @classmethod
-    async def get_or_create(cls, session: AsyncSession, user_id: int, **kwargs) -> "User":
-        """
-        Get a user from the database or create a new one if not found.
+        Get a user by user_id.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
             user_id (int): The unique Telegram user ID.
-            kwargs (dict): Additional attributes for the user if creating a new one (e.g., vpn_id).
+
+        Returns:
+            User | None: The user object if found, else None.
+
+        Example:
+            user = await User.get(session, user_id=123456)
+        """
+        filter = [User.user_id == user_id]
+        query = await session.execute(select(User).where(*filter))
+        return query.scalar_one_or_none()
+
+    @classmethod
+    async def get_or_create(cls, session: AsyncSession, user_id: int, **kwargs) -> "User":
+        """
+        Get a user or create a new one if not found.
+
+        Arguments:
+            session (AsyncSession): The asynchronous SQLAlchemy session.
+            user_id (int): The unique Telegram user ID.
+            kwargs (dict): Additional attributes if creating a new user.
 
         Returns:
             User: The user object.
@@ -65,25 +65,18 @@ class User(Base):
         Example:
             user = await User.get_or_create(session, user_id=123456, vpn_id="vpn123")
         """
-        filters = [User.user_id == user_id]
-        result = await session.execute(select(User).filter(*filters))
+        filter = [User.user_id == user_id]
+        query = await session.execute(select(User).where(*filter))
+        user = query.scalar_one_or_none()
 
-        try:
-            user = result.scalar_one()
-            for key, value in kwargs.items():
-                if key != "vpn_id":
-                    setattr(user, key, value)
-        except NoResultFound:
+        if user is None:
             user = User(user_id=user_id, **kwargs)
             session.add(user)
-
-        try:
-            await session.commit()
-        except IntegrityError:
-            await session.rollback()
-            raise ValueError(
-                f"Error during user {user_id} creation or update, possibly due to integrity issues."
-            )
+            try:
+                await session.commit()
+            except IntegrityError:
+                await session.rollback()
+                return None
 
         return user
 
@@ -100,25 +93,25 @@ class User(Base):
         Example:
             await User.update(session, user_id=123456, first_name="John")
         """
-        filters = [User.user_id == user_id]
-        await session.execute(update(User).filter(*filters).values(**kwargs))
+        filter = [User.user_id == user_id]
+        await session.execute(update(User).where(*filter).values(**kwargs))
         await session.commit()
 
     @classmethod
-    async def exists(cls, session: AsyncSession, **kwargs) -> bool:
+    async def exists(cls, session: AsyncSession, user_id: int) -> bool:
         """
-        Check if a user exists in the database based on the provided filters.
+        Check if a user exists by user_id.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            kwargs (dict): The filters for checking the user (e.g., user_id=123456).
+            user_id (int): The unique Telegram user ID.
 
         Returns:
-            bool: True if the user exists, otherwise False.
+            bool: True if user exists, otherwise False.
 
         Example:
             exists = await User.exists(session, user_id=123456)
         """
-        filters = [*[getattr(User, key) == value for key, value in kwargs.items()]]
-        query = await session.execute(select(User).filter(*filters))
-        return query.scalar() is not None
+        filter = [User.user_id == user_id]
+        query = await session.execute(select(User).where(*filter))
+        return query.scalar_one_or_none() is not None

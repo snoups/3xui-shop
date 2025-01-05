@@ -61,7 +61,7 @@ class DatabaseConfig:  # TODO: Add support for different drivers
     Configuration for the database.
 
     Attributes:
-        HOST (str | None):  Host address of the database server (if available).
+        HOST (str | None): Host address of the database server (if available).
         PORT (int | None): Port number for the database server (if available).
         USERNAME (str | None): Username for database authentication.
         PASSWORD (str | None): Password for database authentication.
@@ -74,12 +74,12 @@ class DatabaseConfig:  # TODO: Add support for different drivers
     PASSWORD: str | None
     NAME: str
 
-    def url(self, driver: str = "sqlite+aiosqlite") -> str:
+    def url(self, driver: str = "sqlite+aiosqlite") -> str:  # TODO: MySQL
         """
-        Generates a database connection URL using the provided driver,
-        username, password, host, port, and database name.
+        Generates a database connection URL using the provided driver, username,
+        password, host, port, and database name.
 
-        Args:
+        Arguments:
             driver (str): Driver to use for the connection. Defaults to "sqlite+aiosqlite".
 
         Returns:
@@ -145,7 +145,7 @@ def load_config() -> Config:
     return Config(
         bot=BotConfig(
             TOKEN=env.str("BOT_TOKEN"),
-            ADMINS=env.list("BOT_ADMINS", subcast=int, default=[]),
+            ADMINS=env.list("BOT_ADMINS", subcast=list, default=[]),
             DEV_ID=env.int("BOT_DEV_ID"),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
         ),
