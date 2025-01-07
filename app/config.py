@@ -56,7 +56,7 @@ class XUIConfig:
 
 
 @dataclass
-class DatabaseConfig:  # TODO: Add support for different drivers
+class DatabaseConfig:
     """
     Configuration for the database.
 
@@ -74,7 +74,7 @@ class DatabaseConfig:  # TODO: Add support for different drivers
     PASSWORD: str | None
     NAME: str
 
-    def url(self, driver: str = "sqlite+aiosqlite") -> str:  # TODO: MySQL
+    def url(self, driver: str = "sqlite+aiosqlite") -> str:
         """
         Generates a database connection URL using the provided driver, username,
         password, host, port, and database name.

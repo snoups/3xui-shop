@@ -77,7 +77,13 @@ async def main() -> None:
     # Initialize components
     db = Database(config.database)
     storage = MemoryStorage()  # TODO: REDIS
-    bot = Bot(token=config.bot.TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN))
+    bot = Bot(
+        token=config.bot.TOKEN,
+        default=DefaultBotProperties(
+            parse_mode=ParseMode.MARKDOWN,
+            link_preview_is_disabled=True,
+        ),
+    )
     notification_service = NotificationService(bot)
     dp = Dispatcher(
         storage=storage,

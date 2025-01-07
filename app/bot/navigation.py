@@ -53,6 +53,7 @@ class NavAdminTools(str, Enum):
     MAIN = "admin_tools"
     SERVER_MANAGEMENT = "server_management"
     SHOW_SERVER = "show_server"
+    PING_SERVER = "ping_server"
     ADD_SERVER = "add_server"
     ADD_SERVER_BACK = "add_server_back"
     СONFIRM_ADD_SERVER = "сonfirm_add_server"
@@ -80,8 +81,8 @@ class NavAdminTools(str, Enum):
 class SubscriptionData(CallbackData, prefix="subscription"):
     state: NavSubscription
     is_extend: bool = False
-    user_id: int
-    message_id: int = 0
-    devices: int = 0
-    duration: int = 0
-    price: int = 0
+    user_id: int = None
+    message_id: int = None
+    devices: int = None
+    duration: int = None
+    price: int = None

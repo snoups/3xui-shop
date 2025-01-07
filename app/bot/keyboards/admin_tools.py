@@ -126,9 +126,6 @@ def promocode_duration_keyboard() -> InlineKeyboardMarkup:
     """
     Generates a keyboard for selecting promocode duration.
 
-    Arguments:
-        callback_data (CreatePromocodeCallback): Data for tracking promocode creation process.
-
     Returns:
         InlineKeyboardMarkup: Keyboard for selecting duration options with a back button.
     """
@@ -183,6 +180,9 @@ def servers_keyboard(servers: list) -> InlineKeyboardMarkup:
 
     Options include adding, deleting, and editing servers, with a back button.
 
+    Arguments:
+        servers (list): List of server objects to be displayed in the keyboard.
+
     Returns:
         InlineKeyboardMarkup: Keyboard with server management options and a back button.
     """
@@ -197,13 +197,10 @@ def servers_keyboard(servers: list) -> InlineKeyboardMarkup:
 
     server: Server
     for server in servers:
-        if server.online:
-            status = "🟢"
-        else:
-            status = "🔴"
+        status = "🟢" if server.online else "🔴"
         builder.row(
             InlineKeyboardButton(
-                text=f"{status} | {server.name} | {server.current_clients}/{server.max_clients}",
+                text=f"{status} {server.name}",
                 callback_data=NavAdminTools.SHOW_SERVER + f"_{server.name}",
             )
         )
@@ -213,25 +210,42 @@ def servers_keyboard(servers: list) -> InlineKeyboardMarkup:
 
 
 def server_keyboard(server_name: str) -> InlineKeyboardMarkup:
+    """
+    Generates a keyboard for a single server with options for pinging and deleting it.
+
+    Arguments:
+        server_name (str): The name of the server for which the keyboard is generated.
+
+    Returns:
+        InlineKeyboardMarkup: Keyboard with server options (ping and delete) and a back button.
+    """
     builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("📶 Ping"),
+            callback_data=NavAdminTools.PING_SERVER + f"_{server_name}",
+        )
+    )
     builder.row(
         InlineKeyboardButton(
             text=_("🗑️ Delete"),
             callback_data=NavAdminTools.DELETE_SERVER + f"_{server_name}",
         )
     )
-    builder.row(
-        InlineKeyboardButton(
-            text=_("✏️ Edit"),
-            callback_data=NavAdminTools.EDIT_SERVER + f"_{server_name}",
-        )
-    )
+
     builder.adjust(2)
-    builder.row(back_button(NavAdminTools.MAIN))
+    builder.row(back_button(NavAdminTools.SERVER_MANAGEMENT))
     return builder.as_markup()
 
 
 def confirm_add_server_keyboard() -> InlineKeyboardMarkup:
+    """
+    Generates a confirmation keyboard for adding a server.
+
+    Returns:
+        InlineKeyboardMarkup: Keyboard with a confirmation button and a back button.
+    """
     builder = InlineKeyboardBuilder()
 
     builder.row(

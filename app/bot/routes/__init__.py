@@ -23,9 +23,9 @@ def include(dp: Dispatcher) -> None:
     dp.include_routers(
         *[
             error.router,
+            main_menu.router,
             admin_tools.router,
             download.router,
-            main_menu.router,
             notification.router,
             profile.router,
             referral.router,

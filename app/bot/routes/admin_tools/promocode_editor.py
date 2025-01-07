@@ -252,7 +252,6 @@ async def callback_duration_selected(
             promocode=promocode.code,
             duration=PlanService.convert_days_to_period(promocode.duration),
         ),
-        duration=5,
     )
     await state.set_state(None)
 
