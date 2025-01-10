@@ -4,7 +4,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyboards.back import back_button, back_to_main_menu_button
 from app.bot.navigation import NavDownload, NavSubscription, SubscriptionData
-from app.bot.services import PlanService
+from app.bot.payment_gateways import PaymentGateway
+from app.bot.services.plan import PlanService
 
 
 def pay_keyboard(pay_url: str, callback_data: SubscriptionData) -> InlineKeyboardMarkup:
@@ -28,6 +29,7 @@ def pay_keyboard(pay_url: str, callback_data: SubscriptionData) -> InlineKeyboar
 
 
 def payment_method_keyboard(
+    gateways: dict[str, PaymentGateway],
     callback_data: SubscriptionData,
     plan_service: PlanService,
 ) -> InlineKeyboardMarkup:
@@ -44,30 +46,18 @@ def payment_method_keyboard(
     builder = InlineKeyboardBuilder()
     plan = plan_service.get_plan(callback_data.devices)
 
-    callback_data.state = NavSubscription.PAY_YOOKASSA
-    price = plan.prices.rub[callback_data.duration]
-    builder.row(
-        InlineKeyboardButton(
-            text=_("YooKassa | {price} ₽").format(price=price),
-            callback_data=callback_data.pack(),
+    for gateway_name, gateway in gateways.items():
+        price = plan.prices.to_dict()[gateway.code][str(callback_data.duration)]
+        if price is None:
+            continue
+
+        callback_data.state = gateway.callback
+        builder.row(
+            InlineKeyboardButton(
+                text=f"{_(gateway.name)} | {price} {gateway.symbol}",
+                callback_data=callback_data.pack(),
+            )
         )
-    )
-    callback_data.state = NavSubscription.PAY_TELEGRAM_STARS
-    price = plan.prices.xtr[callback_data.duration]
-    builder.row(
-        InlineKeyboardButton(
-            text="TelegramStars | {price} ★".format(price=price),
-            callback_data=callback_data.pack(),
-        )
-    )
-    callback_data.state = NavSubscription.PAY_CRYPTOMUS
-    price = plan.prices.usd[callback_data.duration]
-    builder.row(
-        InlineKeyboardButton(
-            text="Cryptomus | {price} $".format(price=price),
-            callback_data=callback_data.pack(),
-        )
-    )
 
     callback_data.state = NavSubscription.DEVICES
     builder.row(back_button(callback_data.pack()))

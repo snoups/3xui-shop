@@ -74,4 +74,4 @@ class DBSessionMiddleware(BaseMiddleware):
             data["user"] = user
             data["session"] = session
             logger.debug("Session and user added to handler data.")
-        return await handler(event, data)
+            return await handler(event, data)

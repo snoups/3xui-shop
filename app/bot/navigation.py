@@ -81,8 +81,8 @@ class NavAdminTools(str, Enum):
 class SubscriptionData(CallbackData, prefix="subscription"):
     state: NavSubscription
     is_extend: bool = False
-    user_id: int = None
-    message_id: int = None
-    devices: int = None
-    duration: int = None
-    price: int = None
+    user_id: int = 0
+    message_id: int = 0
+    devices: int = 0
+    duration: int = 0
+    price: int = 0

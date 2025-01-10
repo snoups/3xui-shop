@@ -2,20 +2,22 @@ from aiogram import Bot
 from aiogram.types import LabeledPrice
 from aiogram.utils.i18n import gettext as _
 
-# from app.bot.navigation import SubscriptionCallback
+from app.bot.navigation import NavSubscription, SubscriptionData
+from app.bot.payment_gateways import PaymentGateway
 from app.bot.services.plan import PlanService
 
 
-class TelegramStars:
+class TelegramStars(PaymentGateway):
     """
     Service for handling payment creation using Telegram Stars.
-
-    This service provides methods to create a payment link for a subscription
-    based on the number of selected devices and duration. The payment is processed
-    via Telegram's invoice system with specified prices.
     """
 
-    async def create_payment(self, data, bot: Bot) -> str:
+    name = "TelegramStars"
+    symbol = "★"
+    code = "XTR"
+    callback = NavSubscription.PAY_TELEGRAM_STARS
+
+    async def create_payment(self, session, data: SubscriptionData, bot: Bot) -> str:
         """
         Create a payment link for the subscription.
 
@@ -23,7 +25,7 @@ class TelegramStars:
         including devices and duration. It uses the Telegram bot's invoice creation system.
 
         Arguments:
-            data (SubscriptionCallback): The subscription data, including devices and duration.
+            data (SubscriptionData): The subscription data, including devices and duration.
             bot (Bot): The instance of the Bot for creating the invoice link.
 
         Returns:

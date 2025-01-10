@@ -1,24 +1,27 @@
-# from app.bot.navigation import SubscriptionCallback
+from app.bot.navigation import NavSubscription, SubscriptionData
+from app.bot.payment_gateways import PaymentGateway
 
 
-class Cryptomus:
+class Cryptomus(PaymentGateway):
     """
     Service for creating payments through the Cryptomus platform.
-
-    This class handles the payment creation process using the Cryptomus API, generating
-    payment links or processing payment requests for subscriptions.
     """
 
-    def create_payment(self, data) -> str:
+    name = "Cryptomus"
+    symbol = "$"
+    code = "USD"
+    callback = NavSubscription.PAY_CRYPTOMUS
+
+    def create_payment(self, data: SubscriptionData) -> str:
         """
         Create a payment link for the subscription using Cryptomus.
 
         This method generates a payment link based on the provided subscription data.
 
         Arguments:
-            data (SubscriptionCallback): The subscription data, including devices and duration.
+            data (SubscriptionData): The subscription data, including devices and duration.
 
         Returns:
-            str: The payment link for the subscription.
+            str: A URL for the payment link to complete the subscription process.
         """
         pass

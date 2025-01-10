@@ -18,16 +18,15 @@ logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-# @router.callback_query(
-#    SubscriptionData.filter(F.state.startswith(NavSubscription.PAY)), IsPrivate()
-# )
 @router.callback_query(
-    SubscriptionData.filter(F.state == NavSubscription.PAY_TELEGRAM_STARS), IsPrivate()
+    SubscriptionData.filter(F.state.startswith(NavSubscription.PAY)), IsPrivate()
 )
 async def callback_payment_method_selected(
     callback: CallbackQuery,
     callback_data: SubscriptionData,
     plan_service: PlanService,
+    payment_service: PaymentService,
+    session: AsyncSession,
     bot: Bot,
 ) -> None:
     """
@@ -39,24 +38,33 @@ async def callback_payment_method_selected(
         plan_service (PlanService): Service for managing subscription plans.
         bot (Bot): The bot instance to send messages and interact with the user.
     """
+
+    # TODO: FIX MANY CALL
     method = callback_data.state
     devices = callback_data.devices
     duration = callback_data.duration
     logger.info(f"User {callback.from_user.id} selected payment method: {method}")
     logger.info(f"User {callback.from_user.id} selected {devices} devices and {duration} days.")
-
-    payment_service = PaymentService(method)
+    gateway = payment_service.get_gateway(method)
     price = plan_service.get_price_for_duration(
         plan_service.get_plan(devices).prices.to_dict(),
         duration,
-        payment_service.method.code,
+        gateway.code,
     )
     callback_data.price = price
     callback_data.message_id = callback.message.message_id
 
     # TODO: Make a check for the existence of a subscription
 
-    link = await payment_service.create_payment(callback_data, bot)
+    # await Transaction.create(
+    #     session=session,
+    #     user_id=callback.message.from_user.id,
+    #     payment_id=,
+    #     amount=price,
+    #     status="process",
+    # )
+
+    link = await payment_service.create_payment(gateway, callback_data, bot)
     logger.info(f"Payment link created for user {callback.from_user.id}: {link}")
 
     await callback.message.edit_text(
@@ -73,7 +81,7 @@ async def callback_payment_method_selected(
             devices=devices,
             duration=plan_service.convert_days_to_period(duration),
             price=price,
-            currency=payment_service.method.symbol,
+            currency=gateway.symbol,
         ),
         reply_markup=pay_keyboard(link, callback_data),
     )
@@ -138,6 +146,7 @@ async def successful_payment(
     await Transaction.create(
         session=session,
         user_id=message.from_user.id,
+        plan=message.successful_payment.invoice_payload,
         payment_id=message.successful_payment.telegram_payment_charge_id,
         amount=message.successful_payment.total_amount,
         status="success",

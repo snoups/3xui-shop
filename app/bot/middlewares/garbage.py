@@ -31,7 +31,8 @@ class GarbageMiddleware(BaseMiddleware):
             Any: The result of calling the next handler with the updated data.
         """
         if isinstance(event, Update) and event.message:
-            if event.message.from_user != event.bot.id and NavMain.START not in event.message.text:
-                await event.message.delete()
+            if event.message.from_user != event.bot.id:
+                if event.message.text and NavMain.START not in event.message.text:
+                    await event.message.delete()
 
         return await handler(event, data)

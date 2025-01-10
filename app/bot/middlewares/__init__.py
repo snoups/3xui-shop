@@ -23,16 +23,7 @@ def register(dp: Dispatcher, **kwargs) -> None:
     dp.update.outer_middleware.register(MaintenanceMiddleware())
     dp.update.outer_middleware.register(ConfigMiddleware(kwargs["config"]))
     dp.update.outer_middleware.register(DBSessionMiddleware(kwargs["session"]))
-
-    dp.update.outer_middleware.register(
-        ServicesMiddleware(
-            vpn_service=kwargs["vpn"],
-            notification_service=kwargs["notification"],
-            plan_service=kwargs["plan"],
-            server_service=kwargs["server"],
-            promocode_service=kwargs["promocode"],
-        )
-    )
+    dp.update.outer_middleware.register(ServicesMiddleware(**kwargs["services"]))
 
 
 __all__ = [

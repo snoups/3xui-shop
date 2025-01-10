@@ -21,6 +21,7 @@ class Transaction(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    plan: Mapped[str] = mapped_column(String(length=64), nullable=False)
     payment_id: Mapped[str] = mapped_column(String(length=64), unique=True, nullable=False)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[str] = mapped_column(String(length=16), nullable=False)
@@ -101,5 +102,41 @@ class Transaction(Base):
             except IntegrityError:
                 await session.rollback()
                 return None
+
+        return transaction
+
+    @classmethod
+    async def update(cls, session: AsyncSession, payment_id: str, **kwargs) -> "Transaction | None":
+        """
+        Update an existing transaction in the database.
+
+        Arguments:
+            session (AsyncSession): The asynchronous SQLAlchemy session.
+            payment_id (str): The unique payment ID for the transaction.
+            kwargs (dict): Fields to update (e.g., status, amount).
+
+        Returns:
+            Transaction | None: The updated transaction object if successful, or None if not found.
+
+        Example:
+            updated_transaction = await Transaction.update(session, payment_id="abc123",
+                status="completed", amount=100.0)
+        """
+        filter = [Transaction.payment_id == payment_id]
+        query = await session.execute(select(Transaction).where(*filter))
+        transaction = query.scalar_one_or_none()
+
+        if not transaction:
+            return None
+
+        for key, value in kwargs.items():
+            if hasattr(transaction, key):
+                setattr(transaction, key, value)
+
+        try:
+            await session.commit()
+        except IntegrityError:
+            await session.rollback()
+            return None
 
         return transaction

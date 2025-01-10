@@ -1,73 +1,14 @@
 import logging
 
 from aiogram import Bot
+from aiohttp.web import Application
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.bot.navigation import NavSubscription
-from app.bot.payment_gateways import Cryptomus, TelegramStars, Yookassa
+from app.bot.navigation import NavSubscription, SubscriptionData
+from app.bot.payment_gateways import Cryptomus, PaymentGateway, TelegramStars, Yookassa
+from app.config import Config
 
 logger = logging.getLogger(__name__)
-
-
-# TODO: REWORK
-
-
-class PaymentMethod:
-    """
-    Class representing a payment method with its symbol and currency code.
-
-    This class associates a payment method with its corresponding callback data,
-    currency symbol, currency code, and gateway class.
-
-    Attributes:
-        callback_data (str): The callback identifier for the payment method.
-        symbol (str): The currency symbol associated with the payment method.
-        code (str): The currency code associated with the payment method.
-        gateway: The payment gateway class associated with this payment method.
-    """
-
-    def __init__(self, callback_data: str, symbol: str, code: str, gateway) -> None:
-        """
-        Initialize a PaymentMethod instance.
-
-        Arguments:
-            callback_data (str): The callback identifier for the payment method.
-            symbol (str): The currency symbol associated with the payment method.
-            code (str): The currency code associated with the payment method.
-            gateway: The payment gateway class associated with this payment method.
-        """
-        self.callback_data = callback_data
-        self.symbol = symbol
-        self.code = code
-        self.gateway = gateway
-        logger.debug(f"Initialized PaymentMethod with {callback_data}, {symbol}, {code}")
-
-    @classmethod
-    def from_callback(cls, callback_data: str) -> "PaymentMethod":
-        """
-        Create a PaymentMethod instance based on the callback data.
-
-        Arguments:
-            callback_data (str): The callback identifier for the payment method.
-
-        Returns:
-            PaymentMethod: The corresponding PaymentMethod instance.
-
-        Raises:
-            ValueError: If the callback data is invalid.
-        """
-        methods = {
-            # Navigation.PAY_YOOKASSA: ("₽", "RUB", Yookassa()),
-            NavSubscription.PAY_TELEGRAM_STARS: ("★", "XTR", TelegramStars()),
-            # Navigation.PAY_CRYPTOMUS: ("$", "USD", Cryptomus()),
-        }
-
-        if callback_data not in methods:
-            logger.error(f"Invalid callback data: {callback_data}")
-            raise ValueError(f"Invalid callback data: {callback_data}")
-
-        symbol, code, gateway = methods[callback_data]
-        logger.debug(f"Created PaymentMethod from {callback_data}")
-        return cls(callback_data, symbol, code, gateway)
 
 
 class PaymentService:
@@ -78,25 +19,57 @@ class PaymentService:
     based on the selected payment method.
 
     Attributes:
-        method (PaymentMethod): The selected payment method instance.
+        gateways (dict[str, PaymentGateway]): A dictionary of payment gateways keyed by method name.
     """
 
-    def __init__(self, callback_data: str) -> None:
+    def __init__(
+        self, app: Application, config: Config, bot: Bot, session: AsyncSession, vpn_service
+    ):
         """
-        Initialize the PaymentService with a specific payment method based on callback data.
+        Initializes the PaymentService and configures available payment gateways.
 
         Arguments:
-            callback_data (str): The callback identifier for the payment method.
+            app (Application): The Aiohttp application instance used to set up routes.
+            config (Config): The configuration object containing payment gateway settings.
+            bot (Bot): The Telegram Bot instance.
         """
-        logger.debug(f"Initializing PaymentService with {callback_data}")
-        self.method = PaymentMethod.from_callback(callback_data)
+        self.gateways: dict[str, PaymentGateway] = {}
+        self.session = session
+        if config.yookassa.SHOP_ID and config.yookassa.TOKEN:
+            yookassa = Yookassa(config, bot)
+            self.gateways[NavSubscription.PAY_YOOKASSA] = yookassa
+            app.router.add_post(
+                f"/yookassa",
+                lambda request: Yookassa.webhook_handler(request, session, bot, vpn_service),
+            )
+        self.gateways[NavSubscription.PAY_TELEGRAM_STARS] = TelegramStars()
 
-    async def create_payment(self, data, bot: Bot | None = None) -> str:
+        logger.info(f"PaymentService initialized.")
+
+    def get_gateway(self, gateway_name: str) -> PaymentGateway:
         """
-        Creates a payment using the selected payment method.
+        Retrieves the payment gateway instance for the given gateway name.
 
         Arguments:
-            data (SubscriptionCallback): The data required to create the payment.
+            gateway_name (str): The name of the gateway.
+
+        Returns:
+            PaymentGateway: The corresponding payment gateway instance.
+        """
+        return self.gateways.get(gateway_name)
+
+    async def create_payment(
+        self,
+        gateway: PaymentGateway,
+        data: SubscriptionData,
+        bot: Bot | None = None,
+    ) -> str:
+        """
+        Creates a payment link using the selected payment gateway.
+
+        Arguments:
+            gateway (PaymentGateway): The payment gateway to use for creating the payment.
+            data (SubscriptionData): The data required to create the payment link.
             bot (Bot | None): The bot instance, required for TelegramStars gateway.
 
         Returns:
@@ -104,7 +77,7 @@ class PaymentService:
         """
         logger.debug(f"Creating payment with data: {data}")
 
-        if bot and self.method.callback_data == NavSubscription.PAY_TELEGRAM_STARS:
-            return await self.method.gateway.create_payment(data, bot)
+        if bot and isinstance(gateway, TelegramStars):
+            return await gateway.create_payment(self.session, data, bot)
 
-        return await self.method.gateway.create_payment(data)
+        return await gateway.create_payment(self.session, data)

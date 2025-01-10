@@ -6,16 +6,13 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.i18n import I18n
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiohttp import web
 
 from app.bot import commands, filters, middlewares, routes
 from app.bot.middlewares import MaintenanceMiddleware
-from app.bot.services import (
-    NotificationService,
-    PlanService,
-    PromocodeService,
-    ServerService,
-    VPNService,
-)
+from app.bot.services import NotificationService, initialize
+from app.bot.services.vpn import VPNService
 from app.config import DEFAULT_LOCALES_DIR, Config, load_config
 from app.db.database import Database
 from app.logger import setup_logging
@@ -35,11 +32,10 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
     config: Config = dispatcher.get("config")
     notification_service: NotificationService = dispatcher.get("notification_service")
 
-    # Notify developer about bot stop
     if config.bot.DEV_ID:
         await notification_service.notify_by_id(config.bot.DEV_ID, "#BotStopped")
 
-    # Cleanup resources
+    await bot.delete_webhook()
     await commands.delete(bot)
     await bot.delete_webhook()
     await bot.session.close()
@@ -57,47 +53,56 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
     """
     logger.info("Bot started.")
     config: Config = dispatcher.get("config")
+    webhook_url = f"{config.bot.WEBHOOK}webhook"
+
+    if await bot.get_webhook_info() != webhook_url:
+        await bot.set_webhook(webhook_url)
+
+    current_webhook = await bot.get_webhook_info()
+    logger.info(f"Current webhook URL: {current_webhook.url}")
+
     notification_service: NotificationService = dispatcher.get("notification_service")
 
-    # Notify developer about bot start
     if config.bot.DEV_ID:
         await notification_service.notify_by_id(config.bot.DEV_ID, "#BotStarted")
 
 
 async def main() -> None:
     """
-    Main function that initializes the bot and starts polling.
+    Initializes the bot, sets up services, and runs the application.
     """
+    # Create web application
+    app = web.Application()
+
     # Load configuration
     config = load_config()
 
-    # Setup logging
+    # Set up logging
     setup_logging(config.logging)
 
-    # Initialize components
+    # Initialize database
     db = Database(config.database)
-    storage = MemoryStorage()  # TODO: REDIS
+
+    # Set up in-memory storage for FSM (Finite State Machine)
+    storage = MemoryStorage()  # TODO: RedisStorage
+
+    # Initialize the bot with the token and default properties
     bot = Bot(
         token=config.bot.TOKEN,
-        default=DefaultBotProperties(
-            parse_mode=ParseMode.MARKDOWN,
-            link_preview_is_disabled=True,
-        ),
+        default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN, link_preview_is_disabled=True),
     )
-    notification_service = NotificationService(bot)
-    dp = Dispatcher(
-        storage=storage,
-        config=config,
-        bot=bot,
-        db=db,
-        notification_service=notification_service,
-    )
+
+    # Initialize services
+    services = initialize(app, config, db, bot)
+    vpn_service: VPNService = services.get("vpn_service")
+    await vpn_service.initialize()
+
+    # Create the dispatcher with the storage, config, bot, database, and services
+    dp = Dispatcher(storage=storage, config=config, bot=bot, db=db, **services)
+
+    # Set up internationalization (i18n)
     i18n = I18n(path=DEFAULT_LOCALES_DIR, default_locale="en", domain="bot")
     I18n.set_current(i18n)
-    plan_service = PlanService()
-    promocode_service = PromocodeService(db.session)
-    server_service = ServerService(db.session)
-    vpn_service = VPNService(db.session, config, promocode_service)
 
     # Register event handlers
     dp.startup.register(on_startup)
@@ -113,17 +118,7 @@ async def main() -> None:
     MaintenanceMiddleware.set_mode(True)
 
     # Register middlewares
-    middlewares.register(
-        dp,
-        config=config,
-        session=db.session,
-        i18n=i18n,
-        plan=plan_service,
-        notification=notification_service,
-        promocode=promocode_service,
-        server=server_service,
-        vpn=vpn_service,
-    )
+    middlewares.register(dp, config=config, session=db.session, i18n=i18n, services=services)
 
     # Include bot routes
     routes.include(dp)
@@ -131,15 +126,19 @@ async def main() -> None:
     # Initialize database
     await db.initialize()
 
-    # Initialize VPNService
-    await vpn_service.initialize()
-
     # Set up bot commands
     await commands.setup(bot)
 
-    # Start bot polling
-    await bot.delete_webhook()
-    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+    # Set up webhook request handler
+    webhook_requests_handler = SimpleRequestHandler(
+        dispatcher=dp,
+        bot=bot,
+    )
+    webhook_requests_handler.register(app, path="/webhook")
+
+    # Set up application and run
+    setup_application(app, dp, bot=bot)
+    await web._run_app(app, host="0.0.0.0", port=config.bot.WEBHOOK_PORT)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ import logging
 from typing import Any, Awaitable, Callable
 
 from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject, Update
+from aiogram.types import TelegramObject, Update, User
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin
@@ -39,15 +39,11 @@ class MaintenanceMiddleware(BaseMiddleware):
             Any: Handler result if maintenance mode allows processing, else None.
         """
         if isinstance(event, Update):
-            if event.message:
-                user_id = event.message.from_user.id
-            elif event.callback_query:
-                user_id = event.callback_query.from_user.id
+            user: User = data["event_from_user"]
+            is_admin = await IsAdmin()(event.event)
 
-            is_admin = await IsAdmin()(event.message or event.callback_query)
-
-            if self.active and not is_admin and user_id != event.bot.id:
-                logger.info(f"User {user_id} tried to interact with the bot during maintenance.")
+            if self.active and not is_admin and user.id != event.bot.id:
+                logger.info(f"User {user.id} tried to interact with the bot during maintenance.")
                 text = _("🚧 The bot is in maintenance mode. Please wait.")
                 if event.message:
                     await event.message.answer(text=text, show_alert=True)

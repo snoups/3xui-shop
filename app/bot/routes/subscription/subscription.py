@@ -14,7 +14,7 @@ from app.bot.keyboards.subscription import (
     subscription_keyboard,
 )
 from app.bot.navigation import NavSubscription, SubscriptionData
-from app.bot.services import ClientData, PlanService, VPNService
+from app.bot.services import ClientData, PaymentService, PlanService, VPNService
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -155,6 +155,7 @@ async def callback_duration_selected(
     callback: CallbackQuery,
     callback_data: SubscriptionData,
     plan_service: PlanService,
+    payment_service: PaymentService,
 ) -> None:
     """
     Handler for selecting the subscription duration.
@@ -168,5 +169,5 @@ async def callback_duration_selected(
     callback_data.state = NavSubscription.PAY
     await callback.message.edit_text(
         text=_("💳 *Choose a payment method:*"),
-        reply_markup=payment_method_keyboard(callback_data, plan_service),
+        reply_markup=payment_method_keyboard(payment_service.gateways, callback_data, plan_service),
     )

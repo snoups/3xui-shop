@@ -27,12 +27,18 @@ class BotConfig:
         ADMINS (list[int]): List of admin IDs (user IDs) for admin tools.
         DEV_ID (int): Developer ID (user ID) for notifications.
         SUPPORT_ID (int): Support ID (user ID) for support.
+        WEBHOOK (str): URL for the webhook to receive updates from Telegram.
+        WEBHOOK_PORT (int): Port for the webhook service.
+        EMAIL (str): Email address for receipts.
     """
 
     TOKEN: str
     ADMINS: list[int]
     DEV_ID: int
     SUPPORT_ID: int
+    WEBHOOK: str
+    WEBHOOK_PORT: int
+    EMAIL: str
 
 
 @dataclass
@@ -56,13 +62,27 @@ class XUIConfig:
 
 
 @dataclass
+class YooKassaConfig:
+    """
+    Configuration for YooKassa.
+
+    Attributes:
+        TOKEN (str | None): API token for YooKassa.
+        SHOP_ID (int | None): Shop ID for YooKassa.
+    """
+
+    TOKEN: str | None
+    SHOP_ID: int | None
+
+
+@dataclass
 class DatabaseConfig:
     """
     Configuration for the database.
 
     Attributes:
-        HOST (str | None): Host address of the database server (if available).
-        PORT (int | None): Port number for the database server (if available).
+        HOST (str | None): Host address of the database server.
+        PORT (int | None): Port number for the database server.
         USERNAME (str | None): Username for database authentication.
         PASSWORD (str | None): Password for database authentication.
         NAME (str): Name of the database to connect to.
@@ -114,17 +134,19 @@ class Config:
     Main configuration class for the application.
 
     Contains all configurations related to the bot, XUI service,
-    database, and logging.
+    YooKassa, database, and logging.
 
     Attributes:
         bot (BotConfig): Bot configuration.
         xui (XUIConfig): XUI configuration.
+        yookassa (YooKassaConfig): YooKassa configuration.
         database (DatabaseConfig): Database configuration.
         logging (LoggingConfig): Logging configuration.
     """
 
     bot: BotConfig
     xui: XUIConfig
+    yookassa: YooKassaConfig
     database: DatabaseConfig
     logging: LoggingConfig
 
@@ -148,6 +170,9 @@ def load_config() -> Config:
             ADMINS=env.list("BOT_ADMINS", subcast=list, default=[]),
             DEV_ID=env.int("BOT_DEV_ID"),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
+            WEBHOOK=env.str("BOT_WEBHOOK"),
+            WEBHOOK_PORT=env.int("BOT_WEBHOOK_PORT", 8080),
+            EMAIL=env.str("BOT_EMAIL"),
         ),
         xui=XUIConfig(
             HOST=env.str("XUI_HOST"),
@@ -155,6 +180,10 @@ def load_config() -> Config:
             PASSWORD=env.str("XUI_PASSWORD"),
             TOKEN=env.str("XUI_TOKEN", default=None),
             SUBSCRIPTION=env.str("XUI_SUBSCRIPTION"),
+        ),
+        yookassa=YooKassaConfig(
+            TOKEN=env.str("YOOKASSA_TOKEN", default=None),
+            SHOP_ID=env.int("YOOKASSA_SHOP_ID", default=None),
         ),
         database=DatabaseConfig(
             HOST=env.str("DB_HOST", default=None),

@@ -41,28 +41,22 @@ def subscription_keyboard(
     builder = InlineKeyboardBuilder()
 
     if not has_subscription:
-        builder.row(
-            InlineKeyboardButton(
-                text=_("💳 Buy subscription"),
-                callback_data=callback_data.pack(),
-            )
+        builder.button(
+            text=_("💳 Buy subscription"),
+            callback_data=callback_data,
         )
     else:
         callback_data.state = NavSubscription.EXTEND
-        builder.row(
-            InlineKeyboardButton(
-                text=_("💳 Extend subscription"),
-                callback_data=callback_data.pack(),
-            )
+        builder.button(
+            text=_("💳 Extend subscription"),
+            callback_data=callback_data,
         )
 
-    builder.row(
-        InlineKeyboardButton(
-            text=_("🎟️ Activate promocode"),
-            callback_data=NavSubscription.PROMOCODE,
-        )
+    builder.button(
+        text=_("🎟️ Activate promocode"),
+        callback_data=NavSubscription.PROMOCODE,
     )
-
+    builder.adjust(1)
     builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
@@ -88,11 +82,9 @@ def devices_keyboard(
 
     for plan in plans:
         callback_data.devices = plan.devices
-        builder.row(
-            InlineKeyboardButton(
-                text=plan_service.convert_devices_to_title(plan.devices),
-                callback_data=callback_data.pack(),
-            )
+        builder.button(
+            text=plan_service.convert_devices_to_title(plan.devices),
+            callback_data=callback_data,
         )
 
     builder.adjust(2)
@@ -123,11 +115,9 @@ def duration_keyboard(
         callback_data.duration = duration
         period = plan_service.convert_days_to_period(duration)
         price = plan_service.get_plan(callback_data.devices).prices.rub[duration]
-        builder.row(
-            InlineKeyboardButton(
-                text=f"{period} | {price} ₽",
-                callback_data=callback_data.pack(),
-            )
+        builder.button(
+            text=f"{period} | {price} ₽",
+            callback_data=callback_data,
         )
 
     builder.adjust(2)

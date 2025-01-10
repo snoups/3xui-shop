@@ -4,8 +4,8 @@ from datetime import datetime, timedelta, timezone
 from py3xui import AsyncApi, Client, Inbound
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.bot.services import PromocodeService
 from app.bot.services.client import ClientData
+from app.bot.services.promocode import PromocodeService
 from app.config import Config
 from app.db.models import Promocode, User
 
