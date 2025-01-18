@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 
 class DBSessionMiddleware(BaseMiddleware):
     """
-    Middleware for managing database sessions in handlers.
+    Middleware for managing database sessions and ensuring user existence in handlers.
 
     This middleware ensures that a database session is available for every handler.
-    It also manages user creation in the database if the user is not already present.
+    It also checks if the user exists in the database and creates a new user if necessary.
 
     Attributes:
         session (async_sessionmaker): A factory for creating async database sessions.
@@ -25,10 +25,10 @@ class DBSessionMiddleware(BaseMiddleware):
 
     def __init__(self, session: async_sessionmaker) -> None:
         """
-        Initializes the middleware with a session factory.
+        Initializes middleware with a session factory for creating async database sessions.
 
         Arguments:
-            session (async_sessionmaker): A session maker that creates async database sessions.
+            session (async_sessionmaker): Session maker for async database sessions.
         """
         self.session = session
         logger.debug("DBSessionMiddleware initialized.")
@@ -40,19 +40,19 @@ class DBSessionMiddleware(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         """
-        Middleware handler that injects the database session and user into the handler data.
+        Middleware handler that adds the database session and user to handler data.
 
-        This method opens a new database session for every request. If a user is present
-        in the event, it will ensure that the user is stored in the database. Then, the
-        session and user objects are added to the handler's data dictionary.
+        This method opens a new database session for every request. If the user is present
+        in the event, it ensures that the user is stored in the database or retrieved if
+        already exists. The session and user are then added to the handler's data dictionary.
 
         Arguments:
-            handler (Callable): The handler function to process the incoming event.
+            handler (Callable): The handler function that processes the incoming event.
             event (TelegramObject): The incoming Telegram event (message, callback, etc.).
             data (dict): The data dictionary passed to the handler.
 
         Returns:
-            Any: The result of calling the next handler with the injected database session and user.
+            Any: The result of calling the next handler with the updated data.
         """
         session: AsyncSession
         async with self.session() as session:

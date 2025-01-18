@@ -16,6 +16,8 @@ DEFAULT_LOG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
 DEFAULT_LOG_DIR = "logs"
 DEFAULT_LOG_ARCHIVE_FORMAT = "zip"
 
+DEFAULT_WEBHOOK_PORT = 8080
+
 
 @dataclass
 class BotConfig:
@@ -167,11 +169,13 @@ def load_config() -> Config:
     return Config(
         bot=BotConfig(
             TOKEN=env.str("BOT_TOKEN"),
-            ADMINS=env.list("BOT_ADMINS", subcast=list, default=[]),
+            ADMINS=env.list(
+                "BOT_ADMINS", subcast=list, default=[], required=False
+            ),  # TODO: TEST required
             DEV_ID=env.int("BOT_DEV_ID"),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
             WEBHOOK=env.str("BOT_WEBHOOK"),
-            WEBHOOK_PORT=env.int("BOT_WEBHOOK_PORT", 8080),
+            WEBHOOK_PORT=env.int("BOT_WEBHOOK_PORT", default=DEFAULT_WEBHOOK_PORT),
             EMAIL=env.str("BOT_EMAIL"),
         ),
         xui=XUIConfig(

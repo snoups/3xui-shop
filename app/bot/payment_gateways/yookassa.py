@@ -16,10 +16,10 @@ from yookassa.domain.notification import (
 )
 from yookassa.domain.request.payment_request_builder import PaymentRequestBuilder
 
-from app.bot.keyboards.back import back_to_main_menu_keyboard
-from app.bot.keyboards.payment import payment_success_keyboard
 from app.bot.navigation import NavSubscription, SubscriptionData
 from app.bot.payment_gateways import PaymentGateway
+from app.bot.routes.subscription.keyboard import payment_success_keyboard
+from app.bot.routes.utils.keyboard import back_to_main_menu_keyboard
 from app.bot.services.plan import PlanService
 from app.bot.services.vpn import VPNService
 from app.config import Config

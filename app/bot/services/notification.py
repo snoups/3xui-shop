@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot
 from aiogram.types import Message
 
-from app.bot.keyboards.notification import close_notification_keyboard
+from app.bot.routes.utils.keyboard import close_notification_keyboard
 
 logger = logging.getLogger(__name__)
 

@@ -1,20 +1,29 @@
+import logging
 from datetime import datetime
+from typing import Self
 
-from sqlalchemy import *
+from sqlalchemy import String, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
-from ._base import Base
-from .transaction import Transaction
+from . import Base
+
+logger = logging.getLogger(__name__)
 
 
 class User(Base):
     """
     Model representing the User table in the database.
 
-    This model stores user information related to the bot, including their unique ID, VPN ID, and
-    other personal details.
+    Attributes:
+        id (int): The unique user ID (primary key).
+        vpn_id (str): The unique VPN identifier for the user.
+        user_id (int): The unique Telegram user ID.
+        first_name (str): The user's first name.
+        username (str | None): The user's Telegram username.
+        language_code (str | None): The user's language code (e.g., "en").
+        created_at (datetime): The timestamp when the user was created.
     """
 
     __tablename__ = "users"
@@ -26,12 +35,15 @@ class User(Base):
     username: Mapped[str | None] = mapped_column(String(length=32), nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
 
-    transactions: Mapped[list["Transaction"]] = relationship(
-        "Transaction", back_populates="user", cascade="all, delete-orphan"
-    )
+    def __repr__(self) -> str:
+        return (
+            f"<User(id={self.id}, vpn_id='{self.vpn_id}', user_id={self.user_id}, "
+            f"first_name={self.first_name}, username={self.username}, "
+            f"created_at={self.created_at})>"
+        )
 
     @classmethod
-    async def get(cls, session: AsyncSession, user_id: int) -> "User | None":
+    async def get(cls, session: AsyncSession, user_id: int) -> Self | None:
         """
         Get a user by user_id.
 
@@ -50,7 +62,7 @@ class User(Base):
         return query.scalar_one_or_none()
 
     @classmethod
-    async def get_or_create(cls, session: AsyncSession, user_id: int, **kwargs) -> "User":
+    async def get_or_create(cls, session: AsyncSession, user_id: int, **kwargs) -> Self | None:
         """
         Get a user or create a new one if not found.
 
@@ -60,7 +72,7 @@ class User(Base):
             kwargs (dict): Additional attributes if creating a new user.
 
         Returns:
-            User: The user object.
+            User | None: The user object if found or created, else None.
 
         Example:
             user = await User.get_or_create(session, user_id=123456, vpn_id="vpn123")
@@ -74,8 +86,9 @@ class User(Base):
             session.add(user)
             try:
                 await session.commit()
-            except IntegrityError:
+            except IntegrityError as exception:
                 await session.rollback()
+                logger.error(f"Error occurred while creating user {user_id}: {exception}")
                 return None
 
         return user

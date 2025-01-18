@@ -1,17 +1,26 @@
+from typing import Self
+
 from aiosqlite import IntegrityError
 from sqlalchemy import *
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ._base import Base
+from . import Base
 
 
 class Server(Base):
     """
     Model representing a VPN server in the database.
 
-    This model stores information about each VPN server, including its name, host,
-    subscription, max clients, current load, and location.
+    Attributes:
+        id (int): The unique server ID (primary key).
+        name (str): The name of the VPN server.
+        host (str): The host address or IP of the VPN server.
+        subscription (str): The address of the VPN subscription.
+        max_clients (int): The maximum number of clients allowed to connect.
+        current_clients (int): The current number of connected clients.
+        location (str | None): The location of the VPN server (optional).
+        online (bool): The online status of the VPN server (True or False).
     """
 
     __tablename__ = "servers"
@@ -25,8 +34,16 @@ class Server(Base):
     location: Mapped[str | None] = mapped_column(String(32), nullable=True)
     online: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    def __repr__(self) -> str:
+        return (
+            f"<Server(id={self.id}, name='{self.name}', host={self.host}, "
+            f"subscription={self.subscription}, max_clients={self.max_clients}, "
+            f"max_clients={self.max_clients}, current_clients={self.current_clients}, "
+            f"location={self.location}, online={self.online})>"
+        )
+
     @classmethod
-    async def get(cls, session: AsyncSession, name: str) -> "Server | None":
+    async def get(cls, session: AsyncSession, name: str) -> Self | None:
         """
         Get a server from the database based on the provided name.
 
@@ -45,9 +62,9 @@ class Server(Base):
         return query.scalar_one_or_none()
 
     @classmethod
-    async def create(cls, session: AsyncSession, name: str, **kwargs) -> "Server":
+    async def create(cls, session: AsyncSession, name: str, **kwargs) -> Self | None:
         """
-        Get a server from the database or create a new one if not found.
+        Create a new server in the database or retrieve an existing one.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
@@ -55,7 +72,7 @@ class Server(Base):
             kwargs (dict): Additional attributes for the server if creating a new one.
 
         Returns:
-            Server: The server object.
+            Server | None: The server object if created or already exists, or None on failure.
 
         Example:
             server = await Server.create(session, name='server1', max_clients=100)
@@ -140,7 +157,7 @@ class Server(Base):
                 return False
 
     @classmethod
-    async def get_all(cls, session: AsyncSession) -> list["Server"]:
+    async def get_all(cls, session: AsyncSession) -> list[Self]:
         """
         Retrieve all servers from the database.
 

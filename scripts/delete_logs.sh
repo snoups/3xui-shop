@@ -2,7 +2,7 @@
 # Script to delete .log files in a specified directory.
 
 # Default directory for logs
-DEFAULT_LOG_DIR="./logs"
+DEFAULT_LOG_DIR="app/logs"
 
 # Use the provided directory path or default to the predefined one
 LOG_DIR="${1:-$DEFAULT_LOG_DIR}"

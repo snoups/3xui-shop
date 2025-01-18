@@ -1,41 +1,43 @@
 from aiogram.filters import BaseFilter
-from aiogram.types import TelegramObject
+from aiogram.types import TelegramObject, User
 
 
 class IsDev(BaseFilter):
     """
-    Filter to check if a user is an admin.
+    Filter to check if the user is the developer.
 
-    This filter checks if the user who triggered the event is in the list of admin IDs.
-    The list of admin IDs can be set using the `set_admins` method.
+    This filter checks if the user who triggered the event is the developer
+    by comparing their ID to the registered developer ID.
 
     Attributes:
-        admins_ids (list[int]): List of admin user IDs.
+        developer_id (int): The ID of the bot developer.
     """
 
     developer_id: int
 
     async def __call__(self, event: TelegramObject) -> bool:
         """
-        Check if the user is an admin.
+        Check if the user is the developer.
 
         Arguments:
             event (TelegramObject): The event object (e.g., Message) to check.
 
         Returns:
-            bool: True if the user is an admin, False otherwise.
+            bool: True if the user is the developer, False otherwise.
         """
-        if not hasattr(event, "from_user") or not event.from_user:
+        user: User | None = getattr(event, "from_user", None)
+
+        if not user:
             return False
 
-        return event.from_user.id == self.developer_id
+        return user.id == self.developer_id
 
     @classmethod
     def set_developer(cls, developer_id: int) -> None:
         """
-        Set the list of admin user IDs.
+        Set the developer ID.
 
         Arguments:
-            admins_ids (list[int]): List of admin IDs.
+            developer_id (int): The ID of the developer.
         """
         cls.developer_id = developer_id

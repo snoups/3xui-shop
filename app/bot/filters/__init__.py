@@ -1,38 +1,19 @@
+from aiogram import Dispatcher
+
 from .is_admin import IsAdmin
 from .is_dev import IsDev
 from .is_private import IsPrivate
 
 
-def register_admins(admins_ids: list[int]) -> None:
+def register(dispatcher: Dispatcher, developer_id: int, admins_ids: list[int]) -> None:
     """
-    Register bot administrators.
-
-    Sets the global list of administrator IDs for the IsAdmin filter, enabling it
-    to identify administrators during bot interactions.
+    Register filters and set developer/admin information.
 
     Arguments:
-        admins_ids (list[int]): List of administrator IDs.
+        dispatcher (Dispatcher): Dispatcher instance to register filters.
+        developer_id (int): The ID of the developer.
+        admins_ids (list[int]): List of admin IDs.
     """
-    IsAdmin.set_admins(admins_ids)
-
-
-def register_developer(developer_id: int) -> None:
-    """
-    Register the bot developer.
-
-    Sets the developer ID for the IsDev filter, allowing the bot to recognize
-    the developer during interactions.
-
-    Arguments:
-        developer_id (int): ID of the developer.
-    """
+    dispatcher.update.filter(IsPrivate())
     IsDev.set_developer(developer_id)
-
-
-__all__ = [
-    "IsAdmin",
-    "IsDev",
-    "IsPrivate",
-    "register_admins",
-    "register_developer",
-]
+    IsAdmin.set_admins(admins_ids)

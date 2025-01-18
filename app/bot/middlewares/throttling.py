@@ -21,8 +21,7 @@ class ThrottlingMiddleware(BaseMiddleware):
     Attributes:
         default_key (str | None): The default key used for throttling.
         default_ttl (float): The default TTL (time-to-live) for user actions, in seconds.
-        caches (dict[str, MutableMapping[int, None]]): A dictionary of TTL caches for
-                                                       each throttling key.
+        caches (dict[str, MutableMapping[int, None]]): TTL caches for each throttling key.
     """
 
     def __init__(
@@ -71,6 +70,7 @@ class ThrottlingMiddleware(BaseMiddleware):
             Optional[Any]: The result of the handler, or None if the request is throttled.
         """
         if not isinstance(event, Update):
+            logger.debug(f"Received event of type {type(event)}, skipping throttling.")
             return await handler(event, data)
 
         if event.pre_checkout_query:
@@ -85,6 +85,7 @@ class ThrottlingMiddleware(BaseMiddleware):
 
         if user is not None:
             key = get_flag(data, "throttling_key", default=self.default_key)
+
             if key:
                 if user.id in self.caches[key]:
                     logger.warning(f"User {user.id} is being throttled with key: {key}")

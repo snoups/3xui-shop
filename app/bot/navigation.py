@@ -86,3 +86,10 @@ class SubscriptionData(CallbackData, prefix="subscription"):
     devices: int = 0
     duration: int = 0
     price: int = 0
+
+
+class TransactionStatus(Enum):
+    PENDING = "pending"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    REFUNDED = "refunded"

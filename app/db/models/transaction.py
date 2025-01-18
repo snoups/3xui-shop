@@ -1,39 +1,52 @@
+import logging
 from datetime import datetime
+from typing import Self
 
 from sqlalchemy import *
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
-from ._base import Base
-from .user import User
+from . import Base
+
+logger = logging.getLogger(__name__)
 
 
 class Transaction(Base):
     """
     Model representing the Transaction table in the database.
 
-    This model stores transaction details for a user's subscription or payment,
-    linking to a specific user and including payment info, amount, status, and timestamps.
+    Attributes:
+        id (int): The unique transaction ID (primary key).
+        user_id (int): The ID of the user associated with the transaction (foreign key).
+        payment_id (str): The unique payment ID for the transaction.
+        plan (str): The name of the subscription plan for the transaction.
+        status (TransactionStatus): The current status of the transaction (pending, failed, etc.).
+        created_at (datetime): The timestamp when the transaction was created.
+        updated_at (datetime): The timestamp when the transaction was last updated.
     """
 
     __tablename__ = "transactions"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    plan: Mapped[str] = mapped_column(String(length=64), nullable=False)
     payment_id: Mapped[str] = mapped_column(String(length=64), unique=True, nullable=False)
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    subscription: Mapped[str] = mapped_column(String(length=255), nullable=False)
     status: Mapped[str] = mapped_column(String(length=16), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="transactions")
+    def __repr__(self) -> str:
+        return (
+            f"<Transaction(id={self.id}, user_id='{self.user_id}', payment_id={self.payment_id}, "
+            f"subscription={self.subscription}, status={self.status}, "
+            f"created_at={self.created_at}, updated_at={self.updated_at})>"
+        )
 
     @classmethod
-    async def get(cls, session: AsyncSession, payment_id: int) -> "Transaction | None":
+    async def get(cls, session: AsyncSession, payment_id: str) -> Self | None:
         """
         Get a transaction by its payment ID.
 
@@ -52,7 +65,7 @@ class Transaction(Base):
         return query.scalar_one_or_none()
 
     @classmethod
-    async def get_by_user(cls, session: AsyncSession, user_id: int) -> list["Transaction"]:
+    async def get_by_user(cls, session: AsyncSession, user_id: int) -> list[Self]:
         """
         Get all transactions for a specific user.
 
@@ -71,7 +84,7 @@ class Transaction(Base):
         return query.scalars().all()
 
     @classmethod
-    async def create(cls, session: AsyncSession, payment_id: str, **kwargs) -> "Transaction | None":
+    async def create(cls, session: AsyncSession, payment_id: str, **kwargs) -> Self | None:
         """
         Create a new transaction in the database.
 
@@ -101,12 +114,13 @@ class Transaction(Base):
                 await session.commit()
             except IntegrityError:
                 await session.rollback()
+                logger.error(f"Error occurred while creating transaction {payment_id}")
                 return None
 
         return transaction
 
     @classmethod
-    async def update(cls, session: AsyncSession, payment_id: str, **kwargs) -> "Transaction | None":
+    async def update(cls, session: AsyncSession, payment_id: str, **kwargs) -> None:
         """
         Update an existing transaction in the database.
 
@@ -115,28 +129,9 @@ class Transaction(Base):
             payment_id (str): The unique payment ID for the transaction.
             kwargs (dict): Fields to update (e.g., status, amount).
 
-        Returns:
-            Transaction | None: The updated transaction object if successful, or None if not found.
-
         Example:
-            updated_transaction = await Transaction.update(session, payment_id="abc123",
-                status="completed", amount=100.0)
+            await Transaction.update(session, payment_id="abc123", status="completed", amount=100)
         """
         filter = [Transaction.payment_id == payment_id]
-        query = await session.execute(select(Transaction).where(*filter))
-        transaction = query.scalar_one_or_none()
-
-        if not transaction:
-            return None
-
-        for key, value in kwargs.items():
-            if hasattr(transaction, key):
-                setattr(transaction, key, value)
-
-        try:
-            await session.commit()
-        except IntegrityError:
-            await session.rollback()
-            return None
-
-        return transaction
+        await session.execute(update(Transaction).where(*filter).values(**kwargs))
+        await session.commit()

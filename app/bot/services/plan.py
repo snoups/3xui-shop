@@ -5,8 +5,9 @@ from dataclasses import dataclass, field
 
 from aiogram.utils.i18n import gettext as _
 
-from app.bot.services.client import UNLIMITED
 from app.config import DEFAULT_PLANS_DIR
+
+from .client import UNLIMITED
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,11 @@
+import logging
 import re
+import time
 from urllib.parse import urlparse
 
-import requests
+import aiohttp
+
+logger = logging.getLogger(__name__)
 
 
 async def ping_url(url: str, timeout: int = 5) -> float | None:
@@ -16,10 +20,14 @@ async def ping_url(url: str, timeout: int = 5) -> float | None:
         float | None: The response time in milliseconds, or None if the request failed.
     """
     try:
-        response = requests.get(url, timeout=timeout)
-        if response.status_code == 200:
-            return round(response.elapsed.total_seconds() * 1000)
-    except requests.RequestException:
+        async with aiohttp.ClientSession() as session:
+            start_time = time.time()
+            async with session.get(url, timeout=timeout) as response:
+                response_time = (time.time() - start_time) * 1000
+                if response.status == 200:
+                    return round(response_time)
+    except aiohttp.ClientError as e:
+        logger.warning(f"Failed to ping {url}: {str(e)}")
         return None
 
 
@@ -34,11 +42,10 @@ def is_valid_host(data: str) -> bool:
         bool: True if the data is a valid URL or IP, False otherwise.
     """
     try:
-        # Check if it's a valid URL
         parsed = urlparse(data)
         if all([parsed.scheme, parsed.netloc]):
             return True
-        # Check if it's a valid IP
+
         ip_pattern = re.compile(
             r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}"
             r"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"

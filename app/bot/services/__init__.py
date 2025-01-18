@@ -41,15 +41,3 @@ def initialize(app: Application, config: Config, db: Database, bot: Bot) -> dict
         "vpn_service": vpn_service,
         "payment_service": payment_service,
     }
-
-
-__all__ = [
-    "register",
-    "ClientData",
-    "NotificationService",
-    "PaymentService",
-    "PlanService",
-    "PromocodeService",
-    "ServerService",
-    "VPNService",
-]

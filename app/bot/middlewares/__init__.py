@@ -1,31 +1,32 @@
-from aiogram import Dispatcher
-from aiogram.utils.i18n import SimpleI18nMiddleware
+from typing import Any
 
-from .config import ConfigMiddleware
+from aiogram import Dispatcher
+from aiogram.utils.i18n import I18n, SimpleI18nMiddleware
+from sqlalchemy.ext.asyncio import async_sessionmaker
+
 from .database import DBSessionMiddleware
 from .garbage import GarbageMiddleware
 from .maintenance import MaintenanceMiddleware
-from .services import ServicesMiddleware
 from .throttling import ThrottlingMiddleware
 
 
-def register(dp: Dispatcher, **kwargs) -> None:
+def register(dispatcher: Dispatcher, i18n: I18n, session: async_sessionmaker) -> None:
     """
     Register middlewares to extend the bot's functionality.
 
     Arguments:
-        dp (Dispatcher): Dispatcher instance to register middlewares on.
-        kwargs (Any): Middleware dependencies such as config, session, services, and throttling.
+        dispatcher (Dispatcher): Dispatcher instance to register middlewares on.
+        i18n (I18n): Instance for internationalization to be used in SimpleI18nMiddleware.
+        session (async_sessionmaker): Async session maker to be used by DBSessionMiddleware.
     """
-    dp.update.outer_middleware.register(ThrottlingMiddleware())
-    dp.update.outer_middleware.register(GarbageMiddleware())
-    dp.update.outer_middleware.register(SimpleI18nMiddleware(kwargs["i18n"]))
-    dp.update.outer_middleware.register(MaintenanceMiddleware())
-    dp.update.outer_middleware.register(ConfigMiddleware(kwargs["config"]))
-    dp.update.outer_middleware.register(DBSessionMiddleware(kwargs["session"]))
-    dp.update.outer_middleware.register(ServicesMiddleware(**kwargs["services"]))
 
+    middlewares = [
+        ThrottlingMiddleware(),
+        GarbageMiddleware(),
+        SimpleI18nMiddleware(i18n),
+        MaintenanceMiddleware(),
+        DBSessionMiddleware(session),
+    ]
 
-__all__ = [
-    "register",
-]
+    for middleware in middlewares:
+        dispatcher.update.outer_middleware.register(middleware)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-01-07 18:49+0500\n"
+"POT-Creation-Date: 2025-01-11 21:31+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -134,19 +134,15 @@ msgstr "🆘 Помощь"
 msgid "💥 Close"
 msgstr "💥 Закрыть"
 
-#: app/bot/keyboards/payment.py:23
+#: app/bot/keyboards/payment.py:24
 msgid "💸 Pay"
 msgstr "💸 Оплатить"
 
-#: app/bot/keyboards/payment.py:51
-msgid "YooKassa | {price} ₽"
-msgstr "ЮKassa | {price} ₽"
-
-#: app/bot/keyboards/payment.py:90 app/bot/keyboards/support.py:74
+#: app/bot/keyboards/payment.py:80 app/bot/keyboards/support.py:74
 msgid "📥 Download app"
 msgstr "📥 Скачать приложение"
 
-#: app/bot/keyboards/profile.py:23 app/bot/keyboards/subscription.py:46
+#: app/bot/keyboards/profile.py:23 app/bot/keyboards/subscription.py:45
 #: app/bot/keyboards/support.py:68
 msgid "💳 Buy subscription"
 msgstr "💳 Купить подписку"
@@ -159,11 +155,11 @@ msgstr "🔑 Показать ключ"
 msgid "💳 Renew subscription"
 msgstr "💳 Продлить подписку"
 
-#: app/bot/keyboards/subscription.py:54
+#: app/bot/keyboards/subscription.py:51
 msgid "💳 Extend subscription"
 msgstr "💳 Продлить подписку"
 
-#: app/bot/keyboards/subscription.py:61
+#: app/bot/keyboards/subscription.py:56
 msgid "🎟️ Activate promocode"
 msgstr "🎟️ Активировать промокод"
 
@@ -179,15 +175,49 @@ msgstr "❓ Как подключиться"
 msgid "❓ VPN not working"
 msgstr "❓ VPN не работает"
 
-#: app/bot/middlewares/maintenance.py:51
+#: app/bot/middlewares/maintenance.py:47
 msgid "🚧 The bot is in maintenance mode. Please wait."
 msgstr "🚧 Бот находится в режиме обслуживания. Пожалуйста, подождите."
 
-#: app/bot/payment_gateways/telegram_stars.py:36
-#: app/bot/payment_gateways/telegram_stars.py:39
-#: app/bot/payment_gateways/yookassa.py:44
+#: app/bot/payment_gateways/telegram_stars.py:38
+#: app/bot/payment_gateways/telegram_stars.py:41
+#: app/bot/payment_gateways/yookassa.py:67
 msgid "Subscription | {devices} for {duration}"
 msgstr "Подписка | {devices} на {duration}"
+
+#: app/bot/payment_gateways/yookassa.py:213
+#: app/bot/routes/subscription/payment.py:157
+msgid ""
+"✅ *Payment successful!*\n"
+"\n"
+"Your subscription has been extended for {duration}\n"
+msgstr ""
+"✅ *Платеж прошел успешно!*\n"
+"\n"
+"Ваша подписка продлена на {duration}\n"
+
+#: app/bot/payment_gateways/yookassa.py:225
+#: app/bot/routes/subscription/payment.py:168
+msgid ""
+"✅ *Payment successful!*\n"
+"\n"
+"🔑 *Your key:* ```{key}```\n"
+"_The key will be saved in your profile._\n"
+"\n"
+"To start using our service, go to the download page of the application "
+"and download it for your platform. Then you can manually enter the key or"
+" click `🔌 Connect` and the key will be automatically added to the "
+"application."
+msgstr ""
+"✅ *Платеж прошел успешно!*\n"
+"\n"
+"🔑 *Ваш ключ:* ```{key}```\n"
+"_Ключ будет сохранен в вашем профиле._\n"
+"\n"
+"Чтобы начать пользоваться нашим сервисом, перейдите на страницу загрузки "
+"приложения и загрузите его для своей платформы. Затем вы можете вручную "
+"ввести ключ или нажать `🔌 Подключить`, и ключ будет автоматически "
+"добавлен."
 
 #: app/bot/routes/download.py:26
 msgid "📲 *Choose your platform:*"
@@ -199,7 +229,7 @@ msgid ""
 "click the `🔌 Connect` button."
 msgstr ""
 "Чтобы подключиться, вам необходимо установить приложение и ввести свой "
-"ключ вручную илнажать кнопку `🔌 Подключить`"
+"ключ вручную или нажать кнопку `🔌 Подключить`"
 
 #: app/bot/routes/main_menu.py:27
 msgid ""
@@ -566,7 +596,7 @@ msgstr "✅ _Сервер успешно удален._"
 msgid "❌ _Failed to delete the server._"
 msgstr "❌ _Не удалось удалить сервер._"
 
-#: app/bot/routes/subscription/payment.py:63
+#: app/bot/routes/subscription/payment.py:71
 msgid ""
 "✅ *You selected:*\n"
 "\n"
@@ -585,38 +615,6 @@ msgstr ""
 "\n"
 "_После оплаты для вас сгенерируется уникальный ключ, для подключения к "
 "VPN. Ключ будет доступен в вашем профиле._"
-
-#: app/bot/routes/subscription/payment.py:148
-msgid ""
-"✅ *Payment successful!*\n"
-"\n"
-"Your subscription has been extended for {duration}\n"
-msgstr ""
-"✅ *Платеж прошел успешно!*\n"
-"\n"
-"Ваша подписка продлена на {duration}\n"
-
-#: app/bot/routes/subscription/payment.py:159
-msgid ""
-"✅ *Payment successful!*\n"
-"\n"
-"🔑 *Your key:* ```{key}```\n"
-"_The key will be saved in your profile._\n"
-"\n"
-"To start using our service, go to the download page of the application "
-"and download it for your platform. Then you can manually enter the key or"
-" click `🔌 Connect` and the key will be automatically added to the "
-"application."
-msgstr ""
-"✅ *Платеж прошел успешно!*\n"
-"\n"
-"🔑 *Ваш ключ:* ```{key}```\n"
-"_Ключ будет сохранен в вашем профиле._\n"
-"\n"
-"Чтобы начать пользоваться нашим сервисом, перейдите на страницу загрузки "
-"приложения и загрузите его для своей платформы. Затем вы можете вручную "
-"ввести ключ или нажать `🔌 Подключить`, и ключ будет автоматически "
-"добавлен."
 
 #: app/bot/routes/subscription/promocode.py:44
 msgid ""
@@ -690,7 +688,7 @@ msgstr "⏳ *Укажите срок действия:*"
 msgid "🌐 *Select the number of devices:*"
 msgstr "🌐 *Выберите количество устройств:*"
 
-#: app/bot/routes/subscription/subscription.py:170
+#: app/bot/routes/subscription/subscription.py:171
 msgid "💳 *Choose a payment method:*"
 msgstr "💳 *Выберите способ оплаты:*"
 
@@ -759,3 +757,4 @@ msgid_plural "{} months"
 msgstr[0] "1 месяц"
 msgstr[1] "{} месяца"
 msgstr[2] "{} месяцев"
+

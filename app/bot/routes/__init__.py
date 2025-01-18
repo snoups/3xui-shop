@@ -1,16 +1,7 @@
 from aiogram import Dispatcher
 
-from . import (
-    admin_tools,
-    download,
-    error,
-    main_menu,
-    notification,
-    profile,
-    referral,
-    subscription,
-    support,
-)
+from . import admin_tools, download, main_menu, profile, referral, support, utils
+from .subscription import payment_handler, promocode_handler, subscription_handler
 
 
 def include(dp: Dispatcher) -> None:
@@ -22,15 +13,28 @@ def include(dp: Dispatcher) -> None:
     """
     dp.include_routers(
         *[
-            error.router,
-            main_menu.router,
-            admin_tools.router,
-            download.router,
-            notification.router,
-            profile.router,
-            referral.router,
-            subscription.router,
-            support.router,
+            utils.error_handler.router,
+            utils.notification_handler.router,
+            #
+            main_menu.handler.router,
+            profile.handler.router,
+            referral.handler.router,
+            support.handler.router,
+            download.handler.router,
+            #
+            subscription_handler.router,
+            payment_handler.router,
+            promocode_handler.router,
+            #
+            admin_tools.admin_tools_handler.router,
+            admin_tools.backup_handler.router,
+            admin_tools.maintenance_handler.router,
+            admin_tools.notification_handler.router,
+            admin_tools.promocode_handler.router,
+            admin_tools.restart_handler.router,
+            admin_tools.server_handler.router,
+            admin_tools.statistics_handler.router,
+            admin_tools.user_handler.router,
         ]
     )
 

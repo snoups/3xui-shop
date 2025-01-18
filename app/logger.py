@@ -1,128 +1,171 @@
-import gzip
 import logging
+import logging.handlers
 import os
-import shutil
+import tarfile
 import zipfile
-from datetime import datetime, timezone
+from datetime import datetime
 from logging.handlers import TimedRotatingFileHandler
 
 from app.config import LoggingConfig
 
+logger = logging.getLogger(__name__)
 
-class CompressingFileHandler(TimedRotatingFileHandler):
+
+class ArchiveRotatingFileHandler(TimedRotatingFileHandler):
     """
-    A custom TimedRotatingFileHandler with support for log file archiving.
-
-    Attributes:
-        archive_format (str): Format for archiving log files ("zip" or "gz").
+    Custom handler that archives the log file during each rotation.
     """
 
     def __init__(
         self,
-        filename: str,
-        when: str = "midnight",
-        interval: int = 1,
-        backupCount: int = 0,
-        encoding: str = None,
-        delay: bool = False,
-        utc: bool = False,
+        filename,
+        when="h",
+        interval=1,
+        backupCount=0,
+        encoding=None,
+        delay=False,
+        utc=False,
         atTime=None,
-        archive_format: str = "zip",
-    ) -> None:
+        errors=None,
+        archive_format="zip",
+    ):
         """
-        Initialize the file handler with archiving capabilities.
+        Initializes the handler with options for the archive format.
 
         Arguments:
-            filename (str): Name of the log file.
-            when (str): Rotation interval ("S", "M", "H", "D", "midnight").
-            interval (int): Frequency of rotation.
-            backupCount (int): Number of backups to keep.
-            encoding (str): Encoding of the log file. Defaults to None.
-            delay (bool): Whether to delay file creation until writing.
-            utc (bool): Use UTC time for log rotation.
-            atTime (Optional[datetime.time]): Exact time for rotation.
-            archive_format (str): Format for archived logs ("zip" or "gz").
+            filename (str): The name of the log file to rotate.
+            when (str): The frequency of rotation (e.g., 'h' for hours, 'd' for days).
+            interval (int): The interval of rotation.
+            backupCount (int): The number of backup log files to keep.
+            encoding (str): The encoding of the log file.
+            delay (bool): Whether to delay file opening until the first log entry.
+            utc (bool): Whether to use UTC time.
+            atTime (datetime): The exact time to perform the rollover (if any).
+            errors (str): The error handling strategy for file open errors.
+            archive_format (str): The format of the archive file ('zip' or 'gz').
 
         Raises:
-            ValueError: If `archive_format` is not "zip" or "gz".
+            ValueError: If archive_format is not 'zip' or 'gz'.
         """
-        super().__init__(filename, when, interval, backupCount, encoding, delay, utc, atTime)
-
+        super().__init__(
+            filename,
+            when,
+            interval,
+            backupCount,
+            encoding,
+            delay,
+            utc,
+            atTime,
+            errors,
+        )
         if archive_format not in {"zip", "gz"}:
             raise ValueError("archive_format must be either 'zip' or 'gz'")
 
         self.archive_format = archive_format
+        logger.debug(f"Initialized ArchiveRotatingFileHandler with format: {self.archive_format}")
 
-    def doRollover(self) -> None:
+    def doRollover(self):
         """
-        Perform log rotation and archive the old log file.
-
-        Archives the rotated log file in the specified format ("zip" or "gz"),
-        then deletes the original log file to save space.
+        Perform log rotation, archive the current log file, and remove old logs.
+        Supports both ZIP and GZ formats for archiving.
         """
         super().doRollover()
 
-        # Generate the name of the current log file
-        log_file = self.rotation_filename(self.baseFilename)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        dir_name = os.path.dirname(self.baseFilename)
+        archive_name = os.path.join(dir_name, f"{timestamp}.{self.archive_format}")
 
-        if self.archive_format == "zip":
-            self._archive_to_zip(log_file)
-        elif self.archive_format == "gz":
-            self._archive_to_gz(log_file)
+        self._archive_log_file(archive_name)  # TODO: send archive to developer
+        self._remove_old_logs()
 
-        # Remove the original log file
-        os.remove(log_file)
-
-    def _archive_to_zip(self, log_file: str) -> None:
+    def _archive_log_file(self, archive_name: str) -> None:
         """
-        Archive the log file to a .zip format.
+        Archive the current log file to the specified archive name.
 
         Arguments:
-            log_file (str): Path to the log file to archive.
+            archive_name (str): The name of the archive file.
         """
-        zip_file = f"{log_file}.zip"
-        logging.info(f"Archiving {log_file} to {zip_file}")
+        logger.info(f"Archiving {self.baseFilename} to {archive_name}")
+        if os.path.exists(self.baseFilename):
+            if self.archive_format == "zip":
+                self._archive_to_zip(archive_name)
+            elif self.archive_format == "gz":
+                self._archive_to_gz(archive_name)
+        else:
+            logger.warning(f"Log file {self.baseFilename} does not exist, skipping archive.")
 
-        with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as archive:
-            archive.write(log_file, os.path.basename(log_file))
-
-    def _archive_to_gz(self, log_file: str) -> None:
+    def _archive_to_zip(self, archive_name: str) -> None:
         """
-        Archive the log file to a .gz format.
+        Archive the log file to a ZIP format.
 
         Arguments:
-            log_file (str): Path to the log file to archive.
+            archive_name (str): The name of the archive file.
         """
-        gz_file = f"{log_file}.gz"
-        logging.info(f"Archiving {log_file} to {gz_file}")
+        log = self.getFilesToDelete()[0]
+        new_log_name = self._get_log_filename(archive_name)
+        with zipfile.ZipFile(archive_name, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.write(log, new_log_name)
 
-        with open(log_file, "rb") as log:
-            with gzip.open(gz_file, "wb") as archive:
-                shutil.copyfileobj(log, archive)
+    def _archive_to_gz(self, archive_name: str) -> None:
+        """
+        Archive the log file to a GZ format.
+
+        Arguments:
+            archive_name (str): The name of the archive file.
+        """
+        log = self.getFilesToDelete()[0]
+        new_log_name = self._get_log_filename(archive_name)
+        with tarfile.open(archive_name, "w:gz") as archive:
+            archive.add(log, new_log_name)
+
+    def _get_log_filename(self, archive_name: str) -> str:
+        """
+        Generate the log file name to be used inside the archive.
+
+        Arguments:
+            archive_name (str): The name of the archive file.
+
+        Returns:
+            str: The log file name.
+        """
+        return os.path.splitext(os.path.basename(archive_name))[0] + ".log"
+
+    def _remove_old_logs(self) -> None:
+        """
+        Remove old log files and any other temporary rotated files.
+        """
+        files_to_delete = self.getFilesToDelete()
+        logger.debug(f"Removing old log files: {files_to_delete}")
+        for file in files_to_delete:
+            if os.path.exists(file):
+                try:
+                    os.remove(file)
+                    logger.debug(f"Successfully deleted old log file: {file}")
+                except Exception as exception:
+                    logger.error(f"Error deleting {file}: {exception}")
 
 
 def setup_logging(config: LoggingConfig) -> None:
     """
     Configure the logging system for the application.
 
-    Sets up a logging system with a file handler for rotating logs and compressing them
-    into the specified archive format. Also configures a stream handler for console output.
+    Sets up logging with a file handler for rotating logs and compressing them into
+    the specified archive format. Also configures a stream handler for console output.
 
     Arguments:
-        config (LoggingConfig): Logging configuration object.
+        config (LoggingConfig): Configuration object with logging parameters.
     """
     log_dir = config.DIR
     os.makedirs(log_dir, exist_ok=True)
-
+    log_file = os.path.join(log_dir, f"app.log")
     logging.basicConfig(
         level=getattr(logging, config.LEVEL.upper(), logging.INFO),
         format=config.FORMAT,
         handlers=[
-            CompressingFileHandler(
-                filename=os.path.join(log_dir, f"{datetime.now(timezone.utc).date()}.log"),
+            ArchiveRotatingFileHandler(
+                log_file,
                 when="midnight",
                 interval=1,
-                backupCount=7,
                 encoding="utf-8",
                 archive_format=config.ARCHIVE_FORMAT,
             ),
@@ -134,11 +177,14 @@ def setup_logging(config: LoggingConfig) -> None:
     aiogram_logger = logging.getLogger("aiogram.event")
     aiogram_logger.setLevel(logging.CRITICAL)
 
-    aiosqlite_logger = logging.getLogger("aiosqlite")
-    aiosqlite_logger.setLevel(logging.INFO)
+    # aiosqlite_logger = logging.getLogger("aiosqlite")
+    # aiosqlite_logger.setLevel(logging.INFO)
 
-    httpcore_logger = logging.getLogger("httpcore")
-    httpcore_logger.setLevel(logging.INFO)
+    # httpcore_logger = logging.getLogger("httpcore")
+    # httpcore_logger.setLevel(logging.INFO)
+
+    aiohttp_logger = logging.getLogger("aiohttp.access")
+    aiohttp_logger.setLevel(logging.WARNING)
 
     httpx_logger = logging.getLogger("httpx")
-    httpx_logger.setLevel(logging.INFO)
+    httpx_logger.setLevel(logging.WARNING)
