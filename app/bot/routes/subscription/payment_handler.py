@@ -118,9 +118,8 @@ async def successful_payment(
     await Transaction.create(
         session=session,
         user_id=message.from_user.id,
-        plan=message.successful_payment.invoice_payload,
+        subscription=message.successful_payment.invoice_payload,
         payment_id=message.successful_payment.telegram_payment_charge_id,
-        # amount=message.successful_payment.total_amount,
         status="success",
     )
 

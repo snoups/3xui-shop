@@ -96,9 +96,8 @@ class Yookassa(PaymentGateway):
             await Transaction.create(
                 session=session,
                 user_id=data.user_id,
-                plan=data.pack(),
+                subscription=data.pack(),
                 payment_id=response.id,
-                amount=data.price,
                 status="process",
             )
 
@@ -189,7 +188,7 @@ class Yookassa(PaymentGateway):
 
                 async with session() as session:
                     transaction = await Transaction.get(session=session, payment_id=payment_info.id)
-                data = SubscriptionData.unpack(transaction.plan)
+                data = SubscriptionData.unpack(transaction.subscription)
                 await bot.delete_message(chat_id=data.user_id, message_id=data.message_id)
                 if data.is_extend:
                     await vpn_service.extend_subscription(data.user_id, data.devices, data.duration)
@@ -201,9 +200,8 @@ class Yookassa(PaymentGateway):
                 await Transaction.update(
                     session=session,
                     user_id=data.user_id,
-                    plan=data.pack(),
+                    subscription=data.pack(),
                     payment_id=payment_info.id,
-                    amount=data.price,
                     status="success",
                 )
 
