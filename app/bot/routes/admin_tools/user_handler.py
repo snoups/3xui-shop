@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, User
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin
@@ -19,5 +19,6 @@ async def callback_user_editor(callback: CallbackQuery) -> None:
     Arguments:
         callback (CallbackQuery): The incoming callback query.
     """
-    logger.info(f"Admin {callback.from_user.id} opened user editor.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} opened user editor.")
     await callback.answer(text=_("Under development!"), show_alert=True)

@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, User
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin, IsDev
@@ -21,7 +21,8 @@ async def callback_admin_tools(callback: CallbackQuery) -> None:
     Arguments:
         callback (CallbackQuery): The incoming callback query.
     """
-    logger.info(f"Admin {callback.from_user.id} opened admin tools.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} opened admin tools.")
     is_dev = await IsDev()(callback)
     await callback.message.edit_text(
         text=_("🛠 *Admin tools:*"),

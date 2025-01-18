@@ -2,20 +2,20 @@ import asyncio
 import logging
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
-from aiogram.types import User as TelegramUser
+from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery, User
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.navigation import NavProfile
 from app.bot.services import ClientData, VPNService
 
-from .keyboard import buy_subscription_keyboard, show_key_keyboard
+from .keyboard import buy_subscription_keyboard, profile_keyboard
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
-async def prepare_message(user: TelegramUser, client_data: ClientData) -> str:
+async def prepare_message(user: User, client_data: ClientData) -> str:
     profile = (
         _("👤 *Your profile:*\n" "Name: {name}\n" "ID: {id}\n").format(
             name=user.first_name, id=user.id
@@ -52,25 +52,31 @@ async def prepare_message(user: TelegramUser, client_data: ClientData) -> str:
 
 
 @router.callback_query(F.data == NavProfile.MAIN)
-async def callback_profile(callback: CallbackQuery, vpn_service: VPNService) -> None:
-    logger.info(f"User {callback.from_user.id} opened profile page.")
-
-    client_data = await vpn_service.get_client_data(callback.from_user.id)
+async def callback_profile(
+    callback: CallbackQuery,
+    vpn_service: VPNService,
+    state: FSMContext,
+) -> None:
+    user: User = callback.from_user
+    logger.info(f"User {user.id} opened profile page.")
+    await state.update_data(callback=NavProfile.MAIN)
+    client_data = await vpn_service.get_client_data(user.id)
     reply_markup = (
-        show_key_keyboard()
+        profile_keyboard()
         if client_data and not client_data.has_subscription_expired
         else buy_subscription_keyboard()
     )
     await callback.message.edit_text(
-        text=await prepare_message(callback.from_user, client_data),
+        text=await prepare_message(user, client_data),
         reply_markup=reply_markup,
     )
 
 
 @router.callback_query(F.data == NavProfile.SHOW_KEY)
 async def callback_show_key(callback: CallbackQuery, vpn_service: VPNService) -> None:
-    logger.info(f"User {callback.from_user.id} looked key.")
-    key = await vpn_service.get_key(callback.from_user.id)
+    user: User = callback.from_user
+    logger.info(f"User {user.id} looked key.")
+    key = await vpn_service.get_key(user.id)
     key_text = _("🔑 *Your key:* (Closes after {seconds_text}) ```{key}```")
     message = await callback.message.answer(key_text.format(key=key, seconds_text=_("6 seconds")))
 

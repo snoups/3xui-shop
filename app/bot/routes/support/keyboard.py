@@ -3,7 +3,7 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.navigation import NavDownload, NavMain, NavSubscription, NavSupport
-from app.bot.routes.utils.keyboard import back_button
+from app.bot.routes.utils.keyboard import back_button, back_to_main_menu_button
 
 
 def contact_button(support_id: int) -> InlineKeyboardButton:
@@ -29,7 +29,7 @@ def support_keyboard(support_id: int) -> InlineKeyboardMarkup:
     )
     builder.row(contact_button(support_id))
 
-    builder.row(back_button(NavMain.MAIN_MENU))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 

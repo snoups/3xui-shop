@@ -6,7 +6,7 @@ from app.bot.navigation import NavDownload, NavSupport
 from app.bot.routes.utils.keyboard import back_button
 
 
-def platforms_keyboard() -> InlineKeyboardMarkup:
+def platforms_keyboard(previous_callback: str = None) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.row(
@@ -15,7 +15,8 @@ def platforms_keyboard() -> InlineKeyboardMarkup:
         InlineKeyboardButton(text="💻 Windows", callback_data=NavDownload.PLATFORM_WINDOWS),
     )
 
-    builder.row(back_button(NavSupport.HOW_TO_CONNECT))
+    back_callback = previous_callback if previous_callback else NavSupport.HOW_TO_CONNECT
+    builder.row(back_button(back_callback))
     return builder.as_markup()
 
 

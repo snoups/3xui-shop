@@ -3,7 +3,7 @@ import logging
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, User
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin
@@ -52,7 +52,8 @@ async def callback_promocode_editor(callback: CallbackQuery, state: FSMContext) 
         callback (CallbackQuery): The incoming callback query.
         state (FSMContext): The state context for managing conversation state.
     """
-    logger.info(f"Admin {callback.from_user.id} opened promocode editor.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} opened promocode editor.")
     await state.set_state(None)
 
     await callback.message.edit_text(
@@ -70,7 +71,8 @@ async def callback_create_promocode(callback: CallbackQuery, state: FSMContext) 
     Arguments:
         callback (CallbackQuery): The incoming callback query.
     """
-    logger.info(f"Admin {callback.from_user.id} started creating promocode.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} started creating promocode.")
     await state.set_state(CreatePromocodeStates.selecting_duration)
     await callback.message.edit_text(
         text=_("🎟️ *Promocode editor:*\n" "\n" "_Specify the duration_"),
@@ -91,7 +93,8 @@ async def callback_duration_selected(
         callback (CallbackQuery): The incoming callback query.
         promocode_service (PromocodeService): Service for handling promocode creation.
     """
-    logger.info(f"Admin {callback.from_user.id} selected {callback.data} days for promocode.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} selected {callback.data} days for promocode.")
     promocode = await promocode_service.create_promocode(int(callback.data))
     await callback.message.edit_text(
         text=_("🎟️ *Promocode editor:*\n"),
@@ -120,7 +123,8 @@ async def callback_delete_promocode(callback: CallbackQuery, state: FSMContext) 
         callback (CallbackQuery): The incoming callback query.
         state (FSMContext): The state context for managing conversation state.
     """
-    logger.info(f"Admin {callback.from_user.id} started deleting promocode.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} started deleting promocode.")
     await state.set_state(DeletePromocodeStates.promocode_input)
     await state.update_data(message=callback.message)
     await callback.message.edit_text(
@@ -143,8 +147,9 @@ async def handle_promocode_input(
         state (FSMContext): The state context for managing conversation state.
         promocode_service (PromocodeService): Service for handling promocode deletion.
     """
+    user: User = message.from_user
     input_promocode = message.text.strip()
-    logger.info(f"Admin {message.from_user.id} entered promocode: {input_promocode} for deleting.")
+    logger.info(f"Admin {user.id} entered promocode: {input_promocode} for deleting.")
 
     if await promocode_service.delete_promocode(input_promocode):
         message = await state.get_value("message")
@@ -181,7 +186,8 @@ async def callback_edit_promocode(callback: CallbackQuery, state: FSMContext) ->
         callback (CallbackQuery): The incoming callback query.
         state (FSMContext): The state context for managing conversation state.
     """
-    logger.info(f"Admin {callback.from_user.id} started deleting promocode.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} started deleting promocode.")
     await state.set_state(EditPromocodeStates.promocode_input)
     await state.update_data(message=callback.message)
     await callback.message.edit_text(
@@ -204,8 +210,9 @@ async def handle_promocode_input(
         state (FSMContext): The state context for managing conversation state.
         promocode_service (PromocodeService): Service for handling promocode deletion.
     """
+    user: User = message.from_user
     input_promocode = message.text.strip()
-    logger.info(f"Admin {message.from_user.id} entered promocode: {input_promocode} for editing.")
+    logger.info(f"Admin {user.id} entered promocode: {input_promocode} for editing.")
 
     promocode: Promocode = await promocode_service.get_promocode(input_promocode)
     if promocode and not promocode.is_activated:
@@ -237,7 +244,8 @@ async def callback_duration_selected(
         callback (CallbackQuery): The incoming callback query.
         promocode_service (PromocodeService): Service for handling promocode creation.
     """
-    logger.info(f"Admin {callback.from_user.id} selected {callback.data} days for promocode.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} selected {callback.data} days for promocode.")
     input_promocode = await state.get_value("input_promocode")
     promocode = await promocode_service.update_promocode(input_promocode, int(callback.data))
     await callback.message.edit_text(

@@ -18,12 +18,6 @@ def close_notification_keyboard() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.i18n import gettext as _
-
-from app.bot.navigation import NavMain
-
-
 def back_button(callback: str) -> InlineKeyboardButton:
     return InlineKeyboardButton(text=_("◀️ Back"), callback_data=callback)
 

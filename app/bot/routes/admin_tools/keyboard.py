@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.middlewares import MaintenanceMiddleware
 from app.bot.navigation import NavAdminTools, NavMain
-from app.bot.routes.utils.keyboard import back_button
+from app.bot.routes.utils.keyboard import back_button, back_to_main_menu_button
 from app.db.models import Server
 
 
@@ -83,7 +83,7 @@ def admin_tools_keyboard(is_dev: bool) -> InlineKeyboardMarkup:
         )
     )
 
-    builder.row(back_button(NavMain.MAIN_MENU))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 

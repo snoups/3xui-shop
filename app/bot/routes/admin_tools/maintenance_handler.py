@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, User
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin
@@ -22,7 +22,8 @@ async def callback_maintenance_mode(callback: CallbackQuery) -> None:
     Arguments:
         callback (CallbackQuery): The incoming callback query.
     """
-    logger.info(f"Admin {callback.from_user.id} navigated to maintenance mode options.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} navigated to maintenance mode options.")
     status = _("enabled.") if MaintenanceMiddleware.active else _("disabled.")
     await callback.message.edit_text(
         text=_("🚧 *Maintenance mode:*") + " " + status,
@@ -38,7 +39,8 @@ async def callback_maintenance_on(callback: CallbackQuery) -> None:
     Arguments:
         callback (CallbackQuery): The incoming callback query.
     """
-    logger.info(f"Admin {callback.from_user.id} enabled maintenance mode.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} enabled maintenance mode.")
     MaintenanceMiddleware.set_mode(True)
     await callback.message.edit_text(
         text=_("🚧 *Maintenance mode:* enabled."),
@@ -59,7 +61,8 @@ async def callback_maintenance_off(callback: CallbackQuery) -> None:
     Arguments:
         callback (CallbackQuery): The incoming callback query.
     """
-    logger.info(f"Admin {callback.from_user.id} disabled maintenance mode.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} disabled maintenance mode.")
     MaintenanceMiddleware.set_mode(False)
     await callback.message.edit_text(
         text=_("🚧 *Maintenance mode:* disabled."),

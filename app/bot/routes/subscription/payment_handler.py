@@ -1,7 +1,8 @@
 import logging
 
 from aiogram import Bot, F, Router
-from aiogram.types import CallbackQuery, Message, PreCheckoutQuery
+from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery, Message, PreCheckoutQuery, User
 from aiogram.utils.i18n import gettext as _
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,11 +28,12 @@ async def callback_payment_method_selected(
     bot: Bot,
 ) -> None:
     # TODO: FIX MANY CALL
+    user: User = callback.from_user
     method = callback_data.state
     devices = callback_data.devices
     duration = callback_data.duration
-    logger.info(f"User {callback.from_user.id} selected payment method: {method}")
-    logger.info(f"User {callback.from_user.id} selected {devices} devices and {duration} days.")
+    logger.info(f"User {user.id} selected payment method: {method}")
+    logger.info(f"User {user.id} selected {devices} devices and {duration} days.")
     gateway = payment_service.get_gateway(method)
     price = plan_service.get_price_for_duration(
         plan_service.get_plan(devices).prices.to_dict(),
@@ -45,14 +47,14 @@ async def callback_payment_method_selected(
 
     # await Transaction.create(
     #     session=session,
-    #     user_id=callback.message.from_user.id,
+    #     user_id=callback.from_user.id,
     #     payment_id=,
     #     amount=price,
     #     status="process",
     # )
 
     link = await payment_service.create_payment(gateway, callback_data, bot)
-    logger.info(f"Payment link created for user {callback.from_user.id}: {link}")
+    logger.info(f"Payment link created for user {user.id}: {link}")
 
     await callback.message.edit_text(
         text=_(
@@ -76,7 +78,8 @@ async def callback_payment_method_selected(
 
 @router.pre_checkout_query()
 async def pre_checkout_handler(pre_checkout_query: PreCheckoutQuery) -> None:
-    logger.info(f"Pre-checkout query received from user {pre_checkout_query.from_user.id}")
+    user: User = pre_checkout_query.from_user
+    logger.info(f"Pre-checkout query received from user {user.id}")
     if pre_checkout_query.invoice_payload is not None:
         await pre_checkout_query.answer(ok=True)
     else:
@@ -89,35 +92,38 @@ async def successful_payment(
     session: AsyncSession,
     vpn_service: VPNService,
     bot: Bot,
+    state: FSMContext,
 ) -> None:
-    logger.info(f"Payment successful for user {message.from_user.id}")
+    user: User = message.from_user
+    logger.info(f"Payment successful for user {user.id}")
+    await state.update_data(callback=NavSubscription.MAIN)
     data = SubscriptionData.unpack(message.successful_payment.invoice_payload)
     logger.debug(f"Subscription data unpacked: {data}")
 
     if await IsDev()(message):
         await bot.refund_star_payment(
-            user_id=message.from_user.id,
+            user_id=user.id,
             telegram_payment_charge_id=message.successful_payment.telegram_payment_charge_id,
         )
 
-    await bot.delete_message(chat_id=message.chat.id, message_id=data.message_id)
+    await bot.delete_message(chat_id=user.id, message_id=data.message_id)
     # await bot.edit_message_text(
     #     text="Successful payment!",
-    #     chat_id=message.chat.id,
+    #     chat_id=user.id,
     #     message_id=data.message_id,
     #     reply_markup=back_to_main_menu_keyboard(),
     # )
 
     if data.is_extend:
-        await vpn_service.extend_subscription(data.user_id, data.devices, data.duration)
-        logger.info(f"Subscription extented for user {data.user_id}")
+        await vpn_service.extend_subscription(user.id, data.devices, data.duration)
+        logger.info(f"Subscription extented for user {user.id}")
     else:
-        await vpn_service.create_subscription(data.user_id, data.devices, data.duration)
-        logger.info(f"Subscription created for user {data.user_id}")
+        await vpn_service.create_subscription(user.id, data.devices, data.duration)
+        logger.info(f"Subscription created for user {user.id}")
 
     await Transaction.create(
         session=session,
-        user_id=message.from_user.id,
+        user_id=user.id,
         subscription=message.successful_payment.invoice_payload,
         payment_id=message.successful_payment.telegram_payment_charge_id,
         status="success",
@@ -134,7 +140,7 @@ async def successful_payment(
             reply_markup=back_to_main_menu_keyboard(),
         )
     else:
-        key = await vpn_service.get_key(message.from_user.id)
+        key = await vpn_service.get_key(user.id)
         await message.answer(
             text=_(
                 "✅ *Payment successful!*\n"

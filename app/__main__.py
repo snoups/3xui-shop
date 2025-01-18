@@ -27,8 +27,8 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
         dispatcher (Dispatcher): The dispatcher instance.
         bot (Bot): The bot instance.
     """
-    db: Database = dispatcher["db"]
-    config: Config = dispatcher["config"]
+    db: Database = dispatcher.get("db")
+    config: Config = dispatcher.get("config")
     notification_service: NotificationService = dispatcher.get("notification_service")
 
     if config.bot.DEV_ID:
@@ -50,7 +50,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
         bot (Bot): The bot instance.
     """
     logger.info("Bot started.")
-    config: Config = dispatcher["config"]
+    config: Config = dispatcher.get("config")
     webhook_url = f"{config.bot.WEBHOOK}webhook"
 
     if await bot.get_webhook_info() != webhook_url:

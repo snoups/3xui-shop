@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, User
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.navigation import NavSubscription, SubscriptionData
@@ -56,9 +56,10 @@ async def show_subscription(
 
 @router.callback_query(F.data == NavSubscription.MAIN)
 async def callback_subscription(callback: CallbackQuery, vpn_service: VPNService) -> None:
-    logger.info(f"User {callback.from_user.id} opened subscription page.")
-    client_data = await vpn_service.get_client_data(callback.from_user.id)
-    callback_data = SubscriptionData(state=NavSubscription.PROCESS, user_id=callback.from_user.id)
+    user: User = callback.from_user
+    logger.info(f"User {user.id} opened subscription page.")
+    client_data = await vpn_service.get_client_data(user.id)
+    callback_data = SubscriptionData(state=NavSubscription.PROCESS, user_id=user.id)
     await show_subscription(callback, client_data, callback_data)
 
 
@@ -69,8 +70,9 @@ async def callback_subscription_extend(
     plan_service: PlanService,
     vpn_service: VPNService,
 ) -> None:
-    logger.info(f"User {callback.from_user.id} started extend subscription.")
-    client = await vpn_service.is_client_exists(callback.from_user.id)
+    user: User = callback.from_user
+    logger.info(f"User {user.id} started extend subscription.")
+    client = await vpn_service.is_client_exists(user.id)
     callback_data.devices = await vpn_service.get_limit_ip(client)
     callback_data.state = NavSubscription.DURATION
     callback_data.is_extend = True
@@ -86,7 +88,8 @@ async def callback_subscription_process(
     callback_data: SubscriptionData,
     plan_service: PlanService,
 ) -> None:
-    logger.info(f"User {callback.from_user.id} started subscription process.")
+    user: User = callback.from_user
+    logger.info(f"User {user.id} started subscription process.")
     callback_data.state = NavSubscription.DEVICES
     await callback.message.edit_text(
         text=_("🌐 *Select the number of devices:*"),
@@ -100,7 +103,8 @@ async def callback_devices_selected(
     callback_data: SubscriptionData,
     plan_service: PlanService,
 ) -> None:
-    logger.info(f"User {callback.from_user.id} selected devices: {callback_data.devices}")
+    user: User = callback.from_user
+    logger.info(f"User {user.id} selected devices: {callback_data.devices}")
     callback_data.state = NavSubscription.DURATION
     await callback.message.edit_text(
         text=_("⏳ *Specify the duration:*"),
@@ -115,7 +119,8 @@ async def callback_duration_selected(
     plan_service: PlanService,
     payment_service: PaymentService,
 ) -> None:
-    logger.info(f"User {callback.from_user.id} selected duration: {callback_data.duration}")
+    user: User = callback.from_user
+    logger.info(f"User {user.id} selected duration: {callback_data.duration}")
     callback_data.state = NavSubscription.PAY
     await callback.message.edit_text(
         text=_("💳 *Choose a payment method:*"),

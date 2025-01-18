@@ -33,16 +33,21 @@ def prepare_message(user: User) -> str:
 
 @router.message(Command(NavMain.START))
 async def command_main_menu(message: Message, state: FSMContext) -> None:
-    logger.info(f"User {message.from_user.id} opened main menu page.")
+    user: User = message.from_user
+    logger.info(f"User {user.id} opened main menu page.")
     previous_message_id = await state.get_value("message_id")
 
     if previous_message_id:
-        await message.bot.delete_message(message.chat.id, previous_message_id)
+        try:
+            await message.bot.delete_message(chat_id=user.id, message_id=previous_message_id)
+            logger.debug(f"Main message for user {user.id} deleted.")
+        except Exception as exception:
+            logger.error(f"Failed to delete main message for user {user.id}: {exception}")
         await state.clear()
 
     is_admin = await IsAdmin()(message)
     main_menu_message = await message.answer(
-        text=prepare_message(message.from_user),
+        text=prepare_message(user),
         reply_markup=main_menu_keyboard(is_admin),
     )
     await state.update_data(message_id=main_menu_message.message_id)
@@ -51,11 +56,12 @@ async def command_main_menu(message: Message, state: FSMContext) -> None:
 
 @router.callback_query(F.data == NavMain.MAIN_MENU)
 async def callback_main_menu(callback: CallbackQuery, state: FSMContext) -> None:
-    logger.info(f"User {callback.from_user.id} returned to main menu page.")
+    user: User = callback.from_user
+    logger.info(f"User {user.id} returned to main menu page.")
     await state.clear()
     await state.update_data(message_id=callback.message.message_id)
     is_admin = await IsAdmin()(callback)
     await callback.message.edit_text(
-        text=prepare_message(callback.from_user),
+        text=prepare_message(user),
         reply_markup=main_menu_keyboard(is_admin),
     )

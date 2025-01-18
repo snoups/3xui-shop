@@ -3,7 +3,7 @@ import os
 import sys
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, User
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin
@@ -21,7 +21,8 @@ async def callback_restart_bot(callback: CallbackQuery) -> None:
     Arguments:
         callback (CallbackQuery): The incoming callback query.
     """
-    logger.info(f"Admin {callback.from_user.id} restarted bot.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} restarted bot.")
     name = os.getenv("HOSTNAME", None)
     if name:
         os.system(f"docker restart {name}")  # TODO: Test docker

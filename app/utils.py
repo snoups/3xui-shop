@@ -22,7 +22,7 @@ async def ping_url(url: str, timeout: int = 5) -> float | None:
     try:
         async with aiohttp.ClientSession() as session:
             start_time = time.time()
-            async with session.get(url, timeout=timeout) as response:
+            async with session.get(url, timeout=timeout, ssl=False) as response:
                 response_time = (time.time() - start_time) * 1000
                 if response.status == 200:
                     return round(response_time)

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from aiogram import F, Router
 from aiogram.exceptions import TelegramAPIError
-from aiogram.types import CallbackQuery, FSInputFile
+from aiogram.types import CallbackQuery, FSInputFile, User
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin
@@ -22,7 +22,8 @@ async def callback_create_backup(callback: CallbackQuery) -> None:
     Arguments:
         callback (CallbackQuery): The incoming callback query.
     """
-    logger.info(f"Admin {callback.from_user.id} initiated backup creation.")
+    user: User = callback.from_user
+    logger.info(f"Admin {user.id} initiated backup creation.")
     config = load_config()
     try:
         file = FSInputFile(
