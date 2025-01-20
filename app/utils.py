@@ -1,11 +1,25 @@
 import logging
 import re
 import time
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 import aiohttp
 
 logger = logging.getLogger(__name__)
+
+
+def parse_redirect_url(query_string: str) -> dict[str, str]:
+    """
+    Parses a query string into a dictionary.
+
+    Arguments:
+        query_string (str): The query string from the URL.
+
+    Returns:
+        dict: A dictionary with query parameters as keys and their values as strings.
+    """
+    parsed_query = parse_qs(query_string)
+    return {key: value[0] for key, value in parsed_query.items() if value}
 
 
 async def ping_url(url: str, timeout: int = 5) -> float | None:

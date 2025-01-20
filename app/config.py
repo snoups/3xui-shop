@@ -169,9 +169,7 @@ def load_config() -> Config:
     return Config(
         bot=BotConfig(
             TOKEN=env.str("BOT_TOKEN"),
-            ADMINS=env.list(
-                "BOT_ADMINS", subcast=list, default=[], required=False
-            ),  # TODO: TEST required
+            ADMINS=env.list("BOT_ADMINS", subcast=int, default=[], required=False),
             DEV_ID=env.int("BOT_DEV_ID"),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
             WEBHOOK=env.str("BOT_WEBHOOK"),

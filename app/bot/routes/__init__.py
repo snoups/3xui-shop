@@ -1,17 +1,19 @@
 from aiogram import Dispatcher
+from aiohttp.web import Application
 
 from . import admin_tools, download, main_menu, profile, referral, support, utils
 from .subscription import payment_handler, promocode_handler, subscription_handler
 
 
-def include(dp: Dispatcher) -> None:
+def include(dispatcher: Dispatcher, app: Application) -> None:
     """
     Includes all necessary routers into the main Dispatcher.
 
     Arguments:
-        dp (Dispatcher): The main Dispatcher instance that will handle the routing of updates.
+        dispatcher (Dispatcher): The main Dispatcher instance that will handle the routing of updates.
     """
-    dp.include_routers(
+    app.router.add_get("/connection", download.handler.redirect_to_connection),
+    dispatcher.include_routers(
         *[
             utils.error_handler.router,
             utils.notification_handler.router,

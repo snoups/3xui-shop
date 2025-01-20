@@ -64,8 +64,10 @@ class Yookassa(PaymentGateway):
             str: The payment link for the subscription.
         """
         redirect = f"https://t.me/{(await self.bot.get_me()).username}"
+        devices = PlanService.convert_devices_to_title(data.devices)
+        duration = PlanService.convert_days_to_period(data.duration)
         description = _("Subscription | {devices} for {duration}").format(
-            devices=data.devices, duration=data.duration
+            devices=devices, duration=duration
         )
 
         receipt = Receipt()

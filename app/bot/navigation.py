@@ -93,3 +93,11 @@ class TransactionStatus(Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     REFUNDED = "refunded"
+
+
+V2RAYTUN_IOS_LINK = "https://apps.apple.com/ru/app/v2raytun/id6476628951"
+V2RAYTUN_ANDROID_LINK = "https://play.google.com/store/apps/details?id=com.v2raytun.android"
+HIDDIFY_WINDOWS_LINK = (
+    "https://github.com/hiddify/hiddify-next/releases/download/"
+    "v2.0.5/Hiddify-Windows-Setup-x64.exe"
+)

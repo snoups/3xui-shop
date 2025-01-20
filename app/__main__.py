@@ -7,7 +7,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.i18n import I18n
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
-from aiohttp import web
+from aiohttp.web import Application, _run_app
 
 from app.bot import commands, filters, middlewares, routes
 from app.bot.middlewares import MaintenanceMiddleware
@@ -70,7 +70,7 @@ async def main() -> None:
     Initializes the bot, sets up services, and runs the application.
     """
     # Create web application
-    app = web.Application()
+    app = Application()
 
     # Load configuration
     config = load_config()
@@ -116,7 +116,7 @@ async def main() -> None:
     filters.register(dispatcher, config.bot.DEV_ID, config.bot.ADMINS)
 
     # Include bot routes
-    routes.include(dispatcher)
+    routes.include(dispatcher, app)
 
     # Initialize database
     await db.initialize()
@@ -130,7 +130,7 @@ async def main() -> None:
 
     # Set up application and run
     setup_application(app, dispatcher, bot=bot)
-    await web._run_app(app, host="0.0.0.0", port=config.bot.WEBHOOK_PORT)
+    await _run_app(app, host="0.0.0.0", port=config.bot.WEBHOOK_PORT)
 
 
 if __name__ == "__main__":
