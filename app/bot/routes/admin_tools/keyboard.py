@@ -9,27 +9,10 @@ from app.db.models import Server
 
 
 def admin_tools_button() -> InlineKeyboardButton:
-    """
-    Generates a button for accessing admin tools.
-
-    Returns:
-        InlineKeyboardButton: Button to access admin tools.
-    """
     return InlineKeyboardButton(text=_("🛠 Admin tools"), callback_data=NavAdminTools.MAIN)
 
 
 def admin_tools_keyboard(is_dev: bool) -> InlineKeyboardMarkup:
-    """
-    Generates a keyboard with options for admin tools.
-
-    Includes statistics, user editor, and other management options.
-
-    Arguments:
-        is_dev (bool): Whether the user is a developer, showing additional management options.
-
-    Returns:
-        InlineKeyboardMarkup: Keyboard with admin tool options and a back button.
-    """
     builder = InlineKeyboardBuilder()
 
     if is_dev:
@@ -82,20 +65,18 @@ def admin_tools_keyboard(is_dev: bool) -> InlineKeyboardMarkup:
             callback_data=NavAdminTools.RESTART_BOT,
         )
     )
+    builder.row(
+        InlineKeyboardButton(
+            text=_("TEST BUTTON"),
+            callback_data=NavAdminTools.TEST,
+        )
+    )
 
     builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
 def promocode_editor_keyboard() -> InlineKeyboardMarkup:
-    """
-    Generates a keyboard for managing promocodes.
-
-    Options include create, delete, and edit promocodes, with a back button.
-
-    Returns:
-        InlineKeyboardMarkup: Keyboard with promocode management options and a back button.
-    """
     builder = InlineKeyboardBuilder()
 
     builder.row(
@@ -123,12 +104,6 @@ def promocode_editor_keyboard() -> InlineKeyboardMarkup:
 
 
 def promocode_duration_keyboard() -> InlineKeyboardMarkup:
-    """
-    Generates a keyboard for selecting promocode duration.
-
-    Returns:
-        InlineKeyboardMarkup: Keyboard for selecting duration options with a back button.
-    """
     builder = InlineKeyboardBuilder()
     duration_options = [1, 7, 30, 90, 365]
 
@@ -146,12 +121,6 @@ def promocode_duration_keyboard() -> InlineKeyboardMarkup:
 
 
 def maintenance_mode_keyboard() -> InlineKeyboardMarkup:
-    """
-    Generates a keyboard for toggling maintenance mode.
-
-    Returns:
-        InlineKeyboardMarkup: Keyboard with maintenance mode toggle and a back button.
-    """
     builder = InlineKeyboardBuilder()
 
     if MaintenanceMiddleware.active:
@@ -175,17 +144,6 @@ def maintenance_mode_keyboard() -> InlineKeyboardMarkup:
 
 
 def servers_keyboard(servers: list) -> InlineKeyboardMarkup:
-    """
-    Generates a keyboard for managing servers.
-
-    Options include adding, deleting, and editing servers, with a back button.
-
-    Arguments:
-        servers (list): List of server objects to be displayed in the keyboard.
-
-    Returns:
-        InlineKeyboardMarkup: Keyboard with server management options and a back button.
-    """
     builder = InlineKeyboardBuilder()
 
     builder.row(
@@ -210,15 +168,6 @@ def servers_keyboard(servers: list) -> InlineKeyboardMarkup:
 
 
 def server_keyboard(server_name: str) -> InlineKeyboardMarkup:
-    """
-    Generates a keyboard for a single server with options for pinging and deleting it.
-
-    Arguments:
-        server_name (str): The name of the server for which the keyboard is generated.
-
-    Returns:
-        InlineKeyboardMarkup: Keyboard with server options (ping and delete) and a back button.
-    """
     builder = InlineKeyboardBuilder()
 
     builder.row(
@@ -240,12 +189,6 @@ def server_keyboard(server_name: str) -> InlineKeyboardMarkup:
 
 
 def confirm_add_server_keyboard() -> InlineKeyboardMarkup:
-    """
-    Generates a confirmation keyboard for adding a server.
-
-    Returns:
-        InlineKeyboardMarkup: Keyboard with a confirmation button and a back button.
-    """
     builder = InlineKeyboardBuilder()
 
     builder.row(

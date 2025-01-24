@@ -5,10 +5,11 @@ from py3xui import AsyncApi, Client, Inbound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Config
-from app.db.models import Promocode, User
+from app.db.models import Promocode, Server, User
 
 from .client import ClientData
 from .promocode import PromocodeService
+from .server import ServerService
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +21,8 @@ class VPNService:
 
     Attributes:
         session (AsyncSession): Database session for operations.
-        subscription (str): VPN subscription identifier.
-        api (AsyncApi): API client for interacting with the VPN service.
+        config
+        server_service
         promocode_service (PromocodeService): Service for managing promocodes.
     """
 
@@ -29,6 +30,7 @@ class VPNService:
         self,
         session: AsyncSession,
         config: Config,
+        server_service: ServerService,
         promocode_service: PromocodeService,
     ) -> None:
         """
@@ -40,23 +42,47 @@ class VPNService:
             promocode_service (PromocodeService): Service for managing promocodes.
         """
         self.session = session
-        self.subscription = config.xui.SUBSCRIPTION
-        self.api = AsyncApi(
-            host=config.xui.HOST,
-            username=config.xui.USERNAME,
-            password=config.xui.PASSWORD,
-            token=config.xui.TOKEN,
-            use_tls_verify=False,
-            logger=logging.getLogger("xui"),
-        )
+        self.config = config
+        self.server_service = server_service
         self.promocode_service = promocode_service
+
         logger.info("VPNService initialized.")
 
-    async def initialize(self) -> None:
-        """
-        Initializes the VPN service and logs in to the API.
-        """
-        await self.api.login()
+    async def sync_servers(self) -> None:
+        servers_to_add, servers_to_remove = await self.server_service.get_current_servers()
+
+        for server in servers_to_add:
+            if server:
+                await self.add_server(server)
+
+        for server in servers_to_remove:
+            self.server_service.servers.pop(server.id)
+            logger.info(f"Removed server {server.name} from active list.")
+
+        logger.info(
+            f"Sync complete: {len(servers_to_add)} added, {len(servers_to_remove)} removed."
+        )
+
+    async def add_server(self, server: Server) -> None:
+        try:
+            api = AsyncApi(
+                host=server.host,
+                username=self.config.xui.USERNAME,
+                password=self.config.xui.PASSWORD,
+                token=self.config.xui.TOKEN,
+                use_tls_verify=False,
+                logger=logging.getLogger(f"xui_{server.name}"),
+            )
+            await api.login()
+            self.server_service.servers[server.id] = (server, api)
+            logger.info(f"Authenticated and added server {server.name} ({server.host}).")
+        except Exception as exception:
+            logger.error(f"Failed to add server {server.name} ({server.host}): {exception}")
+            if server in self.server_service.servers:
+                self.server_service.servers.pop(server)
+            logger.warning(
+                f"Server {server.name} removed from active list due to authentication failure."
+            )
 
     async def is_client_exists(self, user_id: int) -> Client | None:
         """
@@ -158,10 +184,15 @@ class VPNService:
             str: The generated VPN key.
         """
         async with self.session() as session:
-            user: User = await User.get(session, user_id=user_id)
-        key = f"{self.subscription}{user.vpn_id}"
-        logger.debug(f"Fetched key for {user_id}: {key}.")
-        return key
+            user: User = await User.get(session, tg_id=user_id)
+
+            print(user)
+
+            subscription = user.server.subscription
+
+            key = f"{subscription}{user.vpn_id}"
+            logger.debug(f"Fetched key for {user_id}: {key}.")
+            return key
 
     async def create_client(
         self,
@@ -173,9 +204,9 @@ class VPNService:
         total_gb: int = 0,
         inbound_id: int = 7,  # TODO: Make a server config
     ) -> bool:
-        logger.info(f"Creating new client {user.user_id} | {devices} devices {duration} days.")
+        logger.info(f"Creating new client {user.tg_id} | {devices} devices {duration} days.")
         new_client = Client(
-            email=str(user.user_id),
+            email=str(user.tg_id),
             enable=enable,
             id=user.vpn_id,
             expiry_time=self._days_to_timestamp(duration),
@@ -201,10 +232,10 @@ class VPNService:
         """
         try:
             await self.api.client.add(inbound_id, [new_client])
-            logger.info(f"Successfully created client for {user.user_id}.")
+            logger.info(f"Successfully created client for {user.tg_id}.")
             return True
         except Exception as exception:
-            logger.error(f"Error creating client for {user.user_id}: {exception}")
+            logger.error(f"Error creating client for {user.tg_id}: {exception}")
             return False
 
     async def update_client(
@@ -234,13 +265,13 @@ class VPNService:
         Returns:
             bool: True if the client was updated successfully, False otherwise.
         """
-        logger.info(f"Updating client {user.user_id} | {devices} devices {duration} days.")
+        logger.info(f"Updating client {user.tg_id} | {devices} devices {duration} days.")
 
         try:
-            client: Client = await self.api.client.get_by_email(str(user.user_id))
+            client: Client = await self.api.client.get_by_email(str(user.tg_id))
 
             if client is None:
-                logger.debug(f"Client {user.user_id} not found for update.")
+                logger.debug(f"Client {user.tg_id} not found for update.")
                 return False
 
             if not replace_devices:
@@ -265,10 +296,10 @@ class VPNService:
             client.total_gb = total_gb
 
             await self.api.client.update(client.id, client)
-            logger.info(f"Client {user.user_id} updated successfully.")
+            logger.info(f"Client {user.tg_id} updated successfully.")
             return True
         except Exception as exception:
-            logger.error(f"Error updating client {user.user_id}: {exception}")
+            logger.error(f"Error updating client {user.tg_id}: {exception}")
             return False
 
     async def create_subscription(self, user_id: int, devices: int, duration: int) -> bool:
@@ -284,9 +315,9 @@ class VPNService:
             bool: True if the subscription was created, False otherwise.
         """
         async with self.session() as session:
-            user: User = await User.get(session, user_id=user_id)
+            user: User = await User.get(session, tg_id=user_id)
 
-        if not await self.is_client_exists(user.user_id):
+        if not await self.is_client_exists(user.tg_id):
             return await self.create_client(user, devices, duration)
 
         return await self.update_client(
@@ -310,7 +341,7 @@ class VPNService:
             bool: True if the subscription was extended, False otherwise.
         """
         async with self.session() as session:
-            user: User = await User.get(session, user_id=user_id)
+            user: User = await User.get(session, tg_id=user_id)
         return await self.update_client(user, devices, duration, replace_devices=True)
 
     async def activate_promocode(self, user_id: int, promocode: Promocode) -> bool:
@@ -329,7 +360,7 @@ class VPNService:
             return False
 
         async with self.session() as session:
-            user: User = await User.get(session, user_id=user_id)
+            user: User = await User.get(session, tg_id=user_id)
 
         if await self.is_client_exists(user_id):
             success = await self.update_client(user, devices=0, duration=promocode.duration)

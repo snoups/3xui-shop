@@ -14,7 +14,7 @@ class NavProfile(str, Enum):
     SHOW_KEY = "show_key"
 
 
-class NavRefferal(str, Enum):
+class NavReferral(str, Enum):
     MAIN = "referral"
 
 
@@ -51,6 +51,7 @@ class NavSubscription(str, Enum):
 
 class NavAdminTools(str, Enum):
     MAIN = "admin_tools"
+    TEST = "test"
     SERVER_MANAGEMENT = "server_management"
     SHOW_SERVER = "show_server"
     PING_SERVER = "ping_server"
@@ -101,3 +102,6 @@ HIDDIFY_WINDOWS_LINK = (
     "https://github.com/hiddify/hiddify-next/releases/download/"
     "v2.0.5/Hiddify-Windows-Setup-x64.exe"
 )
+
+MAIN_MESSAGE_ID_KEY = "main_message_id"
+PREVIOUS_CALLBACK_KEY = "previous_callback"

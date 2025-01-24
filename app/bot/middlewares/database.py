@@ -62,8 +62,8 @@ class DBSessionMiddleware(BaseMiddleware):
                 logger.debug(f"Processing user {user.id} | {vpn_id}")
                 user = await User.get_or_create(
                     session,
+                    tg_id=user.id,
                     vpn_id=vpn_id,
-                    user_id=user.id,
                     first_name=user.first_name,
                     username=user.username,
                 )

@@ -40,4 +40,4 @@ class IsDev(BaseFilter):
         Arguments:
             developer_id (int): The ID of the developer.
         """
-        cls.developer_id = developer_id
+        IsDev.developer_id = developer_id

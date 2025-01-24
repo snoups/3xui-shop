@@ -1,11 +1,12 @@
 import logging
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, User
+from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.navigation import NavSubscription, SubscriptionData
 from app.bot.services import ClientData, PaymentService, PlanService, VPNService
+from app.db.models import User
 
 from .keyboard import (
     devices_keyboard,
@@ -55,24 +56,27 @@ async def show_subscription(
 
 
 @router.callback_query(F.data == NavSubscription.MAIN)
-async def callback_subscription(callback: CallbackQuery, vpn_service: VPNService) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} opened subscription page.")
-    client_data = await vpn_service.get_client_data(user.id)
-    callback_data = SubscriptionData(state=NavSubscription.PROCESS, user_id=user.id)
+async def callback_subscription(
+    callback: CallbackQuery,
+    user: User,
+    vpn_service: VPNService,
+) -> None:
+    logger.info(f"User {user.tg_id} opened subscription page.")
+    client_data = await vpn_service.get_client_data(user.tg_id)
+    callback_data = SubscriptionData(state=NavSubscription.PROCESS, user_id=user.tg_id)
     await show_subscription(callback, client_data, callback_data)
 
 
 @router.callback_query(SubscriptionData.filter(F.state == NavSubscription.EXTEND))
 async def callback_subscription_extend(
     callback: CallbackQuery,
+    user: User,
     callback_data: SubscriptionData,
     plan_service: PlanService,
     vpn_service: VPNService,
 ) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} started extend subscription.")
-    client = await vpn_service.is_client_exists(user.id)
+    logger.info(f"User {user.tg_id} started extend subscription.")
+    client = await vpn_service.is_client_exists(user.tg_id)
     callback_data.devices = await vpn_service.get_limit_ip(client)
     callback_data.state = NavSubscription.DURATION
     callback_data.is_extend = True
@@ -85,11 +89,11 @@ async def callback_subscription_extend(
 @router.callback_query(SubscriptionData.filter(F.state == NavSubscription.PROCESS))
 async def callback_subscription_process(
     callback: CallbackQuery,
+    user: User,
     callback_data: SubscriptionData,
     plan_service: PlanService,
 ) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} started subscription process.")
+    logger.info(f"User {user.tg_id} started subscription process.")
     callback_data.state = NavSubscription.DEVICES
     await callback.message.edit_text(
         text=_("🌐 *Select the number of devices:*"),
@@ -100,11 +104,11 @@ async def callback_subscription_process(
 @router.callback_query(SubscriptionData.filter(F.state == NavSubscription.DEVICES))
 async def callback_devices_selected(
     callback: CallbackQuery,
+    user: User,
     callback_data: SubscriptionData,
     plan_service: PlanService,
 ) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} selected devices: {callback_data.devices}")
+    logger.info(f"User {user.tg_id} selected devices: {callback_data.devices}")
     callback_data.state = NavSubscription.DURATION
     await callback.message.edit_text(
         text=_("⏳ *Specify the duration:*"),
@@ -115,12 +119,12 @@ async def callback_devices_selected(
 @router.callback_query(SubscriptionData.filter(F.state == NavSubscription.DURATION))
 async def callback_duration_selected(
     callback: CallbackQuery,
+    user: User,
     callback_data: SubscriptionData,
     plan_service: PlanService,
     payment_service: PaymentService,
 ) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} selected duration: {callback_data.duration}")
+    logger.info(f"User {user.tg_id} selected duration: {callback_data.duration}")
     callback_data.state = NavSubscription.PAY
     await callback.message.edit_text(
         text=_("💳 *Choose a payment method:*"),

@@ -1,5 +1,3 @@
-from typing import Any
-
 from aiogram import Dispatcher
 from aiogram.utils.i18n import I18n, SimpleI18nMiddleware
 from sqlalchemy.ext.asyncio import async_sessionmaker

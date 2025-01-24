@@ -8,6 +8,20 @@ import aiohttp
 logger = logging.getLogger(__name__)
 
 
+def split_text(text: str, chunk_size: int = 4096) -> list[str]:
+    """
+    Splits a string into smaller chunks of a specified size.
+
+    Arguments:
+        text (str): The string to split.
+        chunk_size (int): The maximum size of each chunk. Defaults to 4096.
+
+    Returns:
+        list[str]: A list of string chunks, each with a size not exceeding `chunk_size`.
+    """
+    return [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
+
+
 def parse_redirect_url(query_string: str) -> dict[str, str]:
     """
     Parses a query string into a dictionary.

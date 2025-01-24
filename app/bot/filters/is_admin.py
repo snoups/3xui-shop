@@ -43,4 +43,4 @@ class IsAdmin(BaseFilter):
         Arguments:
             admins_ids (list[int]): List of admin IDs.
         """
-        cls.admins_ids = admins_ids
+        IsAdmin.admins_ids = admins_ids

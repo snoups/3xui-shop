@@ -82,4 +82,4 @@ class MaintenanceMiddleware(BaseMiddleware):
             active (bool): True to enable maintenance mode, False to disable it.
         """
         logger.info(f"Maintenance Mode: {'enabled' if active else 'disabled'}")
-        cls.active = active
+        MaintenanceMiddleware.active = active

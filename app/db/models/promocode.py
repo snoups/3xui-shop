@@ -5,7 +5,7 @@ from typing import Self
 from sqlalchemy import *
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 
 from . import Base
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Promocode(Base):
     """
-    Model representing the Promocode table in the database.
+    Represents a Promocode in the database.
 
     Attributes:
         id (int): The unique promocode ID (primary key).
@@ -31,10 +31,18 @@ class Promocode(Base):
     code: Mapped[str] = mapped_column(String(length=8), unique=True, nullable=False)
     duration: Mapped[int] = mapped_column(nullable=False)
     is_activated: Mapped[bool] = mapped_column(default=False, nullable=False)
-    activated_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    activated_by: Mapped[int | None] = mapped_column(ForeignKey("users.tg_id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
 
+    activated_user: Mapped["User"] = relationship("User", back_populates="activated_promocodes")  # type: ignore
+
     def __repr__(self) -> str:
+        """
+        Represents the Promocode object as a string.
+
+        Returns:
+            str: A string representation of the Promocode object.
+        """
         return (
             f"<Promocode(id={self.id}, code='{self.code}', duration={self.duration}, "
             f"is_activated={self.is_activated}, activated_by={self.activated_by}, "
@@ -44,26 +52,28 @@ class Promocode(Base):
     @classmethod
     async def get(cls, session: AsyncSession, code: str) -> Self | None:
         """
-        Get a promocode by its code.
+        Retrieve a promocode by its code.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
-            code (str): The promocode code to search for.
+            code (str): The unique promocode code.
 
         Returns:
-            Promocode | None: The promocode object if found, or None if not found.
+            Promocode | None: The promocode object if found, otherwise None.
 
         Example:
-            promocode = await Promocode.get(session, code="ABC123")
+            promocode = await Promocode.get(session, code='ABC123')
         """
         filter = [Promocode.code == code]
-        query = await session.execute(select(Promocode).where(*filter))
+        query = await session.execute(
+            select(Promocode).options(selectinload(Promocode.activated_user)).where(*filter)
+        )
         return query.scalar_one_or_none()
 
     @classmethod
     async def create(cls, session: AsyncSession, code: str, **kwargs) -> Self | None:
         """
-        Create a new promocode in the database.
+        Create a new promocode.
 
         Arguments:
             session (AsyncSession): The asynchronous SQLAlchemy session.
@@ -76,16 +86,17 @@ class Promocode(Base):
         Example:
             promocode = await Promocode.create(session, code="ABC123", duration=3600)
         """
-        filter = [Promocode.code == code]
-        query = await session.execute(select(Promocode).where(*filter))
-        promocode = query.scalar_one_or_none()
+        promocode = await Promocode.get(session, code)
 
-        try:
-            await session.commit()
-        except IntegrityError as exception:
-            await session.rollback()
-            logger.error(f"Error occurred while creating promocode {code}: {exception}")
-            return None
+        if promocode is None:
+            promocode = Promocode(code=code, **kwargs)
+            session.add(promocode)
+
+            try:
+                await session.commit()
+            except IntegrityError:
+                await session.rollback()
+                return None
 
         return promocode
 
@@ -105,25 +116,6 @@ class Promocode(Base):
         filter = [Promocode.code == code]
         await session.execute(update(Promocode).where(*filter).values(**kwargs))
         await session.commit()
-
-    @classmethod
-    async def exists(cls, session: AsyncSession, code: str) -> bool:
-        """
-        Check if a promocode exists.
-
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            code (str): The promocode code to check.
-
-        Returns:
-            bool: True if the promocode exists, otherwise False.
-
-        Example:
-            exists = await Promocode.exists(session, code="ABC123")
-        """
-        filter = [Promocode.code == code]
-        query = await session.execute(select(Promocode).where(*filter))
-        return query.scalar_one_or_none() is not None
 
     @classmethod
     async def delete(cls, session: AsyncSession, code: str) -> bool:
@@ -150,3 +142,20 @@ class Promocode(Base):
             return True
         else:
             return False
+
+    @classmethod
+    async def exists(cls, session: AsyncSession, code: str) -> bool:
+        """
+        Check if a promocode exists.
+
+        Arguments:
+            session (AsyncSession): The asynchronous SQLAlchemy session.
+            code (str): The promocode code to check.
+
+        Returns:
+            bool: True if the promocode exists, otherwise False.
+
+        Example:
+            exists = await Promocode.exists(session, code="ABC123")
+        """
+        return await Promocode.get(session, code) is not None

@@ -4,13 +4,14 @@ from aiogram import F, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import CallbackQuery, Message, User
+from aiogram.types import CallbackQuery, Message
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsDev
 from app.bot.navigation import NavAdminTools
 from app.bot.routes.utils.keyboard import back_keyboard
 from app.bot.services import NotificationService, ServerService
+from app.db.models import User
 from app.utils import is_valid_client_count, is_valid_host, ping_url
 
 from .keyboard import confirm_add_server_keyboard, server_keyboard, servers_keyboard
@@ -30,11 +31,11 @@ class AddServerStates(StatesGroup):
 @router.callback_query(F.data == NavAdminTools.SERVER_MANAGEMENT, IsDev())
 async def callback_server_management(
     callback: CallbackQuery,
+    user: User,
     state: FSMContext,
     server_service: ServerService,
 ) -> None:
-    user: User = callback.from_user
-    logger.info(f"Dev {user.id} opened servers.")
+    logger.info(f"Dev {user.tg_id} opened servers.")
     await state.set_state(None)
     text = _("🌐 *Server management:*\n")
     servers = await server_service.get_all_servers()
@@ -98,7 +99,6 @@ async def show_add_server(state: FSMContext) -> None:
 
 @router.callback_query(StateFilter("*"), F.data == NavAdminTools.ADD_SERVER_BACK, IsDev())
 async def callback_add_server_back(callback: CallbackQuery, state: FSMContext) -> None:
-    user: User = callback.from_user
     current_state = await state.get_state()
 
     match current_state:
@@ -115,9 +115,8 @@ async def callback_add_server_back(callback: CallbackQuery, state: FSMContext) -
 
 
 @router.callback_query(F.data == NavAdminTools.ADD_SERVER, IsDev())
-async def callback_add_server(callback: CallbackQuery, state: FSMContext) -> None:
-    user: User = callback.from_user
-    logger.info(f"Dev {user.id} started adding server.")
+async def callback_add_server(callback: CallbackQuery, user: User, state: FSMContext) -> None:
+    logger.info(f"Dev {user.tg_id} started adding server.")
     await state.set_state(AddServerStates.name)
     await state.update_data(message=callback.message)
     await show_add_server(state)
@@ -126,13 +125,13 @@ async def callback_add_server(callback: CallbackQuery, state: FSMContext) -> Non
 @router.message(AddServerStates.name, IsDev())
 async def message_name(
     message: Message,
+    user: User,
     state: FSMContext,
     server_service: ServerService,
 ) -> None:
-    user: User = message.from_user
     server_name = message.text.strip()
-    logger.info(f"Dev {user.id} entered server name: {server_name}")
-    existing_server = await server_service.get_server(server_name)
+    logger.info(f"Dev {user.tg_id} entered server name: {server_name}")
+    existing_server = await server_service.get_server_by_name(server_name)
 
     if not existing_server:
         await state.set_state(AddServerStates.host)
@@ -147,10 +146,9 @@ async def message_name(
 
 
 @router.message(AddServerStates.host, IsDev())
-async def message_host(message: Message, state: FSMContext) -> None:
-    user: User = message.from_user
+async def message_host(message: Message, user: User, state: FSMContext) -> None:
     server_host = message.text.strip()
-    logger.info(f"Dev {user.id} entered server host: {server_host}")
+    logger.info(f"Dev {user.tg_id} entered server host: {server_host}")
 
     if is_valid_host(server_host):
         await state.set_state(AddServerStates.subscription)
@@ -165,10 +163,9 @@ async def message_host(message: Message, state: FSMContext) -> None:
 
 
 @router.message(AddServerStates.subscription, IsDev())
-async def message_subscription(message: Message, state: FSMContext) -> None:
-    user: User = message.from_user
+async def message_subscription(message: Message, user: User, state: FSMContext) -> None:
     server_subscription = message.text.strip()
-    logger.info(f"Dev {user.id} entered server subscription: {server_subscription}")
+    logger.info(f"Dev {user.tg_id} entered server subscription: {server_subscription}")
 
     if is_valid_host(server_subscription):
         await state.set_state(AddServerStates.max_clients)
@@ -183,10 +180,9 @@ async def message_subscription(message: Message, state: FSMContext) -> None:
 
 
 @router.message(AddServerStates.max_clients, IsDev())
-async def message_max_clients(message: Message, state: FSMContext) -> None:
-    user: User = message.from_user
+async def message_max_clients(message: Message, user: User, state: FSMContext) -> None:
     server_max_clients = message.text.strip()
-    logger.info(f"Dev {user.id} entered server max clients: {server_max_clients}")
+    logger.info(f"Dev {user.tg_id} entered server max clients: {server_max_clients}")
 
     if is_valid_client_count(server_max_clients):
         await state.set_state(AddServerStates.confirmation)
@@ -203,11 +199,11 @@ async def message_max_clients(message: Message, state: FSMContext) -> None:
 @router.callback_query(AddServerStates.confirmation, IsDev())
 async def callback_confirmation(
     callback: CallbackQuery,
+    user: User,
     state: FSMContext,
     server_service: ServerService,
 ) -> None:
-    user: User = callback.from_user
-    logger.info(f"Dev {user.id} confirmed adding server.")
+    logger.info(f"Dev {user.tg_id} confirmed adding server.")
     data = await state.get_data()
 
     server = await server_service.add_server(
@@ -239,11 +235,14 @@ async def callback_confirmation(
 
 # region Server
 @router.callback_query(F.data.startswith(NavAdminTools.SHOW_SERVER), IsDev())
-async def callback_show_server(callback: CallbackQuery, server_service: ServerService) -> None:
-    user: User = callback.from_user
+async def callback_show_server(
+    callback: CallbackQuery,
+    user: User,
+    server_service: ServerService,
+) -> None:
     server_name = callback.data.split("_")[2]
-    logger.info(f"Dev {user.id} open server {server_name}.")
-    server = await server_service.get_server(server_name)
+    logger.info(f"Dev {user.tg_id} open server {server_name}.")
+    server = await server_service.get_server_by_name(server_name)
     status = "🟢" if server.online else "🔴"
     text = _(
         "️️️️🌐 *Server {server_name}:*\n"
@@ -265,11 +264,14 @@ async def callback_show_server(callback: CallbackQuery, server_service: ServerSe
 
 
 @router.callback_query(F.data.startswith(NavAdminTools.PING_SERVER), IsDev())
-async def callback_ping_server(callback: CallbackQuery, server_service: ServerService) -> None:
-    user: User = callback.from_user
+async def callback_ping_server(
+    callback: CallbackQuery,
+    user: User,
+    server_service: ServerService,
+) -> None:
     server_name = callback.data.split("_")[2]
-    logger.info(f"Dev {user.id} pinging server {server_name}.")
-    server = await server_service.get_server(server_name)
+    logger.info(f"Dev {user.tg_id} pinging server {server_name}.")
+    server = await server_service.get_server_by_name(server_name)
     ping = await ping_url(server.host)
     online = True if ping else False
     if online != server.online:
@@ -291,12 +293,12 @@ async def callback_ping_server(callback: CallbackQuery, server_service: ServerSe
 @router.callback_query(F.data.startswith(NavAdminTools.DELETE_SERVER), IsDev())
 async def callback_delete_server(
     callback: CallbackQuery,
+    user: User,
     state: FSMContext,
     server_service: ServerService,
 ) -> None:
-    user: User = callback.from_user
     server_name = callback.data.split("_")[2]
-    logger.info(f"Dev {user.id} open server {server_name}.")
+    logger.info(f"Dev {user.tg_id} open server {server_name}.")
     deleted = await server_service.delete_server(server_name)
     await callback_server_management(callback, state, server_service)
 

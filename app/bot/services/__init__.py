@@ -30,7 +30,7 @@ def initialize(app: Application, config: Config, db: Database, bot: Bot) -> dict
     plan_service = PlanService()
     promocode_service = PromocodeService(db.session)
     server_service = ServerService(db.session)
-    vpn_service = VPNService(db.session, config, promocode_service)
+    vpn_service = VPNService(db.session, config, server_service, promocode_service)
     payment_service = PaymentService(app, config, bot, db.session, vpn_service)
 
     return {

@@ -3,7 +3,7 @@ import logging
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import CallbackQuery, Message, User
+from aiogram.types import CallbackQuery, Message
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.navigation import NavSubscription
@@ -14,6 +14,7 @@ from app.bot.services import (
     PromocodeService,
     VPNService,
 )
+from app.db.models import User
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -24,9 +25,8 @@ class ActivatePromocodeStates(StatesGroup):
 
 
 @router.callback_query(F.data == NavSubscription.PROMOCODE)
-async def callback_promocode(callback: CallbackQuery, state: FSMContext) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} started activating promocode.")
+async def callback_promocode(callback: CallbackQuery, user: User, state: FSMContext) -> None:
+    logger.info(f"User {user.tg_id} started activating promocode.")
     await state.set_state(ActivatePromocodeStates.promocode_input)
     await state.update_data(message=callback.message)
     await callback.message.edit_text(
@@ -38,17 +38,17 @@ async def callback_promocode(callback: CallbackQuery, state: FSMContext) -> None
 @router.message(ActivatePromocodeStates.promocode_input)
 async def handle_promocode_input(
     message: Message,
+    user: User,
     state: FSMContext,
     promocode_service: PromocodeService,
     vpn_service: VPNService,
 ) -> None:
-    user: User = message.from_user
     input_promocode = message.text.strip()
-    logger.info(f"User {user.id} entered promocode: {input_promocode} for activating.")
+    logger.info(f"User {user.tg_id} entered promocode: {input_promocode} for activating.")
 
     promocode = await promocode_service.get_promocode(input_promocode)
     if promocode and not promocode.is_activated:
-        success = await vpn_service.activate_promocode(user.id, promocode)
+        success = await vpn_service.activate_promocode(user.tg_id, promocode)
         message = await state.get_value("message")
         if success:
             await message.edit_text(

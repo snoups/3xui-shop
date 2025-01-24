@@ -1,11 +1,12 @@
 import logging
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, User
+from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.navigation import NavSupport
 from app.config import Config
+from app.db.models import User
 
 from .keyboard import contact_keyboard, how_to_connect_keyboard, support_keyboard
 
@@ -14,9 +15,8 @@ router = Router(name=__name__)
 
 
 @router.callback_query(F.data == NavSupport.MAIN)
-async def callback_support(callback: CallbackQuery, config: Config) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} opened support page.")
+async def callback_support(callback: CallbackQuery, user: User, config: Config) -> None:
+    logger.info(f"User {user.tg_id} opened support page.")
     await callback.message.edit_text(
         text=_(
             "🆘 *Support:*\n"
@@ -29,9 +29,8 @@ async def callback_support(callback: CallbackQuery, config: Config) -> None:
 
 
 @router.callback_query(F.data == NavSupport.HOW_TO_CONNECT)
-async def callback_how_to_connect(callback: CallbackQuery, config: Config) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} opened how to connect page.")
+async def callback_how_to_connect(callback: CallbackQuery, user: User, config: Config) -> None:
+    logger.info(f"User {user.tg_id} opened how to connect page.")
     await callback.message.edit_text(
         text=_(
             "ℹ️ *How to connect:*\n"
@@ -45,9 +44,8 @@ async def callback_how_to_connect(callback: CallbackQuery, config: Config) -> No
 
 
 @router.callback_query(F.data == NavSupport.VPN_NOT_WORKING)
-async def callback_vpn_not_working(callback: CallbackQuery, config: Config) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} opened vpn not working page.")
+async def callback_vpn_not_working(callback: CallbackQuery, user: User, config: Config) -> None:
+    logger.info(f"User {user.tg_id} opened vpn not working page.")
     await callback.message.edit_text(
         text=_(
             "ℹ️ *VPN not working:*\n"

@@ -16,8 +16,6 @@ from app.config import DEFAULT_LOCALES_DIR, Config, load_config
 from app.db.database import Database
 from app.logger import setup_logging
 
-logger = logging.getLogger(__name__)
-
 
 async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
     """
@@ -38,7 +36,7 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
     await bot.delete_webhook()
     await bot.session.close()
     await db.close()
-    logger.info("Bot stopped.")
+    logging.info("Bot stopped.")
 
 
 async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
@@ -49,7 +47,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
         dispatcher (Dispatcher): The dispatcher instance.
         bot (Bot): The bot instance.
     """
-    logger.info("Bot started.")
+    logging.info("Bot started.")
     config: Config = dispatcher.get("config")
     webhook_url = f"{config.bot.WEBHOOK}webhook"
 
@@ -57,7 +55,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
         await bot.set_webhook(webhook_url)
 
     current_webhook = await bot.get_webhook_info()
-    logger.info(f"Current webhook URL: {current_webhook.url}")
+    logging.info(f"Current webhook URL: {current_webhook.url}")
 
     notification_service: NotificationService = dispatcher.get("notification_service")
 
@@ -93,14 +91,14 @@ async def main() -> None:
     # Initialize services
     services = initialize(app, config, db, bot)
     vpn_service: VPNService = services["vpn_service"]
-    await vpn_service.initialize()
+    await vpn_service.sync_servers()
 
     # Set up internationalization (i18n)
     i18n = I18n(path=DEFAULT_LOCALES_DIR, default_locale="en", domain="bot")
     I18n.set_current(i18n)
 
     # Create the dispatcher with the storage, config, bot, database
-    dispatcher = Dispatcher(storage=storage, config=config, bot=bot, **services)
+    dispatcher = Dispatcher(storage=storage, db=db, config=config, bot=bot, **services)
 
     # Register event handlers
     dispatcher.startup.register(on_startup)
@@ -137,4 +135,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        logger.info("Bot stopped.")
+        logging.info("Bot stopped.")

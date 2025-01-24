@@ -4,6 +4,7 @@ version = "0.4.0"
 description = "This is a Telegram bot for selling VPN subscriptions. It works with 3X-UI."
 authors = ["snoups"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"

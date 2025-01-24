@@ -2,13 +2,14 @@ import logging
 
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, User
+from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import gettext as _
 from aiohttp.web import HTTPFound, Request, Response
 
-from app.bot.navigation import NavDownload
+from app.bot.navigation import PREVIOUS_CALLBACK_KEY, NavDownload
 from app.bot.services import VPNService
 from app.config import Config
+from app.db.models import User
 from app.utils import parse_redirect_url
 
 from .keyboard import download_keyboard, platforms_keyboard
@@ -38,10 +39,9 @@ async def redirect_to_connection(request: Request) -> Response:
 
 
 @router.callback_query(F.data == NavDownload.MAIN)
-async def callback_download(callback: CallbackQuery, state: FSMContext) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} opened download apps page.")
-    previous_callback = await state.get_value("callback")
+async def callback_download(callback: CallbackQuery, user: User, state: FSMContext) -> None:
+    logger.info(f"User {user.tg_id} opened download apps page.")
+    previous_callback = await state.get_value(PREVIOUS_CALLBACK_KEY)
     await callback.message.edit_text(
         text=_("📲 *Choose your platform:*"),
         reply_markup=platforms_keyboard(previous_callback),
@@ -51,12 +51,12 @@ async def callback_download(callback: CallbackQuery, state: FSMContext) -> None:
 @router.callback_query(F.data.startswith(NavDownload.PLATFORM))
 async def callback_platform(
     callback: CallbackQuery,
+    user: User,
     vpn_service: VPNService,
     config: Config,
 ) -> None:
-    user: User = callback.from_user
-    logger.info(f"User {user.id} selected platform: {callback.data}")
-    key = await vpn_service.get_key(user.id)
+    logger.info(f"User {user.tg_id} selected platform: {callback.data}")
+    key = await vpn_service.get_key(user.tg_id)
 
     if callback.data == NavDownload.PLATFORM_IOS:
         icon = "🍏 "
