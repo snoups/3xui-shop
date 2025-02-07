@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "3xui-shop"
-version = "0.4.0"
+version = "0.5.0"
 description = "This is a Telegram bot for selling VPN subscriptions. It works with 3X-UI."
 authors = ["snoups"]
 readme = "README.md"
@@ -17,6 +17,7 @@ yookassa = "^3.4.3"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
 aiosqlite = "^0.20.0"
 alembic = "^1.14.0"
+redis = "^5.2.1"
 
 [build-system]
 requires = ["poetry-core"]

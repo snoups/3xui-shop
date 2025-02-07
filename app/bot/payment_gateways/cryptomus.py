@@ -1,27 +1,25 @@
-from app.bot.navigation import NavSubscription, SubscriptionData
+import logging
+
+from aiogram import Bot
+
+from app.bot.models import SubscriptionData
 from app.bot.payment_gateways import PaymentGateway
+from app.bot.utils.navigation import NavSubscription
+from app.config import Config
+
+logger = logging.getLogger(__name__)
 
 
 class Cryptomus(PaymentGateway):
-    """
-    Service for creating payments through the Cryptomus platform.
-    """
-
     name = "Cryptomus"
     symbol = "$"
     code = "USD"
     callback = NavSubscription.PAY_CRYPTOMUS
 
+    def __init__(self, config: Config, bot: Bot):
+        self.config = config
+        self.bot = bot
+        logger.info("Cryptomus payment gateway initialized.")
+
     def create_payment(self, data: SubscriptionData) -> str:
-        """
-        Create a payment link for the subscription using Cryptomus.
-
-        This method generates a payment link based on the provided subscription data.
-
-        Arguments:
-            data (SubscriptionData): The subscription data, including devices and duration.
-
-        Returns:
-            str: A URL for the payment link to complete the subscription process.
-        """
         pass

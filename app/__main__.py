@@ -1,37 +1,34 @@
 import asyncio
 import logging
+from urllib.parse import urljoin
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.utils.i18n import I18n
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp.web import Application, _run_app
 
-from app.bot import commands, filters, middlewares, routes
+from app import logger
+from app.bot import filters, middlewares, routers, services
 from app.bot.middlewares import MaintenanceMiddleware
-from app.bot.services import NotificationService, VPNService, initialize
+from app.bot.models import ServicesContainer
+from app.bot.utils import commands
+from app.bot.utils.constants import (
+    BOT_STARTED_TAG,
+    BOT_STOPPED_TAG,
+    DEFAULT_LANGUAGE,
+    I18N_DOMAIN,
+    TELEGRAM_WEBHOOK,
+)
 from app.config import DEFAULT_LOCALES_DIR, Config, load_config
 from app.db.database import Database
-from app.logger import setup_logging
 
 
-async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
-    """
-    Handles bot shutdown events.
-
-    Arguments:
-        dispatcher (Dispatcher): The dispatcher instance.
-        bot (Bot): The bot instance.
-    """
-    db: Database = dispatcher.get("db")
-    config: Config = dispatcher.get("config")
-    notification_service: NotificationService = dispatcher.get("notification_service")
-
-    if config.bot.DEV_ID:
-        await notification_service.notify_by_id(config.bot.DEV_ID, "#BotStopped")
-
+async def on_shutdown(db: Database, bot: Bot, services: ServicesContainer) -> None:
+    await services.notification.notify_developer(BOT_STOPPED_TAG)
     await commands.delete(bot)
     await bot.delete_webhook()
     await bot.session.close()
@@ -39,17 +36,8 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
     logging.info("Bot stopped.")
 
 
-async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
-    """
-    Handles bot startup events.
-
-    Arguments:
-        dispatcher (Dispatcher): The dispatcher instance.
-        bot (Bot): The bot instance.
-    """
-    logging.info("Bot started.")
-    config: Config = dispatcher.get("config")
-    webhook_url = f"{config.bot.WEBHOOK}webhook"
+async def on_startup(config: Config, bot: Bot, services: ServicesContainer) -> None:
+    webhook_url = urljoin(config.bot.HOST, TELEGRAM_WEBHOOK)
 
     if await bot.get_webhook_info() != webhook_url:
         await bot.set_webhook(webhook_url)
@@ -57,16 +45,11 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
     current_webhook = await bot.get_webhook_info()
     logging.info(f"Current webhook URL: {current_webhook.url}")
 
-    notification_service: NotificationService = dispatcher.get("notification_service")
-
-    if config.bot.DEV_ID:
-        await notification_service.notify_by_id(config.bot.DEV_ID, "#BotStarted")
+    await services.notification.notify_developer(BOT_STARTED_TAG)
+    logging.info("Bot started.")
 
 
 async def main() -> None:
-    """
-    Initializes the bot, sets up services, and runs the application.
-    """
     # Create web application
     app = Application()
 
@@ -74,31 +57,39 @@ async def main() -> None:
     config = load_config()
 
     # Set up logging
-    setup_logging(config.logging)
+    logger.setup_logging(config.logging)
 
     # Initialize database
     db = Database(config.database)
 
-    # Set up in-memory storage for FSM (Finite State Machine)
-    storage = MemoryStorage()  # TODO: RedisStorage
+    # Set up storage for FSM (Finite State Machine)
+    storage = RedisStorage.from_url("redis://0.0.0.0:6379/0")
+    # storage = MemoryStorage()
 
     # Initialize the bot with the token and default properties
     bot = Bot(
         token=config.bot.TOKEN,
-        default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN, link_preview_is_disabled=True),
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML, link_preview_is_disabled=True),
     )
 
-    # Initialize services
-    services = initialize(app, config, db, bot)
-    vpn_service: VPNService = services["vpn_service"]
-    await vpn_service.sync_servers()
-
     # Set up internationalization (i18n)
-    i18n = I18n(path=DEFAULT_LOCALES_DIR, default_locale="en", domain="bot")
+    i18n = I18n(path=DEFAULT_LOCALES_DIR, default_locale=DEFAULT_LANGUAGE, domain=I18N_DOMAIN)
     I18n.set_current(i18n)
 
-    # Create the dispatcher with the storage, config, bot, database
-    dispatcher = Dispatcher(storage=storage, db=db, config=config, bot=bot, **services)
+    # Initialize services
+    services_container = await services.initialize(app, config, bot, db.session, storage)
+
+    # Sync servers
+    await services_container.server_pool.sync_servers()
+
+    # Create the dispatcher with the storage, database, config, bot, services
+    dispatcher = Dispatcher(
+        storage=storage,
+        db=db,
+        config=config,
+        bot=bot,
+        services=services_container,
+    )
 
     # Register event handlers
     dispatcher.startup.register(on_startup)
@@ -113,8 +104,8 @@ async def main() -> None:
     # Register filters
     filters.register(dispatcher, config.bot.DEV_ID, config.bot.ADMINS)
 
-    # Include bot routes
-    routes.include(dispatcher, app)
+    # Include bot routers
+    routers.include(dispatcher, app)
 
     # Initialize database
     await db.initialize()
@@ -124,11 +115,11 @@ async def main() -> None:
 
     # Set up webhook request handler
     webhook_requests_handler = SimpleRequestHandler(dispatcher, bot)
-    webhook_requests_handler.register(app, path="/webhook")
+    webhook_requests_handler.register(app, path=TELEGRAM_WEBHOOK)
 
     # Set up application and run
     setup_application(app, dispatcher, bot=bot)
-    await _run_app(app, host="0.0.0.0", port=config.bot.WEBHOOK_PORT)
+    await _run_app(app, host="0.0.0.0", port=config.bot.PORT)
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,7 +17,9 @@ DEFAULT_LOG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
 DEFAULT_LOG_DIR = "logs"
 DEFAULT_LOG_ARCHIVE_FORMAT = "zip"
 
-DEFAULT_WEBHOOK_PORT = 8080
+DEFAULT_BOT_PORT = 8080
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -29,8 +32,8 @@ class BotConfig:
         ADMINS (list[int]): List of admin IDs (user IDs) for admin tools.
         DEV_ID (int): Developer ID (user ID) for notifications.
         SUPPORT_ID (int): Support ID (user ID) for support.
-        WEBHOOK (str): URL for the webhook to receive updates from Telegram.
-        WEBHOOK_PORT (int): Port for the webhook service.
+        HOST (str): Base URL for the application.
+        PORT (int): Port for the application.
         EMAIL (str): Email address for receipts.
     """
 
@@ -38,8 +41,8 @@ class BotConfig:
     ADMINS: list[int]
     DEV_ID: int
     SUPPORT_ID: int
-    WEBHOOK: str
-    WEBHOOK_PORT: int
+    HOST: str
+    PORT: int
     EMAIL: str
 
 
@@ -49,7 +52,7 @@ class XUIConfig:
     Configuration for XUI.
 
     Attributes:
-        HOST (str): Host URL for the XUI service.
+        HOST (str): Base URL for the XUI panel.
         USERNAME (str): Username for XUI authentication.
         PASSWORD (str): Password for XUI authentication.
         TOKEN (str | None): API token for XUI (if provided).
@@ -166,21 +169,29 @@ def load_config() -> Config:
     env = Env()
     env.read_env()
 
+    bot_admins = env.list("BOT_ADMINS", subcast=int, default=[], required=False)
+    if not bot_admins:
+        logger.warning("BOT_ADMINS list is empty.")
+
+    xui_token = env.str("XUI_TOKEN", default=None)
+    if not xui_token:
+        logger.warning("XUI_TOKEN is not set.")
+
     return Config(
         bot=BotConfig(
             TOKEN=env.str("BOT_TOKEN"),
-            ADMINS=env.list("BOT_ADMINS", subcast=int, default=[], required=False),
+            ADMINS=bot_admins,
             DEV_ID=env.int("BOT_DEV_ID"),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
-            WEBHOOK=env.str("BOT_WEBHOOK"),
-            WEBHOOK_PORT=env.int("BOT_WEBHOOK_PORT", default=DEFAULT_WEBHOOK_PORT),
+            HOST=env.str("BOT_HOST"),
+            PORT=env.int("BOT_PORT", default=DEFAULT_BOT_PORT),
             EMAIL=env.str("BOT_EMAIL"),
         ),
         xui=XUIConfig(
             HOST=env.str("XUI_HOST"),
             USERNAME=env.str("XUI_USERNAME"),
             PASSWORD=env.str("XUI_PASSWORD"),
-            TOKEN=env.str("XUI_TOKEN", default=None),
+            TOKEN=xui_token,
             SUBSCRIPTION=env.str("XUI_SUBSCRIPTION"),
         ),
         yookassa=YooKassaConfig(

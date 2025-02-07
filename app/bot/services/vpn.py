@@ -1,120 +1,55 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .server_pool import ServerPoolService
+
 import logging
-from datetime import datetime, timedelta, timezone
 
-from py3xui import AsyncApi, Client, Inbound
-from sqlalchemy.ext.asyncio import AsyncSession
+from py3xui import Client, Inbound
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.config import Config
-from app.db.models import Promocode, Server, User
-
-from .client import ClientData
-from .promocode import PromocodeService
-from .server import ServerService
+from app.bot.models import ClientData
+from app.bot.utils.misc import (
+    add_days_to_timestamp,
+    days_to_timestamp,
+    get_current_timestamp,
+)
+from app.db.models import Promocode, User
 
 logger = logging.getLogger(__name__)
 
 
 class VPNService:
-    """
-    Service for managing VPN client operations, including client creation, updating, and
-    subscription management.
-
-    Attributes:
-        session (AsyncSession): Database session for operations.
-        config
-        server_service
-        promocode_service (PromocodeService): Service for managing promocodes.
-    """
-
-    def __init__(
-        self,
-        session: AsyncSession,
-        config: Config,
-        server_service: ServerService,
-        promocode_service: PromocodeService,
-    ) -> None:
-        """
-        Initializes the VPNService instance.
-
-        Arguments:
-            session (AsyncSession): The session for performing database operations.
-            config (Config): Configuration containing VPN credentials and settings.
-            promocode_service (PromocodeService): Service for managing promocodes.
-        """
+    def __init__(self, session: async_sessionmaker, server_pool_service: ServerPoolService) -> None:
         self.session = session
-        self.config = config
-        self.server_service = server_service
-        self.promocode_service = promocode_service
+        self.server_pool_service = server_pool_service
+        logger.info("VPN Service initialized.")
 
-        logger.info("VPNService initialized.")
+    async def is_client_exists(self, user: User) -> Client | None:
+        connection = await self.server_pool_service.get_connection(user)
 
-    async def sync_servers(self) -> None:
-        servers_to_add, servers_to_remove = await self.server_service.get_current_servers()
+        if not connection:
+            return None
 
-        for server in servers_to_add:
-            if server:
-                await self.add_server(server)
-
-        for server in servers_to_remove:
-            self.server_service.servers.pop(server.id)
-            logger.info(f"Removed server {server.name} from active list.")
-
-        logger.info(
-            f"Sync complete: {len(servers_to_add)} added, {len(servers_to_remove)} removed."
-        )
-
-    async def add_server(self, server: Server) -> None:
-        try:
-            api = AsyncApi(
-                host=server.host,
-                username=self.config.xui.USERNAME,
-                password=self.config.xui.PASSWORD,
-                token=self.config.xui.TOKEN,
-                use_tls_verify=False,
-                logger=logging.getLogger(f"xui_{server.name}"),
-            )
-            await api.login()
-            self.server_service.servers[server.id] = (server, api)
-            logger.info(f"Authenticated and added server {server.name} ({server.host}).")
-        except Exception as exception:
-            logger.error(f"Failed to add server {server.name} ({server.host}): {exception}")
-            if server in self.server_service.servers:
-                self.server_service.servers.pop(server)
-            logger.warning(
-                f"Server {server.name} removed from active list due to authentication failure."
-            )
-
-    async def is_client_exists(self, user_id: int) -> Client | None:
-        """
-        Checks if a client exists by user ID.
-
-        Arguments:
-            user_id (int): The user ID to check.
-
-        Returns:
-            Client | None: The client if found, None otherwise.
-        """
-        client = await self.api.client.get_by_email(str(user_id))
+        client = await connection.api.client.get_by_email(str(user.tg_id))
 
         if client:
-            logger.debug(f"Client {user_id} exists.")
+            logger.debug(f"Client {user.tg_id} exists on server {connection.server.name}.")
         else:
-            logger.debug(f"Client {user_id} not found.")
+            logger.critical(f"Client {user.tg_id} not found on server {connection.server.name}.")
 
         return client
 
-    async def get_limit_ip(self, client: Client) -> int | None:
-        """
-        Retrieves the IP limit for a specific client.
+    async def get_limit_ip(self, user: User, client: Client) -> int | None:
+        connection = await self.server_pool_service.get_connection(user)
 
-        Arguments:
-            client (Client): The client to fetch the limit IP for.
+        if not connection:
+            return None
 
-        Returns:
-            int | None: The IP limit for the client, or None if an error occurs.
-        """
         try:
-            inbounds: list[Inbound] = await self.api.inbound.get_list()
+            inbounds: list[Inbound] = await connection.api.inbound.get_list()
         except Exception as exception:
             logger.error(f"Failed to fetch inbounds: {exception}")
             return None
@@ -125,28 +60,27 @@ class VPNService:
                     logger.debug(f"Client {client.email} limit ip: {inbound_client.limit_ip}")
                     return inbound_client.limit_ip
 
-        logger.debug(f"Client {client.email} not found in inbounds.")
+        logger.critical(f"Client {client.email} not found in inbounds.")
         return None
 
-    async def get_client_data(self, user_id: int) -> ClientData | None:
-        """
-        Retrieves data for a specific client.
+    async def get_client_data(self, user: User) -> ClientData | None:
+        logger.debug(f"Starting to retrieve client data for {user.tg_id}.")
 
-        Arguments:
-            user_id (int): The user ID for which to retrieve client data.
+        connection = await self.server_pool_service.get_connection(user)
 
-        Returns:
-            ClientData | None: The client data if found, or None if an error occurs.
-        """
-        logger.debug(f"Starting to retrieve client data for {user_id}.")
+        if not connection:
+            return None
+
         try:
-            client: Client = await self.api.client.get_by_email(str(user_id))
+            client = await connection.api.client.get_by_email(str(user.tg_id))
 
-            if client is None:
-                logger.debug(f"No client data found for {user_id}.")
+            if not client:
+                logger.critical(
+                    f"Client {user.tg_id} not found on server {connection.server.name}."
+                )
                 return None
 
-            limit_ip = await self.get_limit_ip(client)
+            limit_ip = await self.get_limit_ip(user, client)
             max_devices = -1 if limit_ip == 0 else limit_ip
             traffic_total = client.total
             expiry_time = -1 if client.expiry_time == 0 else client.expiry_time
@@ -167,32 +101,21 @@ class VPNService:
                 traffic_down=client.down,
                 expiry_time=expiry_time,
             )
-            logger.debug(f"Successfully retrieved client data for {user_id}: {client_data}.")
+            logger.debug(f"Successfully retrieved client data for {user.tg_id}: {client_data}.")
             return client_data
         except Exception as exception:
-            logger.error(f"Error retrieving client data for {user_id}: {exception}")
+            logger.error(f"Error retrieving client data for {user.tg_id}: {exception}")
             return None
 
-    async def get_key(self, user_id: int) -> str:
-        """
-        Generates the VPN key for a user.
+    async def get_key(self, user: User) -> str | None:
+        if not user.server_id:
+            logger.debug(f"Server ID for user {user.tg_id} not found.")
+            return None
 
-        Arguments:
-            user_id (int): The user ID to fetch the key for.
-
-        Returns:
-            str: The generated VPN key.
-        """
-        async with self.session() as session:
-            user: User = await User.get(session, tg_id=user_id)
-
-            print(user)
-
-            subscription = user.server.subscription
-
-            key = f"{subscription}{user.vpn_id}"
-            logger.debug(f"Fetched key for {user_id}: {key}.")
-            return key
+        subscription = user.server.subscription
+        key = f"{subscription}{user.vpn_id}"
+        logger.debug(f"Fetched key for {user.tg_id}: {key}.")
+        return key
 
     async def create_client(
         self,
@@ -202,37 +125,30 @@ class VPNService:
         enable: bool = True,
         flow: str = "xtls-rprx-vision",
         total_gb: int = 0,
-        inbound_id: int = 7,  # TODO: Make a server config
+        inbound_id: int = 7,
     ) -> bool:
         logger.info(f"Creating new client {user.tg_id} | {devices} devices {duration} days.")
+
+        await self.server_pool_service.assign_server_to_user(user)
+        connection = await self.server_pool_service.get_connection(user)
+
+        if not connection:
+            return False
+
         new_client = Client(
             email=str(user.tg_id),
             enable=enable,
             id=user.vpn_id,
-            expiry_time=self._days_to_timestamp(duration),
+            expiry_time=days_to_timestamp(duration),
             flow=flow,
             limit_ip=devices,
             sub_id=user.vpn_id,
             total_gb=total_gb,
         )
-        """
-        Creates a new client.
 
-        Arguments:
-            user (User): The user to create a client for.
-            devices (int): The number of devices the client can use.
-            duration (int): The subscription duration in days.
-            enable (bool): Whether the client is enabled.
-            flow (str): The traffic flow protocol.
-            total_gb (int): The total data quota in GB.
-            inbound_id (int): The inbound ID for the server.
-
-        Returns:
-            bool: True if the client was created successfully, False otherwise.
-        """
         try:
-            await self.api.client.add(inbound_id, [new_client])
-            logger.info(f"Successfully created client for {user.tg_id}.")
+            await connection.api.client.add(inbound_id, [new_client])
+            logger.info(f"Successfully created client for {user.tg_id}")
             return True
         except Exception as exception:
             logger.error(f"Error creating client for {user.tg_id}: {exception}")
@@ -249,43 +165,31 @@ class VPNService:
         flow: str = "xtls-rprx-vision",
         total_gb: int = 0,
     ) -> bool:
-        """
-        Updates an existing client.
-
-        Arguments:
-            user (User): The user whose client is to be updated.
-            devices (int): The number of devices the client can use.
-            duration (int): The subscription duration in days.
-            replace_devices (bool): Whether to replace the devices limit.
-            replace_duration (bool): Whether to replace the expiration date.
-            enable (bool): Whether the client is enabled.
-            flow (str): The traffic flow protocol.
-            total_gb (int): The total data quota in GB.
-
-        Returns:
-            bool: True if the client was updated successfully, False otherwise.
-        """
         logger.info(f"Updating client {user.tg_id} | {devices} devices {duration} days.")
+        connection = await self.server_pool_service.get_connection(user)
+
+        if not connection:
+            return False
 
         try:
-            client: Client = await self.api.client.get_by_email(str(user.tg_id))
+            client = await connection.api.client.get_by_email(str(user.tg_id))
 
             if client is None:
-                logger.debug(f"Client {user.tg_id} not found for update.")
+                logger.critical(f"Client {user.tg_id} not found for update.")
                 return False
 
             if not replace_devices:
-                current_device_limit = await self.get_limit_ip(client)
+                current_device_limit = await self.get_limit_ip(user, client)
                 devices = current_device_limit + devices
 
-            current_time = self._current_timestamp()
+            current_time = get_current_timestamp()
 
             if not replace_duration:
                 expiry_time_to_use = max(client.expiry_time, current_time)
             else:
                 expiry_time_to_use = current_time
 
-            expiry_time = self._add_days_to_timestamp(expiry_time_to_use, duration)
+            expiry_time = add_days_to_timestamp(expiry_time_to_use, duration)
 
             client.enable = enable
             client.id = user.vpn_id
@@ -295,29 +199,15 @@ class VPNService:
             client.sub_id = user.vpn_id
             client.total_gb = total_gb
 
-            await self.api.client.update(client.id, client)
+            await connection.api.client.update(client_uuid=client.id, client=client)
             logger.info(f"Client {user.tg_id} updated successfully.")
             return True
         except Exception as exception:
             logger.error(f"Error updating client {user.tg_id}: {exception}")
             return False
 
-    async def create_subscription(self, user_id: int, devices: int, duration: int) -> bool:
-        """
-        Creates a new subscription for the user.
-
-        Arguments:
-            user_id (int): The user ID to create a subscription for.
-            devices (int): The number of devices the user can use.
-            duration (int): The subscription duration in days.
-
-        Returns:
-            bool: True if the subscription was created, False otherwise.
-        """
-        async with self.session() as session:
-            user: User = await User.get(session, tg_id=user_id)
-
-        if not await self.is_client_exists(user.tg_id):
+    async def create_subscription(self, user: User, devices: int, duration: int) -> bool:
+        if not await self.is_client_exists(user):
             return await self.create_client(user, devices, duration)
 
         return await self.update_client(
@@ -328,107 +218,30 @@ class VPNService:
             replace_duration=True,
         )
 
-    async def extend_subscription(self, user_id: int, devices: int, duration: int) -> bool:
-        """
-        Extends the subscription for an existing user.
-
-        Arguments:
-            user_id (int): The user ID to extend the subscription for.
-            devices (int): The number of devices the user can use.
-            duration (int): The subscription extension duration in days.
-
-        Returns:
-            bool: True if the subscription was extended, False otherwise.
-        """
-        async with self.session() as session:
-            user: User = await User.get(session, tg_id=user_id)
+    async def extend_subscription(self, user: User, devices: int, duration: int) -> bool:
         return await self.update_client(user, devices, duration, replace_devices=True)
 
-    async def activate_promocode(self, user_id: int, promocode: Promocode) -> bool:
-        """
-        Activates a promocode for a user.
+    async def activate_promocode(self, user: User, promocode: Promocode) -> bool:
+        async with self.session() as session:
+            activated = await Promocode.set_activated(session, promocode.code, user.tg_id)
 
-        Arguments:
-            user_id (int): The user ID to activate the promocode for.
-            promocode (Promocode): The promocode to activate.
-
-        Returns:
-            bool: True if the promocode was activated, False otherwise.
-        """
-        if not await self.promocode_service.activate_promocode(promocode.code, user_id):
-            logger.debug(f"Failed to activate promocode {promocode.code} for user {user_id}.")
+        if not activated:
+            logger.critical(f"Failed to activate promocode {promocode.code} for user {user.tg_id}.")
             return False
 
-        async with self.session() as session:
-            user: User = await User.get(session, tg_id=user_id)
-
-        if await self.is_client_exists(user_id):
-            success = await self.update_client(user, devices=0, duration=promocode.duration)
-            if success:
-                logger.info(
-                    f"Updated existing client for user {user_id} with promocode {promocode.code}."
-                )
+        if await self.is_client_exists(user):
+            updated = await self.update_client(user, devices=0, duration=promocode.duration)
+            if updated:
+                logger.info(f"Updated client {user.tg_id} with promocode {promocode.code}.")
                 return True
         else:
-            success = await self.create_client(user, devices=1, duration=promocode.duration)
-            if success:
-                logger.info(
-                    f"Created new client for user {user_id} with promocode {promocode.code}."
-                )
+            created = await self.create_client(user, devices=1, duration=promocode.duration)
+            if created:
+                logger.info(f"Created client {user.tg_id} with promocode {promocode.code}.")
                 return True
 
-        await self.promocode_service.deactivate_promocode(promocode.code)
-        logger.warning(
-            f"Promocode {promocode.code} deactivated due to client update/creation failure."
-        )
+        async with self.session() as session:
+            await Promocode.set_deactivated(session, promocode.code)
+
+        logger.warning(f"Promocode {promocode.code} not activated due to failure.")
         return False
-
-    def _gb_to_bytes(self, traffic_gb: int) -> int:
-        """
-        Converts GB to bytes.
-
-        Arguments:
-            traffic_gb (int): The amount of traffic in GB.
-
-        Returns:
-            int: The equivalent amount of bytes.
-        """
-        bytes_in_gb = 1024**3
-        return int(traffic_gb * bytes_in_gb)
-
-    def _current_timestamp(self) -> int:
-        """
-        Returns the current timestamp in milliseconds.
-
-        Returns:
-            int: The current timestamp in milliseconds.
-        """
-        return int(datetime.now(timezone.utc).timestamp() * 1000)
-
-    def _add_days_to_timestamp(self, timestamp: int, days: int) -> int:
-        """
-        Adds a specified number of days to a given timestamp.
-
-        Arguments:
-            timestamp (int): The original timestamp.
-            days (int): The number of days to add.
-
-        Returns:
-            int: The updated timestamp.
-        """
-        current_datetime = datetime.fromtimestamp(timestamp / 1000, tz=timezone.utc)
-        new_datetime = current_datetime + timedelta(days=days)
-        return int(new_datetime.timestamp() * 1000)
-
-    def _days_to_timestamp(self, days: int) -> int:
-        """
-        Converts a number of days to a timestamp.
-
-        Arguments:
-            days (int): The number of days to convert.
-
-        Returns:
-            int: The corresponding timestamp.
-        """
-        current_time = self._current_timestamp()
-        return self._add_days_to_timestamp(current_time, days)

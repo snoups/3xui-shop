@@ -1,10 +1,13 @@
 import logging
 
 from aiogram import Bot
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.storage.base import StorageKey
+from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.utils.i18n import gettext as _
 from aiohttp import web
 from aiohttp.web_request import Request
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from yookassa import Configuration, Payment, Webhook
 from yookassa.domain.common import SecurityHelper
 from yookassa.domain.common.confirmation_type import ConfirmationType
@@ -16,59 +19,48 @@ from yookassa.domain.notification import (
 )
 from yookassa.domain.request.payment_request_builder import PaymentRequestBuilder
 
-from app.bot.navigation import NavSubscription, SubscriptionData
+from app.bot.models import SubscriptionData
+from app.bot.models.enums import TransactionStatus
 from app.bot.payment_gateways import PaymentGateway
-from app.bot.routes.subscription.keyboard import payment_success_keyboard
-from app.bot.routes.utils.keyboard import back_to_main_menu_keyboard
+from app.bot.routers.misc.keyboard import back_keyboard
 from app.bot.services.plan import PlanService
 from app.bot.services.vpn import VPNService
+from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY
+from app.bot.utils.navigation import NavSubscription
 from app.config import Config
-from app.db.models.transaction import Transaction
+from app.db.models import Transaction, User
 
 logger = logging.getLogger(__name__)
 
 
 class Yookassa(PaymentGateway):
-    """
-    Service for creating payments through the Yookassa platform.
-    """
-
     name = "YooKassa"
     symbol = "₽"
     code = Currency.RUB
     callback = NavSubscription.PAY_YOOKASSA
 
-    def __init__(self, config: Config, bot: Bot):
-        """
-        Initialize the Yookassa service with shop credentials.
-
-        Arguments:
-            config (Config): Configuration instance.
-            bot (Bot): Telegram Bot instance.
-        """
+    def __init__(
+        self,
+        config: Config,
+        bot: Bot,
+        session: async_sessionmaker,
+        storage: RedisStorage,
+        vpn_service: VPNService,
+    ):
         self.config = config
         self.bot = bot
+        self.session = session
+        self.storage = storage
+        self.vpn_service = vpn_service
+
         Configuration.configure(config.yookassa.SHOP_ID, config.yookassa.TOKEN)
+        logger.info("YooKassa payment gateway initialized.")
 
-    async def create_payment(self, session: AsyncSession, data: SubscriptionData) -> str:
-        """
-        Create a payment link for the subscription using Yookassa.
-
-        This method generates a payment link based on the provided subscription data,
-        including devices and duration.
-
-        Arguments:
-            data (SubscriptionData): The subscription data, including devices and duration.
-
-        Returns:
-            str: The payment link for the subscription.
-        """
+    async def create_payment(self, data: SubscriptionData) -> str:
         redirect = f"https://t.me/{(await self.bot.get_me()).username}"
         devices = PlanService.convert_devices_to_title(data.devices)
         duration = PlanService.convert_days_to_period(data.duration)
-        description = _("Subscription | {devices} for {duration}").format(
-            devices=devices, duration=duration
-        )
+        description = _("payment:invoice:description").format(devices=devices, duration=duration)
 
         receipt = Receipt()
         receipt.customer = {"email": self.config.bot.EMAIL}
@@ -94,27 +86,18 @@ class Yookassa(PaymentGateway):
         request = builder.build()
         response = Payment.create(request)
 
-        async with session() as session:
+        async with self.session() as session:
             await Transaction.create(
                 session=session,
-                user_id=data.user_id,
+                tg_id=data.user_id,
                 subscription=data.pack(),
                 payment_id=response.id,
-                status="process",
+                status=TransactionStatus.PENDING,
             )
 
         return response.confirmation["confirmation_url"]
 
-    def set_webhook(self, url: str) -> None:  # Only for partners api
-        """
-        Set a webhook for the Yookassa platform.
-
-        This method registers a webhook for payment notifications from Yookassa.
-        It is only available for partners API.
-
-        Arguments:
-            url (str): The URL to register for webhook notifications.
-        """
+    def set_webhook(self, url: str) -> None:
         try:
             events = [
                 WebhookNotificationEventType.PAYMENT_SUCCEEDED,
@@ -138,20 +121,7 @@ class Yookassa(PaymentGateway):
         except Exception as exception:
             logger.debug(f"Failed to register webhook: {exception}")
 
-    @staticmethod
-    async def webhook_handler(request: Request, session, bot: Bot, vpn_service: VPNService):
-        """
-        Handles incoming Yookassa webhook notifications.
-
-        This method processes payment status updates from Yookassa and updates
-        the status of the corresponding subscription.
-
-        Arguments:
-            request (Request): The incoming webhook request.
-
-        Returns:
-            web.Response: The response indicating the result of the processing.
-        """
+    async def webhook_handler(self, request: Request):
         ip = request.headers.get("X-Forwarded-For", request.remote)
         if not SecurityHelper().is_ip_trusted(ip):
             return web.Response(status=403)
@@ -164,82 +134,85 @@ class Yookassa(PaymentGateway):
             match notification_object.event:
                 case WebhookNotificationEventType.PAYMENT_SUCCEEDED:
                     logger.debug("PAYMENT_SUCCEEDED")
-                    some_data = {
-                        "paymentId": response_object.id,
-                        "paymentStatus": response_object.status,
-                    }
-                # case WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
-                #     logger.debug("PAYMENT_WAITING_FOR_CAPTURE")
-                #     some_data = {
-                #         "paymentId": response_object.id,
-                #         "paymentStatus": response_object.status,
-                #     }
-                # case WebhookNotificationEventType.PAYMENT_CANCELED:
-                #     logger.debug("PAYMENT_CANCELED")
-                #     some_data = {
-                #         "paymentId": response_object.id,
-                #         "paymentStatus": response_object.status,
-                #     }
+                    payment_id = response_object.id
+
+                    async with self.session() as session:
+                        transaction = await Transaction.get(session=session, payment_id=payment_id)
+                        data = SubscriptionData.unpack(transaction.subscription)
+                        user = await User.get(session=session, tg_id=data.user_id)
+                        await Transaction.update(
+                            session=session,
+                            tg_id=data.user_id,
+                            subscription=data.pack(),
+                            payment_id=payment_id,
+                            status=TransactionStatus.COMPLETED,
+                        )
+
+                    try:
+                        state: FSMContext = FSMContext(
+                            storage=self.storage,
+                            key=StorageKey(
+                                chat_id=data.user_id,
+                                user_id=data.user_id,
+                                bot_id=self.bot.id,
+                            ),
+                        )
+                        message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
+                        await self.bot.delete_message(chat_id=data.user_id, message_id=message_id)
+                    except Exception as exception:
+                        logger.debug(f"Failed to delete message: {exception}")
+                    if data.is_extend:
+                        await self.vpn_service.extend_subscription(
+                            user, data.devices, data.duration
+                        )
+                        logger.info(f"Subscription extented for user {data.user_id}")
+                    else:
+                        await self.vpn_service.create_subscription(
+                            user, data.devices, data.duration
+                        )
+                        logger.info(f"Subscription created for user {data.user_id}")
+
+                    if data.is_extend:
+                        await self.bot.send_message(
+                            chat_id=data.user_id,
+                            text=_("payment:message:extend_success").format(
+                                duration=PlanService.convert_days_to_period(data.duration)
+                            ),
+                            message_effect_id="5046509860389126442",
+                            reply_markup=back_keyboard(NavSubscription.MAIN),
+                        )
+                    else:
+                        from app.bot.routers.subscription.keyboard import (
+                            payment_success_keyboard,
+                        )
+
+                        key = await self.vpn_service.get_key(user)
+                        await self.bot.send_message(
+                            chat_id=data.user_id,
+                            text=_("payment:message:buying_success").format(key=key),
+                            message_effect_id="5046509860389126442",  # TODO: Delete effect
+                            reply_markup=payment_success_keyboard(),
+                        )
+                    return web.Response(status=200)
+                case WebhookNotificationEventType.PAYMENT_CANCELED:
+                    logger.debug("PAYMENT_CANCELED")
+                    payment_id = response_object.id
+
+                    async with self.session() as session:
+                        transaction = await Transaction.get(session=session, payment_id=payment_id)
+                        data = SubscriptionData.unpack(transaction.subscription)
+                        await Transaction.update(
+                            session=session,
+                            tg_id=data.user_id,
+                            subscription=data.pack(),
+                            payment_id=payment_id,
+                            status=TransactionStatus.CANCELED,
+                        )
+
+                    return web.Response(status=200)
                 case _:
                     return web.Response(status=400)
-
-            payment_info = Payment.find_one(some_data["paymentId"])
-            if payment_info:
-                payment_status = payment_info.status
-                print(payment_status)
-
-                async with session() as session:
-                    transaction = await Transaction.get(session=session, payment_id=payment_info.id)
-                data = SubscriptionData.unpack(transaction.subscription)
-                await bot.delete_message(chat_id=data.user_id, message_id=data.message_id)
-                if data.is_extend:
-                    await vpn_service.extend_subscription(data.user_id, data.devices, data.duration)
-                    logger.info(f"Subscription extented for user {data.user_id}")
-                else:
-                    await vpn_service.create_subscription(data.user_id, data.devices, data.duration)
-                    logger.info(f"Subscription created for user {data.user_id}")
-
-                await Transaction.update(
-                    session=session,
-                    user_id=data.user_id,
-                    subscription=data.pack(),
-                    payment_id=payment_info.id,
-                    status="success",
-                )
-
-                if data.is_extend:
-                    await bot.send_message(
-                        chat_id=data.user_id,
-                        text=_(
-                            "✅ *Payment successful!*\n"
-                            "\n"
-                            "Your subscription has been extended for {duration}\n"
-                        ).format(duration=PlanService.convert_days_to_period(data.duration)),
-                        message_effect_id="5046509860389126442",
-                        reply_markup=back_to_main_menu_keyboard(),
-                    )
-                else:
-                    key = await vpn_service.get_key(data.user_id)
-                    await bot.send_message(
-                        chat_id=data.user_id,
-                        text=_(
-                            "✅ *Payment successful!*\n"
-                            "\n"
-                            "🔑 *Your key:* ```{key}```\n"
-                            "_The key will be saved in your profile._\n"
-                            "\n"
-                            "To start using our service, go to the download page of the application and "
-                            "download it for your platform. Then you can manually enter the key or click "
-                            "`🔌 Connect` and the key will be automatically added to the application."
-                        ).format(key=key),
-                        message_effect_id="5046509860389126442",  # TODO: Delete effect
-                        reply_markup=payment_success_keyboard(),
-                    )
-            else:
-                return web.Response(status=400)
 
         except Exception as exception:
             print(exception)
             return web.Response(status=400)
-
-        return web.Response(status=200)

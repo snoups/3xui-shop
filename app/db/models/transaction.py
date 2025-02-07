@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Self
+from typing import Any, Self
 
 from sqlalchemy import *
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 from sqlalchemy.types import Enum
 
-from app.bot.navigation import TransactionStatus
+from app.bot.models import TransactionStatus
 
 from . import Base
 
@@ -17,18 +17,17 @@ logger = logging.getLogger(__name__)
 
 class Transaction(Base):
     """
-    Represents the Transaction table in the database.
+    Represents a transaction in the database.
 
     Attributes:
-        id (int): The unique transaction ID (primary key).
-        tg_id (int): The Telegram user ID associated with the transaction (foreign key).
-        payment_id (str): The unique payment ID for the transaction.
-        subscription (str): The name of the subscription plan for the transaction.
-        status (TransactionStatus): The current status of the transaction
-            (e.g., pending, failed, completed).
-        created_at (datetime): The timestamp when the transaction was created.
-        updated_at (datetime): The timestamp when the transaction was last updated.
-        user (User): The related user object.
+        id (int): Unique identifier for the transaction (primary key).
+        tg_id (int): Telegram user ID associated with the transaction.
+        payment_id (str): Unique payment identifier for the transaction.
+        subscription (str): Name of the subscription plan associated with the transaction.
+        status (TransactionStatus): Current status of the transaction (e.g., pending, completed).
+        created_at (datetime): Timestamp when the transaction was created.
+        updated_at (datetime): Timestamp when the transaction was last updated.
+        user (User): Related user object.
     """
 
     __tablename__ = "transactions"
@@ -36,7 +35,6 @@ class Transaction(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id"), nullable=False)
     payment_id: Mapped[str] = mapped_column(String(length=64), unique=True, nullable=False)
-
     subscription: Mapped[str] = mapped_column(String(length=255), nullable=False)
     status: Mapped[TransactionStatus] = mapped_column(
         Enum(TransactionStatus, values_callable=lambda obj: [e.value for e in obj]),
@@ -48,16 +46,9 @@ class Transaction(Base):
         onupdate=func.now(),
         nullable=False,
     )
-
     user: Mapped["User"] = relationship("User", back_populates="transactions")  # type: ignore
 
     def __repr__(self) -> str:
-        """
-        Represents the Transaction object as a string.
-
-        Returns:
-            str: A string representation of the Transaction object.
-        """
         return (
             f"<Transaction(id={self.id}, tg_id={self.tg_id}, payment_id='{self.payment_id}', "
             f"subscription='{self.subscription}', status='{self.status}', "
@@ -65,93 +56,65 @@ class Transaction(Base):
         )
 
     @classmethod
-    async def get(cls, session: AsyncSession, payment_id: str) -> Self | None:
-        """
-        Retrieve a transaction by its payment ID.
-
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            payment_id (str): The unique payment ID for the transaction.
-
-        Returns:
-            Transaction | None: The transaction object if found, otherwise None.
-
-        Example:
-            transaction = await Transaction.get(session, payment_id="abc123")
-        """
+    async def get_by_id(cls, session: AsyncSession, payment_id: str) -> Self | None:
         filter = [Transaction.payment_id == payment_id]
         query = await session.execute(
             select(Transaction).options(selectinload(Transaction.user)).where(*filter)
         )
-        return query.scalar_one_or_none()
+        transaction = query.scalar_one_or_none()
+
+        if transaction:
+            logger.debug(f"Transaction {payment_id} retrieved from the database.")
+            return transaction
+
+        logger.warning(f"Transaction {payment_id} not found in the database.")
+        return None
 
     @classmethod
     async def get_by_user(cls, session: AsyncSession, tg_id: int) -> list[Self]:
-        """
-        Retrieve all transactions for a specific user.
-
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            tg_id (int): The unique Telegram user ID for the transactions.
-
-        Returns:
-            list[Transaction]: A list of transactions for the user, or an empty list if none.
-
-        Example:
-            transactions = await Transaction.get_by_user(session, tg_id=123456)
-        """
         filter = [Transaction.tg_id == tg_id]
         query = await session.execute(
             select(Transaction).options(selectinload(Transaction.user)).where(*filter)
         )
-        return query.scalars().all()
+        transactions = query.scalars().all()
+
+        if len(transactions) > 0:
+            logger.debug(f"Transactions for user {tg_id} retrieved: {transactions}")
+            return transactions
+
+        logger.warning(f"Transactions for user {tg_id} not found in the database.")
+        return []
 
     @classmethod
-    async def create(cls, session: AsyncSession, payment_id: str, **kwargs) -> Self | None:
-        """
-        Create a new transaction.
+    async def create(cls, session: AsyncSession, payment_id: str, **kwargs: Any) -> Self | None:
+        transaction = await Transaction.get_by_id(session=session, payment_id=payment_id)
 
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            payment_id (str): The unique payment ID for the transaction.
-            kwargs (dict): Additional attributes for creating the transaction.
+        if transaction:
+            logger.warning(f"Transaction {payment_id} already exists.")
+            return None
 
-        Returns:
-            Transaction | None: The created transaction object if successful,
-                or None if creation failed.
+        transaction = Transaction(payment_id=payment_id, **kwargs)
+        session.add(transaction)
 
-        Example:
-            transaction = await Transaction.create(session, payment_id="abc123",
-                tg_id=123, subscription="plan", status="completed")
-        """
-        transaction = await Transaction.get(session, payment_id)
-
-        if transaction is None:
-            transaction = Transaction(payment_id=payment_id, **kwargs)
-            session.add(transaction)
-
-            try:
-                await session.commit()
-            except IntegrityError:
-                await session.rollback()
-                logger.error(f"Error occurred while creating transaction {payment_id}")
-                return None
-
-        return transaction
+        try:
+            await session.commit()
+            logger.info(f"Transaction {payment_id} created.")
+            return transaction
+        except IntegrityError as exception:
+            await session.rollback()
+            logger.error(f"Error occurred while creating transaction {payment_id}: {exception}")
+            return None
 
     @classmethod
-    async def update(cls, session: AsyncSession, payment_id: str, **kwargs) -> None:
-        """
-        Update an existing transaction.
+    async def update(cls, session: AsyncSession, payment_id: str, **kwargs: Any) -> Self | None:
+        transaction = await Transaction.get_by_id(session=session, payment_id=payment_id)
 
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            payment_id (str): The unique payment ID for the transaction.
-            kwargs (dict): Fields to update (e.g., status).
+        if transaction:
+            filter = [Transaction.id == transaction.id]
+            await session.execute(update(Transaction).where(*filter).values(**kwargs))
+            await session.commit()
+            logger.debug(f"Transaction {payment_id} updated.")
+            return transaction
 
-        Example:
-            await Transaction.update(session, payment_id="1", status="completed")
-        """
-        filter = [Transaction.payment_id == payment_id]
-        await session.execute(update(Transaction).where(*filter).values(**kwargs))
-        await session.commit()
+        logger.warning(f"Transaction {payment_id} not found for update.")
+        return None

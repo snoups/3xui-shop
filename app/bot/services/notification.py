@@ -2,82 +2,164 @@ import asyncio
 import logging
 
 from aiogram import Bot
-from aiogram.types import Message
+from aiogram.types import (
+    CallbackQuery,
+    ForceReply,
+    InlineKeyboardMarkup,
+    InputFile,
+    Message,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+)
 
-from app.bot.routes.utils.keyboard import close_notification_keyboard
+from app.bot.routers.misc.keyboard import close_notification_keyboard
+from app.config import Config
 
 logger = logging.getLogger(__name__)
 
 
 class NotificationService:
-    """
-    Service to send notifications to users in Telegram with optional removal after a delay.
-
-    Attributes:
-        bot (Bot): The aiogram Bot instance used to send messages.
-    """
-
-    def __init__(self, bot: Bot) -> None:
-        """
-        Initializes the NotificationService with a Bot instance.
-
-        Arguments:
-            bot (Bot): The aiogram Bot instance used to send messages.
-        """
+    def __init__(self, config: Config, bot: Bot) -> None:
+        self.config = config
         self.bot = bot
-        logger.info("NotificationService initialized.")
-
-    async def notify_by_id(self, chat_id: int, text: str, duration: int = 0) -> None:
-        """
-        Sends a notification message to the user with the specified chat ID.
-
-        If a duration is provided, the message will be deleted after the specified time.
-
-        Arguments:
-            chat_id (int): The ID of the chat to send the notification to.
-            text (str): The content of the notification message.
-            duration (int): The duration (in seconds) to keep the message before deleting.
-                            Defaults to 0 (doesn't delete the message).
-        """
-        logger.info(f"Sending notification for {chat_id}.")
-        notification: Message
-
-        if duration > 0:
-            notification = await self.bot.send_message(chat_id=chat_id, text=text)
-            logger.debug(f"Notification sent. Waiting for {duration} seconds before deletion.")
-            await asyncio.sleep(duration)
-            await notification.delete()
-            logger.debug(f"Notification deleted after {duration} seconds.")
-            return
-        else:
-            await self.bot.send_message(
-                chat_id=chat_id,
-                text=text,
-                reply_markup=close_notification_keyboard(),
-            )
+        logger.info("Notification Service initialized.")
 
     @staticmethod
-    async def notify_by_message(message: Message, text: str, duration: int = 0) -> None:
-        """
-        Sends a notification message in reply to the specified message.
+    async def _notify(
+        text: str,
+        duration: int,
+        *,
+        message: Message | None = None,
+        chat_id: int | None = None,
+        reply_markup: (
+            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
+        ) = None,
+        document: InputFile | None = None,
+        bot: Bot | None = None,
+    ) -> Message | None:
+        logger.debug(f"Sending notification for {chat_id}")
 
-        If a duration is provided, the message will be deleted after the specified time.
+        if not (message or chat_id):
+            logger.error("Failed to send notification: message or chat_id required")
+            return None
 
-        Arguments:
-            message (Message): The Message object to reply to.
-            text (str): The content of the notification message.
-            duration (int): The duration (in seconds) to keep the message before deleting.
-                            Defaults to 0 (doesn't delete the message).
-        """
-        logger.info(f"Sending notification for {message.chat.id}.")
-        notification: Message
+        if message and not bot:
+            bot = message.bot
+
+        chat_id = message.chat.id if message else chat_id
+
+        if duration == 0 and reply_markup is None:
+            reply_markup = close_notification_keyboard()
+
+        try:
+            if document:
+                send_method = bot.send_document if bot else message.answer_document
+                args = {"document": document, "caption": text}
+            else:
+                send_method = bot.send_message if bot else message.answer
+                args = {"text": text}
+
+            notification = await send_method(
+                chat_id=chat_id,
+                reply_markup=reply_markup,
+                **args,
+            )
+            logger.debug(f"Notification sent to {chat_id}")
+        except Exception as exception:
+            logger.error(f"Failed to send notification: {exception}")
+            return None
 
         if duration > 0:
-            notification = await message.answer(text=text)
-            logger.debug(f"Notification sent. Waiting for {duration} seconds before deletion.")
             await asyncio.sleep(duration)
-            await notification.delete()
-            logger.debug(f"Notification deleted after {duration} seconds.")
+            try:
+                await notification.delete()
+            except Exception as exception:
+                logger.error(f"Failed to delete message {notification.message_id}: {exception}")
+
+        return notification
+
+    async def notify_by_id(
+        self,
+        chat_id: int,
+        text: str,
+        duration: int = 0,
+        reply_markup: (
+            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
+        ) = None,
+        document: InputFile | None = None,
+    ) -> None:
+        await self._notify(
+            text=text,
+            duration=duration,
+            chat_id=chat_id,
+            reply_markup=reply_markup,
+            document=document,
+            bot=self.bot,
+        )
+
+    @staticmethod
+    async def notify_by_message(
+        message: Message,
+        text: str,
+        duration: int = 0,
+        reply_markup: (
+            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
+        ) = None,
+        document: InputFile | None = None,
+    ) -> None:
+        await NotificationService._notify(
+            text=text,
+            duration=duration,
+            message=message,
+            reply_markup=reply_markup,
+            document=document,
+        )
+
+    async def notify_admins(
+        self,
+        text: str,
+        duration: int = 0,
+        reply_markup: (
+            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
+        ) = None,
+        document: InputFile | None = None,
+    ) -> None:
+        if not self.config.bot.ADMINS:
+            logger.warning("Admin list is empty. No notifications will be sent.")
             return
-        else:
-            await message.answer(text=text, reply_markup=close_notification_keyboard())
+
+        for chat_id in self.config.bot.ADMINS:
+            await self._notify(
+                text=text,
+                duration=duration,
+                chat_id=chat_id,
+                reply_markup=reply_markup,
+                document=document,
+                bot=self.bot,
+            )
+
+    async def notify_developer(
+        self,
+        text: str,
+        duration: int = 0,
+        reply_markup: (
+            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
+        ) = None,
+        document: InputFile | None = None,
+    ) -> None:
+        await self._notify(
+            text=text,
+            duration=duration,
+            chat_id=self.config.bot.DEV_ID,
+            reply_markup=reply_markup,
+            document=document,
+            bot=self.bot,
+        )
+
+    @staticmethod
+    async def show_popup(callback: CallbackQuery, text: str, cache_time: int = 0) -> None:
+        try:
+            await callback.answer(text=text, show_alert=True, cache_time=cache_time)
+            logger.debug(f"Popup sent to {callback.from_user.id}")
+        except Exception as exception:
+            logger.error(f"Failed to send popup: {exception}")
