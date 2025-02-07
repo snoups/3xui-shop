@@ -21,7 +21,8 @@ Currently, the bot is under development and not fully functional. Some features 
 - [ ] Trial subscription
 - [ ] Notification
 - [x] Admin panel
-- [ ] Subscription balancer
+- [x] Subscription balancer
+- [ ] Statistics
 
 ## 🛠️ Installation guide
 
@@ -117,13 +118,15 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
 A special thanks to the following individuals for their generous support:
 
-- Boto
+- **Boto**, 
+- [**@olshevskii-sergey**](https://github.com/olshevskii-sergey/)
+- **Aleksey**
 
 You can support me via the following methods:
 
 - **Bitcoin:** `bc1ql53lcaukdv3thxcheh3cmgucwlwkr929gar0cy`
 - **Ethereum:** `0xe604a10258d26c085ada79cdea9a84a5b0894b91`
-- **USDT (Ethereum):** `0xe604a10258d26c085ada79cdea9a84a5b0894b91`
+- **USDT (TRC20):** `TUqDQ4mdtVJZC76789kPYBMzaLFQBDdKhE`
 - **TON:** `UQDogBlLFgrxkVWvDJn6YniCwrJDro7hbk5AqDMoSzmBQ-KQ`
 
 Any support will help me dedicate more time to development and accelerate the project!
