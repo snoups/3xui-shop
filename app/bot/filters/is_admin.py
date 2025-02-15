@@ -12,7 +12,15 @@ logger = logging.getLogger(__name__)
 class IsAdmin(BaseFilter):
     admins_ids: list[int] = []
 
-    async def __call__(self, event: TelegramObject) -> bool:
+    async def __call__(
+        self,
+        event: TelegramObject | None = None,
+        user_id: int | None = None,
+    ) -> bool:
+        if user_id:
+            is_dev = await IsDev()(user_id=user_id)
+            return user_id in self.admins_ids or is_dev
+
         user: TelegramUser | None = event.from_user
 
         if not user:

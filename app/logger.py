@@ -6,7 +6,13 @@ import zipfile
 from datetime import datetime
 from logging.handlers import TimedRotatingFileHandler
 
-from app.config import LoggingConfig
+from app.bot.utils.constants import LOG_GZ_ARCHIVE_FORMAT, LOG_ZIP_ARCHIVE_FORMAT
+from app.config import LoggingConfig, memory_handler
+
+LOG_FILENAME = "app.log"
+LOG_WHEN = "midnight"
+LOG_INTERVAL = 1
+LOG_ENCODING = "utf-8"
 
 logger = logging.getLogger(__name__)
 
@@ -23,53 +29,53 @@ class ArchiveRotatingFileHandler(TimedRotatingFileHandler):
         utc=False,
         atTime=None,
         errors=None,
-        archive_format="zip",
+        archive_format=LOG_ZIP_ARCHIVE_FORMAT,
     ):
         super().__init__(
             filename, when, interval, backupCount, encoding, delay, utc, atTime, errors
         )
-        if archive_format not in {"zip", "gz"}:
+        if archive_format not in {LOG_ZIP_ARCHIVE_FORMAT, LOG_GZ_ARCHIVE_FORMAT}:
             raise ValueError("archive_format must be either 'zip' or 'gz'")
 
         self.archive_format = archive_format
         logger.debug(f"Initialized ArchiveRotatingFileHandler with format: {self.archive_format}")
 
-    def doRollover(self):
+    def doRollover(self) -> None:
         super().doRollover()
 
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         dir_name = os.path.dirname(self.baseFilename)
         archive_name = os.path.join(dir_name, f"{timestamp}.{self.archive_format}")
 
-        self.__archive_log_file(archive_name)  # TODO: send archive to developer
-        self.__remove_old_logs()
+        self._archive_log_file(archive_name)  # TODO: send archive to developer
+        self._remove_old_logs()
 
-    def __archive_log_file(self, archive_name: str) -> None:
+    def _archive_log_file(self, archive_name: str) -> None:
         logger.info(f"Archiving {self.baseFilename} to {archive_name}")
         if os.path.exists(self.baseFilename):
-            if self.archive_format == "zip":
-                self.__archive_to_zip(archive_name)
-            elif self.archive_format == "gz":
-                self.__archive_to_gz(archive_name)
+            if self.archive_format == LOG_ZIP_ARCHIVE_FORMAT:
+                self._archive_to_zip(archive_name)
+            elif self.archive_format == LOG_GZ_ARCHIVE_FORMAT:
+                self._archive_to_gz(archive_name)
         else:
             logger.warning(f"Log file {self.baseFilename} does not exist, skipping archive.")
 
-    def __archive_to_zip(self, archive_name: str) -> None:
+    def _archive_to_zip(self, archive_name: str) -> None:
         log = self.getFilesToDelete()[0]
-        new_log_name = self.__get_log_filename(archive_name)
+        new_log_name = self._get_log_filename(archive_name)
         with zipfile.ZipFile(archive_name, "w", zipfile.ZIP_DEFLATED) as archive:
-            archive.write(log, new_log_name)
+            archive.write(filename=log, arcname=new_log_name)
 
-    def __archive_to_gz(self, archive_name: str) -> None:
+    def _archive_to_gz(self, archive_name: str) -> None:
         log = self.getFilesToDelete()[0]
-        new_log_name = self.__get_log_filename(archive_name)
+        new_log_name = self._get_log_filename(archive_name)
         with tarfile.open(archive_name, "w:gz") as archive:
-            archive.add(log, new_log_name)
+            archive.add(name=log, arcname=new_log_name)
 
-    def __get_log_filename(self, archive_name: str) -> str:
+    def _get_log_filename(self, archive_name: str) -> str:
         return os.path.splitext(os.path.basename(archive_name))[0] + ".log"
 
-    def __remove_old_logs(self) -> None:
+    def _remove_old_logs(self) -> None:
         files_to_delete = self.getFilesToDelete()
         logger.debug(f"Removing old log files: {files_to_delete}")
         for file in files_to_delete:
@@ -84,7 +90,7 @@ class ArchiveRotatingFileHandler(TimedRotatingFileHandler):
 def setup_logging(config: LoggingConfig) -> None:
     log_dir = config.DIR
     os.makedirs(log_dir, exist_ok=True)
-    log_file = os.path.join(log_dir, f"app.log")
+    log_file = os.path.join(log_dir, LOG_FILENAME)
 
     logging.basicConfig(
         level=getattr(logging, config.LEVEL.upper(), logging.INFO),
@@ -92,14 +98,17 @@ def setup_logging(config: LoggingConfig) -> None:
         handlers=[
             ArchiveRotatingFileHandler(
                 filename=log_file,
-                when="midnight",
-                interval=1,
-                encoding="utf-8",
+                when=LOG_WHEN,
+                interval=LOG_INTERVAL,
+                encoding=LOG_ENCODING,
                 archive_format=config.ARCHIVE_FORMAT,
             ),
             logging.StreamHandler(),
         ],
     )
+
+    for record in memory_handler.buffer:
+        logger.handle(record)
 
     logger.debug(
         f"Logging configuration: level={config.LEVEL}, "

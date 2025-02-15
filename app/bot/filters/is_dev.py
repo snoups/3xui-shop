@@ -10,7 +10,14 @@ logger = logging.getLogger(__name__)
 class IsDev(BaseFilter):
     developer_id: int
 
-    async def __call__(self, event: TelegramObject) -> bool:
+    async def __call__(
+        self,
+        event: TelegramObject | None = None,
+        user_id: int | None = None,
+    ) -> bool:
+        if user_id:
+            return user_id == self.developer_id
+
         user: TelegramUser | None = event.from_user
 
         if not user:

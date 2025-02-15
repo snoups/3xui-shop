@@ -1,44 +1,29 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from typing import Any
 
-
-@dataclass
-class Prices:
-    rub: dict[int, float] = field(default_factory=dict)
-    usd: dict[int, float] = field(default_factory=dict)
-    xtr: dict[int, float] = field(default_factory=dict)
-
-    @classmethod
-    def from_dict(cls, data: dict) -> "Prices":
-        return cls(
-            rub={int(k): v for k, v in data.get("RUB", {}).items()},
-            usd={int(k): v for k, v in data.get("USD", {}).items()},
-            xtr={int(k): v for k, v in data.get("XTR", {}).items()},
-        )
-
-    def to_dict(self) -> dict:
-        prices_dict = {
-            "RUB": {str(k): v for k, v in self.rub.items()},
-            "USD": {str(k): v for k, v in self.usd.items()},
-            "XTR": {str(k): v for k, v in self.xtr.items()},
-        }
-        return prices_dict
+from app.bot.utils.constants import Currency
 
 
 @dataclass
 class Plan:
     devices: int
-    prices: Prices
+    prices: dict[str, dict[int, float]]
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Plan":
+    def from_dict(cls, data: dict[str, Any]) -> "Plan":
         return cls(
             devices=data["devices"],
-            prices=Prices.from_dict(data["prices"]),
+            prices={k: {int(m): p for m, p in v.items()} for k, v in data["prices"].items()},
         )
 
-    def to_dict(self) -> dict:
-        plan_dict = {
+    def to_dict(self) -> dict[str, Any]:
+        return {
             "devices": self.devices,
-            "prices": self.prices.to_dict(),
+            "prices": {k: {str(m): p for m, p in v.items()} for k, v in self.prices.items()},
         }
-        return plan_dict
+
+    def get_price(self, currency: Currency | str, duration: int) -> float:
+        if isinstance(currency, str):
+            currency = Currency(currency)
+
+        return self.prices[currency.value][duration]

@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin, IsDev
-from app.bot.models import ServicesContainer
+from app.bot.services import ServicesContainer
 from app.bot.utils.navigation import NavAdminTools
 from app.db.models import User
 
@@ -18,7 +18,7 @@ router = Router(name=__name__)
 @router.callback_query(F.data == NavAdminTools.MAIN, IsAdmin())
 async def callback_admin_tools(callback: CallbackQuery, user: User) -> None:
     logger.info(f"Admin {user.tg_id} opened admin tools.")
-    is_dev = await IsDev()(callback)
+    is_dev = await IsDev()(user_id=user.tg_id)
     await callback.message.edit_text(
         text=_("admin_tools:message:main"),
         reply_markup=admin_tools_keyboard(is_dev),

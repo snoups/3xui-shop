@@ -11,7 +11,7 @@ from app.bot.utils.navigation import (
 )
 
 
-def main_menu_keyboard(is_admin: bool) -> InlineKeyboardMarkup:
+def main_menu_keyboard(is_admin: bool = False) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.row(

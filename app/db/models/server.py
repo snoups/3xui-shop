@@ -44,7 +44,7 @@ class Server(Base):
         return len(self.users)
 
     @current_clients.expression
-    def current_clients(cls):
+    def current_clients(cls) -> Select:
         return (
             select(func.count(User.id)).where(User.server_id == Server.id).label("current_clients")
         )
@@ -62,14 +62,7 @@ class Server(Base):
         query = await session.execute(
             select(Server).options(selectinload(Server.users)).where(*filter)
         )
-        server = query.scalar_one_or_none()
-
-        if server:
-            logger.debug(f"Server {id} retrieved from the database.")
-            return server
-
-        logger.warning(f"Server {id} not found in the database.")
-        return None
+        return query.scalar_one_or_none()
 
     @classmethod
     async def get_by_name(cls, session: AsyncSession, name: str) -> Self | None:
@@ -77,21 +70,12 @@ class Server(Base):
         query = await session.execute(
             select(Server).options(selectinload(Server.users)).where(*filter)
         )
-        server = query.scalar_one_or_none()
-
-        if server:
-            logger.debug(f"Server {name} retrieved from the database.")
-            return server
-
-        logger.warning(f"Server {name} not found in the database.")
-        return None
+        return query.scalar_one_or_none()
 
     @classmethod
     async def get_all(cls, session: AsyncSession) -> list[Self]:
         query = await session.execute(select(Server).options(selectinload(Server.users)))
-        servers = query.scalars().all()
-        logger.debug(f"Retrieved {len(servers)} servers from the database.")
-        return servers
+        return query.scalars().all()
 
     @classmethod
     async def get_least_loaded(cls, session: AsyncSession) -> Self | None:
@@ -104,12 +88,10 @@ class Server(Base):
         )
         server = query.scalar_one_or_none()
 
-        if server:
-            logger.debug(f"Server with least load retrieved from the database.")
-            return server
+        if not server:
+            logger.warning(f"Server with least load not found in the database.")
 
-        logger.warning(f"Server with least load not found in the database.")
-        return None
+        return server
 
     @classmethod
     async def get_available(cls, session: AsyncSession) -> Self | None:
@@ -123,7 +105,7 @@ class Server(Base):
         server = query.scalar_one_or_none()
 
         if server:
-            logger.info(
+            logger.debug(
                 f"Found server with free slots: {server.name} "
                 f"(clients: {server.current_clients}/{server.max_clients})"
             )

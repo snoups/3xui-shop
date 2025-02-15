@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.models import ServicesContainer
 from app.bot.routers.misc.keyboard import back_keyboard
 from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY
+from app.bot.utils.formatting import format_subscription_period
 from app.bot.utils.navigation import NavSubscription
 from app.db.models import Promocode, User
 
@@ -42,15 +43,15 @@ async def handle_promocode_input(
     input_promocode = message.text.strip()
     logger.info(f"User {user.tg_id} entered promocode: {input_promocode} for activating.")
 
-    promocode = await Promocode.get(session, input_promocode)
+    promocode = await Promocode.get(session=session, code=input_promocode)
     if promocode and not promocode.is_activated:
-        success = await services.vpn.activate_promocode(user, promocode)
+        success = await services.vpn.activate_promocode(user=user, promocode=promocode)
         message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
         if success:
             await message.bot.edit_message_text(
                 text=_("promocode:message:activated_success").format(
                     promocode=input_promocode,
-                    duration=services.plan.convert_days_to_period(promocode.duration),
+                    duration=format_subscription_period(promocode.duration),
                 ),
                 chat_id=message.chat.id,
                 message_id=message_id,
@@ -58,7 +59,7 @@ async def handle_promocode_input(
             )
         else:
             text = _("promocode:notification:activate_failed")
-            await services.notification.notify_by_message(message, text, 5)
+            await services.notification.notify_by_message(message=message, text=text, duration=5)
     else:
         text = _("promocode:notification:activate_invalid").format(promocode=input_promocode)
-        await services.notification.notify_by_message(message, text, 5)
+        await services.notification.notify_by_message(message=message, text=text, duration=5)

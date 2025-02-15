@@ -15,7 +15,7 @@ from . import (
 )
 
 
-def include(dispatcher: Dispatcher, app: Application) -> None:
+def include(app: Application, dispatcher: Dispatcher) -> None:
     app.router.add_get(CONNECTION_WEBHOOK, download.handler.redirect_to_connection)
     dispatcher.include_routers(
         misc.error_handler.router,

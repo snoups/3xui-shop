@@ -26,6 +26,7 @@ class ThrottlingMiddleware(BaseMiddleware):
 
         for name, ttl in ttl_map.items():
             self.caches[name] = TTLCache(maxsize=10_000, ttl=ttl)
+
         logger.debug("Throttling Middleware initialized.")
 
     async def __call__(
@@ -49,7 +50,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         user: TelegramUser | None = event.event.from_user
 
         if user is not None:
-            key = get_flag(data, "throttling_key", default=self.default_key)
+            key = get_flag(handler=data, name="throttling_key", default=self.default_key)
 
             if key:
                 if user.id in self.caches[key]:

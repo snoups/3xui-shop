@@ -2,13 +2,13 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from app.bot.routers.misc.keyboard import back_button
+from app.bot.routers.misc.keyboard import back_button, back_to_main_menu_button
 from app.bot.utils.constants import (
     HIDDIFY_WINDOWS_LINK,
     V2RAYTUN_ANDROID_LINK,
     V2RAYTUN_IOS_LINK,
 )
-from app.bot.utils.navigation import NavDownload, NavSubscription, NavSupport
+from app.bot.utils.navigation import NavDownload, NavMain, NavSubscription, NavSupport
 
 
 def platforms_keyboard(previous_callback: str = None) -> InlineKeyboardMarkup:
@@ -29,8 +29,12 @@ def platforms_keyboard(previous_callback: str = None) -> InlineKeyboardMarkup:
         ),
     )
 
-    back_callback = previous_callback if previous_callback else NavSupport.HOW_TO_CONNECT
-    builder.row(back_button(back_callback))
+    if previous_callback == NavMain.MAIN_MENU:
+        builder.row(back_to_main_menu_button())
+    else:
+        back_callback = previous_callback if previous_callback else NavSupport.HOW_TO_CONNECT
+        builder.row(back_button(back_callback))
+
     return builder.as_markup()
 
 

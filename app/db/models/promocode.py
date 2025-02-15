@@ -55,14 +55,7 @@ class Promocode(Base):
         query = await session.execute(
             select(Promocode).options(selectinload(Promocode.activated_user)).where(*filter)
         )
-        promocode = query.scalar_one_or_none()
-
-        if promocode:
-            logger.debug(f"Promocode {code} retrieved from the database.")
-            return promocode
-
-        logger.warning(f"Promocode {code} not found in the database.")
-        return None
+        return query.scalar_one_or_none()
 
     @classmethod
     async def create(cls, session: AsyncSession, **kwargs: Any) -> Self | None:
@@ -122,7 +115,6 @@ class Promocode(Base):
             return False
 
         await Promocode.update(session=session, code=code, is_activated=True, activated_by=user_id)
-        logger.debug(f"Promocode {code} activated by user {user_id}.")
         return True
 
     @classmethod
@@ -138,5 +130,4 @@ class Promocode(Base):
             return False
 
         await Promocode.update(session=session, code=code, is_activated=False, activated_by=None)
-        logger.debug(f"Promocode {code} deactivated.")
         return True

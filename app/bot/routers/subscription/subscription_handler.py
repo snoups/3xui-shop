@@ -7,7 +7,9 @@ from aiogram.utils.i18n import gettext as _
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.models import ClientData, ServicesContainer, SubscriptionData
+from app.bot.payment_gateways import GatewayFactory
 from app.bot.utils.navigation import NavSubscription
+from app.config import Config
 from app.db.models import Server, User
 
 from .keyboard import (
@@ -26,8 +28,8 @@ async def show_subscription(
     client_data: ClientData | None,
     callback_data: SubscriptionData,
 ) -> None:
-    text = ""
     if client_data:
+
         if client_data.has_subscription_expired:
             text = _("subscription:message:expired")
         else:
@@ -39,7 +41,11 @@ async def show_subscription(
         text = _("subscription:message:not_active")
 
     await callback.message.edit_text(
-        text=text, reply_markup=subscription_keyboard(client_data, callback_data)
+        text=text,
+        reply_markup=subscription_keyboard(
+            has_subscription=client_data,
+            callback_data=callback_data,
+        ),
     )
 
 
@@ -54,7 +60,7 @@ async def callback_subscription(
     await state.set_state(None)
     client_data = await services.vpn.get_client_data(user)
     callback_data = SubscriptionData(state=NavSubscription.PROCESS, user_id=user.tg_id)
-    await show_subscription(callback, client_data, callback_data)
+    await show_subscription(callback=callback, client_data=client_data, callback_data=callback_data)
 
 
 @router.callback_query(SubscriptionData.filter(F.state == NavSubscription.EXTEND))
@@ -62,16 +68,21 @@ async def callback_subscription_extend(
     callback: CallbackQuery,
     user: User,
     callback_data: SubscriptionData,
+    config: Config,
     services: ServicesContainer,
 ) -> None:
     logger.info(f"User {user.tg_id} started extend subscription.")
     client = await services.vpn.is_client_exists(user)
-    callback_data.devices = await services.vpn.get_limit_ip(user, client)
+    callback_data.devices = await services.vpn.get_limit_ip(user=user, client=client)
     callback_data.state = NavSubscription.DURATION
     callback_data.is_extend = True
     await callback.message.edit_text(
         text=_("subscription:message:duration"),
-        reply_markup=duration_keyboard(services.plan, callback_data),
+        reply_markup=duration_keyboard(
+            plan_service=services.plan,
+            callback_data=callback_data,
+            currency=config.shop.CURRENCY,
+        ),
     )
 
 
@@ -97,7 +108,7 @@ async def callback_subscription_process(
     callback_data.state = NavSubscription.DEVICES
     await callback.message.edit_text(
         text=_("subscription:message:devices"),
-        reply_markup=devices_keyboard(services.plan, callback_data),
+        reply_markup=devices_keyboard(services.plan.get_all_plans(), callback_data),
     )
 
 
@@ -106,13 +117,18 @@ async def callback_devices_selected(
     callback: CallbackQuery,
     user: User,
     callback_data: SubscriptionData,
+    config: Config,
     services: ServicesContainer,
 ) -> None:
     logger.info(f"User {user.tg_id} selected devices: {callback_data.devices}")
     callback_data.state = NavSubscription.DURATION
     await callback.message.edit_text(
         text=_("subscription:message:duration"),
-        reply_markup=duration_keyboard(services.plan, callback_data),
+        reply_markup=duration_keyboard(
+            plan_service=services.plan,
+            callback_data=callback_data,
+            currency=config.shop.CURRENCY,
+        ),
     )
 
 
@@ -122,12 +138,15 @@ async def callback_duration_selected(
     user: User,
     callback_data: SubscriptionData,
     services: ServicesContainer,
+    gateway_factory: GatewayFactory,
 ) -> None:
     logger.info(f"User {user.tg_id} selected duration: {callback_data.duration}")
     callback_data.state = NavSubscription.PAY
     await callback.message.edit_text(
         text=_("subscription:message:payment_method"),
         reply_markup=payment_method_keyboard(
-            services.payment.gateways, callback_data, services.plan
+            plan=services.plan.get_plan(callback_data.devices),
+            callback_data=callback_data,
+            gateways=gateway_factory.get_gateways(),
         ),
     )

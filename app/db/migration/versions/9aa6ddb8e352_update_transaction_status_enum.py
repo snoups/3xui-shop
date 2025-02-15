@@ -33,7 +33,7 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(["tg_id"], ["users.tg_id"]),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("payment_id"),
+        sa.UniqueConstraint("payment_id", name="uq_transactions_payment_id"),
     )
 
     op.execute(
@@ -62,7 +62,7 @@ def downgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(["tg_id"], ["users.tg_id"]),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("payment_id"),
+        sa.UniqueConstraint("payment_id", name="uq_transactions_payment_id"),
     )
 
     op.execute(

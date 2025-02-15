@@ -39,6 +39,7 @@ class User(Base):
     )
     first_name: Mapped[str] = mapped_column(String(length=32), nullable=False)
     username: Mapped[str | None] = mapped_column(String(length=32), nullable=True)
+    language_code: Mapped[str] = mapped_column(String(length=5), nullable=False, default="en")
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     server: Mapped["Server | None"] = relationship("Server", back_populates="users", uselist=False)  # type: ignore
     transactions: Mapped[list["Transaction"]] = relationship("Transaction", back_populates="user")  # type: ignore
@@ -50,7 +51,8 @@ class User(Base):
         return (
             f"<User(id={self.id}, tg_id={self.tg_id}, vpn_id='{self.vpn_id}', "
             f"server_id={self.server_id}, first_name='{self.first_name}', "
-            f"username='{self.username}', created_at={self.created_at})>"
+            f"username='{self.username}', language_code='{self.language_code}', "
+            f"created_at={self.created_at})>"
         )
 
     @classmethod

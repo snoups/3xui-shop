@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 from sqlalchemy.types import Enum
 
-from app.bot.models import TransactionStatus
+from app.bot.utils.constants import TransactionStatus
 
 from . import Base
 
@@ -61,14 +61,7 @@ class Transaction(Base):
         query = await session.execute(
             select(Transaction).options(selectinload(Transaction.user)).where(*filter)
         )
-        transaction = query.scalar_one_or_none()
-
-        if transaction:
-            logger.debug(f"Transaction {payment_id} retrieved from the database.")
-            return transaction
-
-        logger.warning(f"Transaction {payment_id} not found in the database.")
-        return None
+        return query.scalar_one_or_none()
 
     @classmethod
     async def get_by_user(cls, session: AsyncSession, tg_id: int) -> list[Self]:
@@ -76,14 +69,7 @@ class Transaction(Base):
         query = await session.execute(
             select(Transaction).options(selectinload(Transaction.user)).where(*filter)
         )
-        transactions = query.scalars().all()
-
-        if len(transactions) > 0:
-            logger.debug(f"Transactions for user {tg_id} retrieved: {transactions}")
-            return transactions
-
-        logger.warning(f"Transactions for user {tg_id} not found in the database.")
-        return []
+        return query.scalars().all()
 
     @classmethod
     async def create(cls, session: AsyncSession, payment_id: str, **kwargs: Any) -> Self | None:
@@ -113,7 +99,7 @@ class Transaction(Base):
             filter = [Transaction.id == transaction.id]
             await session.execute(update(Transaction).where(*filter).values(**kwargs))
             await session.commit()
-            logger.debug(f"Transaction {payment_id} updated.")
+            logger.info(f"Transaction {payment_id} updated.")
             return transaction
 
         logger.warning(f"Transaction {payment_id} not found for update.")

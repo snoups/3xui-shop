@@ -25,20 +25,21 @@ class DBSessionMiddleware(BaseMiddleware):
     ) -> Any:
         session: AsyncSession
         async with self.session() as session:
-            telegram_user: TelegramUser | None = event.event.from_user
+            tg_user: TelegramUser | None = event.event.from_user
 
-            if telegram_user is not None and not telegram_user.is_bot:
-                user = await User.get(session=session, tg_id=telegram_user.id)
+            if tg_user is not None and not tg_user.is_bot:
+                user = await User.get(session=session, tg_id=tg_user.id)
 
                 if not user:
                     user = await User.create(
                         session=session,
-                        tg_id=user.id,
+                        tg_id=tg_user.id,
                         vpn_id=str(uuid.uuid4()),
-                        first_name=user.first_name,
-                        username=user.username,
+                        first_name=tg_user.first_name,
+                        username=tg_user.username,
+                        language_code=tg_user.language_code,
                     )
-                    logger.info(f"New user {user.tg_id} created.")  # TODO: Notify
+                    logger.info(f"New user {user.tg_id} created.")  # TODO: Notify new user
 
                 data["user"] = user
                 data["session"] = session

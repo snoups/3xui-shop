@@ -28,7 +28,7 @@ class MaintenanceMiddleware(BaseMiddleware):
             user: TelegramUser | None = event.event.from_user
 
             if user is not None:
-                is_admin = await IsAdmin()(event.event)
+                is_admin = await IsAdmin()(user_id=user.id)
                 logger.debug(f"Is user {user.id} an admin? {'Yes' if is_admin else 'No'}")
 
                 if self.active and not is_admin and user.id != event.bot.id:

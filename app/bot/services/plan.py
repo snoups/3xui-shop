@@ -2,10 +2,7 @@ import json
 import logging
 import os
 
-from aiogram.utils.i18n import gettext as _
-
 from app.bot.models import Plan
-from app.bot.utils.constants import UNLIMITED
 from app.config import DEFAULT_PLANS_DIR
 
 logger = logging.getLogger(__name__)
@@ -35,40 +32,20 @@ class PlanService:
             logger.error(f"'durations' key is missing or not a list in '{file_path}'.")
             raise ValueError(f"'durations' key is missing or not a list in '{file_path}'.")
 
-        self.plans: list[Plan] = [Plan.from_dict(plan) for plan in self.data["plans"]]
-        self.durations: list[int] = self.data["durations"]
+        self._plans: list[Plan] = [Plan.from_dict(plan) for plan in self.data["plans"]]
+        self._durations: list[int] = self.data["durations"]
         logger.info("Plans loaded successfully.")
 
     def get_plan(self, devices: int) -> Plan | None:
-        plan = next((plan for plan in self.plans if plan.devices == devices), None)
+        plan = next((plan for plan in self._plans if plan.devices == devices), None)
 
         if not plan:
             logger.critical(f"Plan with {devices} devices not found.")
 
         return plan
 
-    @staticmethod
-    def get_price_for_duration(prices: dict, duration: int, currency: str = "RUB") -> float:
-        price = prices.get(currency, {}).get(str(duration), 0)
-        return price
+    def get_all_plans(self) -> list[Plan]:
+        return self._plans
 
-    @staticmethod
-    def convert_devices_to_title(devices: int) -> str:
-        if devices == -1:
-            return UNLIMITED + _("devices")
-        return _("1 device", "{} devices", devices).format(devices)
-
-    @staticmethod
-    def convert_days_to_period(days: int) -> str:
-        if days == -1:
-            return UNLIMITED
-
-        if days % 365 == 0:
-            years = days // 365
-            return _("1 year", "{} years", years).format(years)
-
-        if days % 30 == 0:
-            months = days // 30
-            return _("1 month", "{} months", months).format(months)
-
-        return _("1 day", "{} days", days).format(days)
+    def get_durations(self) -> list[int]:
+        return self._durations

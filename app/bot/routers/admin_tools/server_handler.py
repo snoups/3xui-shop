@@ -18,8 +18,9 @@ from app.bot.utils.constants import (
     SERVER_NAME_KEY,
     SERVER_SUBSCRIPTION_KEY,
 )
-from app.bot.utils.misc import is_valid_client_count, is_valid_host, ping_url
 from app.bot.utils.navigation import NavAdminTools
+from app.bot.utils.network import ping_url
+from app.bot.utils.validation import is_valid_client_count, is_valid_host
 from app.db.models import Server, User
 
 from .keyboard import confirm_add_server_keyboard, server_keyboard, servers_keyboard
@@ -51,7 +52,7 @@ async def callback_server_management(
         ping = await ping_url(server.host)
         online = True if ping else False
         if online != server.online:
-            await Server.update(session, server.name, online=online)
+            await Server.update(session=session, name=server.name, online=online)
 
     if not servers:
         text += _("server_management:message:empty")
@@ -116,14 +117,14 @@ async def callback_add_server_back(callback: CallbackQuery, state: FSMContext) -
         case AddServerStates.confirmation:
             await state.set_state(AddServerStates.max_clients)
 
-    await show_add_server(callback.message, state)
+    await show_add_server(message=callback.message, state=state)
 
 
 @router.callback_query(F.data == NavAdminTools.ADD_SERVER, IsDev())
 async def callback_add_server(callback: CallbackQuery, user: User, state: FSMContext) -> None:
     logger.info(f"Dev {user.tg_id} started adding server.")
     await state.set_state(AddServerStates.name)
-    await show_add_server(callback.message, state)
+    await show_add_server(message=callback.message, state=state)
 
 
 @router.message(AddServerStates.name, IsDev())
@@ -136,12 +137,12 @@ async def message_name(
 ) -> None:
     server_name = message.text.strip()
     logger.info(f"Dev {user.tg_id} entered server name: {server_name}")
-    existing_server = await Server.get_by_name(session, server_name)
+    existing_server = await Server.get_by_name(session=session, name=server_name)
 
     if not existing_server:
         await state.set_state(AddServerStates.host)
         await state.update_data({SERVER_NAME_KEY: server_name})
-        await show_add_server(message, state)
+        await show_add_server(message=message, state=state)
     else:
         await services.notification.notify_by_message(
             message=message,
@@ -163,7 +164,7 @@ async def message_host(
     if is_valid_host(server_host):
         await state.set_state(AddServerStates.subscription)
         await state.update_data({SERVER_HOST_KEY: server_host})
-        await show_add_server(message, state)
+        await show_add_server(message=message, state=state)
     else:
         await services.notification.notify_by_message(
             message=message,
@@ -185,7 +186,7 @@ async def message_subscription(
     if is_valid_host(server_subscription):
         await state.set_state(AddServerStates.max_clients)
         await state.update_data({SERVER_SUBSCRIPTION_KEY: server_subscription})
-        await show_add_server(message, state)
+        await show_add_server(message=message, state=state)
     else:
         await services.notification.notify_by_message(
             message=message,
@@ -207,7 +208,7 @@ async def message_max_clients(
     if is_valid_client_count(server_max_clients):
         await state.set_state(AddServerStates.confirmation)
         await state.update_data({SERVER_MAX_CLIENTS_KEY: server_max_clients})
-        await show_add_server(message, state)
+        await show_add_server(message=message, state=state)
     else:
         await services.notification.notify_by_message(
             message=message,
@@ -228,17 +229,17 @@ async def callback_confirmation(
     data = await state.get_data()
 
     server = await Server.create(
-        session,
-        name=data.get("server_name"),
-        host=data.get("server_host"),
-        subscription=data.get("server_subscription"),
-        max_clients=data.get("server_max_clients"),
+        session=session,
+        name=data.get(SERVER_NAME_KEY),
+        host=data.get(SERVER_HOST_KEY),
+        subscription=data.get(SERVER_SUBSCRIPTION_KEY),
+        max_clients=data.get(SERVER_MAX_CLIENTS_KEY),
     )
 
     if server:
         await services.server_pool.sync_servers()
         await state.set_state(None)
-        await callback_server_management(callback, user, session, state)
+        await callback_server_management(callback=callback, user=user, session=session, state=state)
         await services.notification.show_popup(
             callback=callback,
             text=_("server_management:popup:added_success"),
@@ -260,11 +261,10 @@ async def callback_show_server(
     callback: CallbackQuery,
     user: User,
     session: AsyncSession,
-    services: ServicesContainer,
 ) -> None:
     server_name = callback.data.split("_")[2]
     logger.info(f"Dev {user.tg_id} open server {server_name}.")
-    server = await Server.get_by_name(session, server_name)
+    server = await Server.get_by_name(session=session, name=server_name)
     status = (
         _("server_management:message:status_online")
         if server.online
@@ -292,11 +292,11 @@ async def callback_ping_server(
 ) -> None:
     server_name = callback.data.split("_")[2]
     logger.info(f"Dev {user.tg_id} pinging server {server_name}.")
-    server = await Server.get_by_name(session, server_name)
+    server = await Server.get_by_name(session=session, name=server_name)
     ping = await ping_url(server.host)
     online = True if ping else False
     if online != server.online:
-        await Server.update(session, server.name, online=online)
+        await Server.update(session=session, name=server.name, online=online)
     if ping:
         await services.notification.show_popup(
             callback=callback,
@@ -319,8 +319,8 @@ async def callback_delete_server(
 ) -> None:
     server_name = callback.data.split("_")[2]
     logger.info(f"Dev {user.tg_id} open server {server_name}.")
-    deleted = await Server.delete(session, server_name)
-    await callback_server_management(callback, user, session, state)
+    deleted = await Server.delete(session=session, name=server_name)
+    await callback_server_management(callback=callback, user=user, session=session, state=state)
 
     if deleted:
         await services.server_pool.sync_servers()

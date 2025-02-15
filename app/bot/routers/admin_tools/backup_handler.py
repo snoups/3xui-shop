@@ -8,7 +8,7 @@ from aiogram.utils.i18n import gettext as _
 
 from app.bot.filters import IsAdmin
 from app.bot.models import ServicesContainer
-from app.bot.utils.constants import BACKUP_CREATED_TAG
+from app.bot.utils.constants import BACKUP_CREATED_TAG, DB_FORMAT
 from app.bot.utils.navigation import NavAdminTools
 from app.config import DEFAULT_DATA_DIR, Config
 from app.db.models import User
@@ -27,18 +27,18 @@ async def callback_create_backup(
     logger.info(f"Admin {user.tg_id} initiated backup creation.")
     try:
         file = FSInputFile(
-            path=f"{DEFAULT_DATA_DIR}/{config.database.NAME}.sqlite3",
-            filename=f"backup_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.sqlite3",
+            path=f"{DEFAULT_DATA_DIR}/{config.database.NAME}.{DB_FORMAT}",
+            filename=f"backup_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.{DB_FORMAT}",
         )
-        await services.notification.notify_developer(BACKUP_CREATED_TAG, document=file)
-        await services.notification.show_popup(callback, _("backup:popup:success"))
+        await services.notification.notify_developer(text=BACKUP_CREATED_TAG, document=file)
+        await services.notification.show_popup(callback=callback, text=_("backup:popup:success"))
         logger.info(f"Backup sent to developer: {config.bot.DEV_ID}")
     except FileNotFoundError:
         logger.error("Database file not found.")
-        await services.notification.show_popup(callback, _("backup:popup:not_found"))
+        await services.notification.show_popup(callback=callback, text=_("backup:popup:not_found"))
     except TelegramAPIError as exception:
         logger.error(f"Failed to send backup to developer: {exception}")
-        await services.notification.show_popup(callback, _("backup:popup:failed"))
+        await services.notification.show_popup(callback=callback, text=_("backup:popup:failed"))
     except Exception as exception:
         logger.error(f"Unexpected error during backup creation: {exception}")
-        await services.notification.show_popup(callback, _("backup:popup:error"))
+        await services.notification.show_popup(callback=callback, text=_("backup:popup:error"))

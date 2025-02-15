@@ -5,6 +5,7 @@ class NavMain(str, Enum):
     START = "start"
     MAIN_MENU = "main_menu"
     CLOSE_NOTIFICATION = "close_notification"
+    REDIRECT_TO_DOWNLOAD = "redirect_to_download"
 
 
 class NavProfile(str, Enum):

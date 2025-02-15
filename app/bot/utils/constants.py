@@ -30,3 +30,36 @@ DEFAULT_LANGUAGE = "en"
 I18N_DOMAIN = "bot"
 
 UNLIMITED = "∞"
+DB_FORMAT = "sqlite3"
+LOG_ZIP_ARCHIVE_FORMAT = "zip"
+LOG_GZ_ARCHIVE_FORMAT = "gz"
+
+MESSAGE_EFFECT_IDS = {
+    "🔥": "5104841245755180586",
+    "👍": "5107584321108051014",
+    "👎": "5104858069142078462",
+    "❤️": "5044134455711629726",
+    "🎉": "5046509860389126442",
+    "💩": "5046589136895476101",
+}
+
+from enum import Enum
+
+
+class TransactionStatus(Enum):
+    PENDING = "pending"
+    COMPLETED = "completed"
+    CANCELED = "canceled"
+    REFUNDED = "refunded"
+
+
+class Currency(Enum):
+    RUB = "RUB"
+    USD = "USD"
+    XTR = "XTR"
+
+
+class CurrencySymbol(Enum):
+    RUB = "₽"
+    USD = "$"
+    XTR = "★"

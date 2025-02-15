@@ -31,7 +31,7 @@ async def errors_handler(event: ErrorEvent, config: Config, services: ServicesCo
         await services.notification.notify_developer(
             text=text.as_html(),
             document=BufferedInputFile(
-                traceback.format_exc().encode(),
+                file=traceback.format_exc().encode(),
                 filename=f"error_{event.update.update_id}.txt",
             ),
         )

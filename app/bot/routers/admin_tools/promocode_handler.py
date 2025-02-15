@@ -1,6 +1,6 @@
 import logging
 
-from aiogram import Bot, F, Router
+from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
@@ -11,6 +11,7 @@ from app.bot.filters import IsAdmin
 from app.bot.models import ServicesContainer
 from app.bot.routers.misc.keyboard import back_keyboard
 from app.bot.utils.constants import INPUT_PROMOCODE_KEY, MAIN_MESSAGE_ID_KEY
+from app.bot.utils.formatting import format_subscription_period
 from app.bot.utils.navigation import NavAdminTools
 from app.db.models import Promocode, User
 
@@ -47,7 +48,7 @@ async def show_promocode_editor(message: Message, state: FSMContext) -> None:
 @router.callback_query(F.data == NavAdminTools.PROMOCODE_EDITOR, IsAdmin())
 async def callback_promocode_editor(callback: CallbackQuery, user: User, state: FSMContext) -> None:
     logger.info(f"Admin {user.tg_id} opened promocode editor.")
-    await show_promocode_editor(callback.message, state)
+    await show_promocode_editor(message=callback.message, state=state)
 
 
 # region: Create Promocode
@@ -71,13 +72,13 @@ async def callback_duration_selected(
 ) -> None:
     logger.info(f"Admin {user.tg_id} selected {callback.data} days for promocode.")
     promocode = await Promocode.create(session=session, duration=int(callback.data))
-    await show_promocode_editor(callback.message, state)
+    await show_promocode_editor(message=callback.message, state=state)
 
     await services.notification.notify_by_message(
         message=callback.message,
         text=_("promocode_editor:notification:created_success").format(
             promocode=promocode.code,
-            duration=services.plan.convert_days_to_period(promocode.duration),
+            duration=format_subscription_period(promocode.duration),
         ),
     )
 
@@ -108,7 +109,7 @@ async def handle_promocode_input(
     logger.info(f"Admin {user.tg_id} entered promocode: {input_promocode} for deleting.")
 
     if await Promocode.delete(session=session, code=input_promocode):
-        await show_promocode_editor(message, state)
+        await show_promocode_editor(message=message, state=state)
         await services.notification.notify_by_message(
             message=message,
             text=_("promocode_editor:notification:deleted_success").format(
@@ -144,7 +145,6 @@ async def handle_promocode_input(
     user: User,
     session: AsyncSession,
     state: FSMContext,
-    bot: Bot,
     services: ServicesContainer,
 ) -> None:
     input_promocode = message.text.strip()
@@ -155,7 +155,7 @@ async def handle_promocode_input(
         await state.set_state(EditPromocodeStates.selecting_duration)
         await state.update_data({INPUT_PROMOCODE_KEY: input_promocode})
         message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
-        await bot.edit_message_text(
+        await message.bot.edit_message_text(
             text=_("promocode_editor:message:edit_duration").format(
                 promocode=promocode.code,
                 duration=promocode.duration,
@@ -183,14 +183,16 @@ async def callback_duration_selected(
     logger.info(f"Admin {user.tg_id} selected {callback.data} days for promocode.")
     input_promocode = await state.get_value(INPUT_PROMOCODE_KEY)
     promocode = await Promocode.update(
-        session=session, code=input_promocode, duration=int(callback.data)
+        session=session,
+        code=input_promocode,
+        duration=int(callback.data),
     )
-    await show_promocode_editor(callback.message, state)
+    await show_promocode_editor(message=callback.message, state=state)
     await services.notification.notify_by_message(
         message=callback.message,
         text=_("promocode_editor:notification:edited_success").format(
             promocode=promocode.code,
-            duration=services.plan.convert_days_to_period(promocode.duration),
+            duration=format_subscription_period(promocode.duration),
         ),
     )
 

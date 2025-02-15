@@ -15,6 +15,7 @@ from app import logger
 from app.bot import filters, middlewares, routers, services
 from app.bot.middlewares import MaintenanceMiddleware
 from app.bot.models import ServicesContainer
+from app.bot.payment_gateways import GatewayFactory
 from app.bot.utils import commands
 from app.bot.utils.constants import (
     BOT_STARTED_TAG,
@@ -23,7 +24,7 @@ from app.bot.utils.constants import (
     I18N_DOMAIN,
     TELEGRAM_WEBHOOK,
 )
-from app.config import DEFAULT_LOCALES_DIR, Config, load_config
+from app.config import DEFAULT_BOT_HOST, DEFAULT_LOCALES_DIR, Config, load_config
 from app.db.database import Database
 
 
@@ -63,7 +64,7 @@ async def main() -> None:
     db = Database(config.database)
 
     # Set up storage for FSM (Finite State Machine)
-    storage = RedisStorage.from_url("redis://0.0.0.0:6379/0")
+    storage = RedisStorage.from_url(url=config.redis.url())
     # storage = MemoryStorage()
 
     # Initialize the bot with the token and default properties
@@ -77,35 +78,52 @@ async def main() -> None:
     I18n.set_current(i18n)
 
     # Initialize services
-    services_container = await services.initialize(app, config, bot, db.session, storage)
+    services_container = await services.initialize(config=config, session=db.session, bot=bot)
 
     # Sync servers
     await services_container.server_pool.sync_servers()
 
-    # Create the dispatcher with the storage, database, config, bot, services
-    dispatcher = Dispatcher(
+    # Register payment gateways
+    gateway_factory = GatewayFactory()
+    gateway_factory.register_gateways(
+        app=app,
+        config=config,
+        session=db.session,
         storage=storage,
+        bot=bot,
+        i18n=i18n,
+        services=services_container,
+    )
+
+    # Create the dispatcher
+    dispatcher = Dispatcher(
         db=db,
+        storage=storage,
         config=config,
         bot=bot,
         services=services_container,
+        gateway_factory=gateway_factory,
     )
 
     # Register event handlers
     dispatcher.startup.register(on_startup)
     dispatcher.shutdown.register(on_shutdown)
 
-    # Enable Maintenance mode for developing
+    # Enable Maintenance mode for developing # WARNING: remove before production
     MaintenanceMiddleware.set_mode(True)
 
     # Register middlewares
-    middlewares.register(dispatcher, i18n, db.session)
+    middlewares.register(dispatcher=dispatcher, i18n=i18n, session=db.session)
 
     # Register filters
-    filters.register(dispatcher, config.bot.DEV_ID, config.bot.ADMINS)
+    filters.register(
+        dispatcher=dispatcher,
+        developer_id=config.bot.DEV_ID,
+        admins_ids=config.bot.ADMINS,
+    )
 
     # Include bot routers
-    routers.include(dispatcher, app)
+    routers.include(app=app, dispatcher=dispatcher)
 
     # Initialize database
     await db.initialize()
@@ -114,12 +132,12 @@ async def main() -> None:
     await commands.setup(bot)
 
     # Set up webhook request handler
-    webhook_requests_handler = SimpleRequestHandler(dispatcher, bot)
+    webhook_requests_handler = SimpleRequestHandler(dispatcher=dispatcher, bot=bot)
     webhook_requests_handler.register(app, path=TELEGRAM_WEBHOOK)
 
     # Set up application and run
     setup_application(app, dispatcher, bot=bot)
-    await _run_app(app, host="0.0.0.0", port=config.bot.PORT)
+    await _run_app(app, host=DEFAULT_BOT_HOST, port=config.bot.PORT)
 
 
 if __name__ == "__main__":

@@ -63,7 +63,7 @@ async def callback_profile(
         else buy_subscription_keyboard()
     )
     await callback.message.edit_text(
-        text=await prepare_message(user, client_data),
+        text=await prepare_message(user=user, client_data=client_data),
         reply_markup=reply_markup,
     )
 

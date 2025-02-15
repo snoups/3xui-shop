@@ -11,11 +11,21 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
+from aiogram.utils.i18n import gettext as _
+from aiogram.utils.i18n import lazy_gettext as __
 
+from app.bot.models.subscription_data import SubscriptionData
 from app.bot.routers.misc.keyboard import close_notification_keyboard
+from app.bot.routers.subscription.keyboard import payment_success_keyboard
+from app.bot.utils.constants import MESSAGE_EFFECT_IDS
+from app.bot.utils.formatting import format_subscription_period
 from app.config import Config
 
 logger = logging.getLogger(__name__)
+
+ReplyMarkupType = (
+    InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
+)
 
 
 class NotificationService:
@@ -31,14 +41,11 @@ class NotificationService:
         *,
         message: Message | None = None,
         chat_id: int | None = None,
-        reply_markup: (
-            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
-        ) = None,
+        reply_markup: ReplyMarkupType = None,
         document: InputFile | None = None,
         bot: Bot | None = None,
+        message_effect_id: str | None = None,
     ) -> Message | None:
-        logger.debug(f"Sending notification for {chat_id}")
-
         if not (message or chat_id):
             logger.error("Failed to send notification: message or chat_id required")
             return None
@@ -51,19 +58,14 @@ class NotificationService:
         if duration == 0 and reply_markup is None:
             reply_markup = close_notification_keyboard()
 
-        try:
-            if document:
-                send_method = bot.send_document if bot else message.answer_document
-                args = {"document": document, "caption": text}
-            else:
-                send_method = bot.send_message if bot else message.answer
-                args = {"text": text}
+        send_method = bot.send_document if document else bot.send_message
+        args = {"document": document, "caption": text} if document else {"text": text}
 
-            notification = await send_method(
-                chat_id=chat_id,
-                reply_markup=reply_markup,
-                **args,
-            )
+        if message_effect_id:
+            args["message_effect_id"] = message_effect_id
+
+        try:
+            notification = await send_method(chat_id=chat_id, reply_markup=reply_markup, **args)
             logger.debug(f"Notification sent to {chat_id}")
         except Exception as exception:
             logger.error(f"Failed to send notification: {exception}")
@@ -83,10 +85,9 @@ class NotificationService:
         chat_id: int,
         text: str,
         duration: int = 0,
-        reply_markup: (
-            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
-        ) = None,
+        reply_markup: ReplyMarkupType = None,
         document: InputFile | None = None,
+        message_effect_id: str | None = None,
     ) -> None:
         await self._notify(
             text=text,
@@ -95,6 +96,7 @@ class NotificationService:
             reply_markup=reply_markup,
             document=document,
             bot=self.bot,
+            message_effect_id=message_effect_id,
         )
 
     @staticmethod
@@ -102,9 +104,7 @@ class NotificationService:
         message: Message,
         text: str,
         duration: int = 0,
-        reply_markup: (
-            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
-        ) = None,
+        reply_markup: ReplyMarkupType = None,
         document: InputFile | None = None,
     ) -> None:
         await NotificationService._notify(
@@ -119,9 +119,7 @@ class NotificationService:
         self,
         text: str,
         duration: int = 0,
-        reply_markup: (
-            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
-        ) = None,
+        reply_markup: ReplyMarkupType = None,
         document: InputFile | None = None,
     ) -> None:
         if not self.config.bot.ADMINS:
@@ -142,9 +140,7 @@ class NotificationService:
         self,
         text: str,
         duration: int = 0,
-        reply_markup: (
-            InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
-        ) = None,
+        reply_markup: ReplyMarkupType = None,
         document: InputFile | None = None,
     ) -> None:
         await self._notify(
@@ -163,3 +159,30 @@ class NotificationService:
             logger.debug(f"Popup sent to {callback.from_user.id}")
         except Exception as exception:
             logger.error(f"Failed to send popup: {exception}")
+
+    async def notify_purchase_success(
+        self,
+        user_id: int,
+        key: str,
+        message_effect_id: str = MESSAGE_EFFECT_IDS["🎉"],
+    ) -> None:
+        await self.notify_by_id(
+            chat_id=user_id,
+            text=__("payment:message:purchase_success").format(key=key),
+            message_effect_id=message_effect_id,
+            reply_markup=payment_success_keyboard(),
+        )
+
+    async def notify_extend_success(
+        self,
+        user_id: int,
+        data: SubscriptionData,
+        message_effect_id: str = MESSAGE_EFFECT_IDS["🎉"],
+    ) -> None:
+        await self.notify_by_id(
+            chat_id=user_id,
+            text=__("payment:message:extend_success").format(
+                duration=format_subscription_period(data.duration)
+            ),
+            message_effect_id=message_effect_id,
+        )

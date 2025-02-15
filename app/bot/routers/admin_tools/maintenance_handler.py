@@ -45,7 +45,6 @@ async def callback_maintenance_mode_enable(
         text=_("maintenance:message:main").format(status=_("maintenance:status:enabled")),
         reply_markup=maintenance_mode_keyboard(),
     )
-
     await services.notification.show_popup(
         callback=callback,
         text=_("maintenance:popup:enabled"),

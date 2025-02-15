@@ -10,9 +10,19 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.models import SubscriptionData
+from app.bot.models.plan import Plan
 from app.bot.payment_gateways import PaymentGateway
-from app.bot.routers.misc.keyboard import back_button, back_to_main_menu_button
-from app.bot.utils.navigation import NavDownload, NavSubscription
+from app.bot.routers.misc.keyboard import (
+    back_button,
+    back_to_main_menu_button,
+    close_notification_button,
+)
+from app.bot.utils.formatting import (
+    format_device_count,
+    format_subscription_period,
+    get_currency_symbol,
+)
+from app.bot.utils.navigation import NavMain, NavSubscription
 
 
 def change_subscription_button() -> InlineKeyboardButton:
@@ -50,16 +60,15 @@ def subscription_keyboard(
 
 
 def devices_keyboard(
-    plan_service: PlanService,
+    plans: list[Plan],
     callback_data: SubscriptionData,
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    plans = plan_service.plans
 
     for plan in plans:
         callback_data.devices = plan.devices
         builder.button(
-            text=plan_service.convert_devices_to_title(plan.devices),
+            text=format_device_count(plan.devices),
             callback_data=callback_data,
         )
 
@@ -71,16 +80,18 @@ def devices_keyboard(
 def duration_keyboard(
     plan_service: PlanService,
     callback_data: SubscriptionData,
+    currency: str,
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    durations = plan_service.durations
+    durations = plan_service.get_durations()
 
     for duration in durations:
         callback_data.duration = duration
-        period = plan_service.convert_days_to_period(duration)
-        price = plan_service.get_plan(callback_data.devices).prices.rub[duration]
+        period = format_subscription_period(duration)
+        plan = plan_service.get_plan(callback_data.devices)
+        price = plan.get_price(currency=currency, duration=duration)
         builder.button(
-            text=f"{period} | {price} ₽",  # TODO: set default currency in config
+            text=f"{period} | {price} {get_currency_symbol(currency)}",
             callback_data=callback_data,
         )
 
@@ -90,7 +101,12 @@ def duration_keyboard(
         builder.row(back_button(NavSubscription.MAIN))
     else:
         callback_data.state = NavSubscription.PROCESS
-        builder.row(back_button(callback_data.pack()))
+        builder.row(
+            back_button(
+                callback_data.pack(),
+                text=_("subscription:button:change_devices"),
+            )
+        )
 
     return builder.as_markup()
 
@@ -101,33 +117,42 @@ def pay_keyboard(pay_url: str, callback_data: SubscriptionData) -> InlineKeyboar
     builder.row(InlineKeyboardButton(text=_("subscription:button:pay"), url=pay_url))
 
     callback_data.state = NavSubscription.DURATION
-    builder.row(back_button(callback_data.pack()))
+    builder.row(
+        back_button(
+            callback_data.pack(),
+            text=_("subscription:button:change_payment_method"),
+        )
+    )
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
 def payment_method_keyboard(
-    gateways: dict[str, PaymentGateway],
+    plan: Plan,
     callback_data: SubscriptionData,
-    plan_service: PlanService,
+    gateways: list[PaymentGateway],
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    plan = plan_service.get_plan(callback_data.devices)
-
-    for gateway_name, gateway in gateways.items():
-        price = plan.prices.to_dict()[gateway.code][str(callback_data.duration)]
+    for gateway in gateways:
+        price = plan.get_price(currency=gateway.currency, duration=callback_data.duration)
         if price is None:
             continue
 
         callback_data.state = gateway.callback
         builder.row(
             InlineKeyboardButton(
-                text=f"{_(gateway.name)} | {price} {gateway.symbol}",
+                text=f"{gateway.name} | {price} {gateway.symbol.value}",
                 callback_data=callback_data.pack(),
             )
         )
 
     callback_data.state = NavSubscription.DEVICES
-    builder.row(back_button(callback_data.pack()))
+    builder.row(
+        back_button(
+            callback_data.pack(),
+            text=_("subscription:button:change_duration"),
+        )
+    )
     return builder.as_markup()
 
 
@@ -137,9 +162,9 @@ def payment_success_keyboard() -> InlineKeyboardMarkup:
     builder.row(
         InlineKeyboardButton(
             text=_("subscription:button:download_app"),
-            callback_data=NavDownload.MAIN,
+            callback_data=NavMain.REDIRECT_TO_DOWNLOAD,
         )
     )
 
-    builder.row(back_to_main_menu_button())
+    builder.row(close_notification_button())
     return builder.as_markup()

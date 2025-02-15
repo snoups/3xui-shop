@@ -11,7 +11,7 @@ from py3xui import Client, Inbound
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.bot.models import ClientData
-from app.bot.utils.misc import (
+from app.bot.utils.time import (
     add_days_to_timestamp,
     days_to_timestamp,
     get_current_timestamp,
@@ -80,7 +80,7 @@ class VPNService:
                 )
                 return None
 
-            limit_ip = await self.get_limit_ip(user, client)
+            limit_ip = await self.get_limit_ip(user=user, client=client)
             max_devices = -1 if limit_ip == 0 else limit_ip
             traffic_total = client.total
             expiry_time = -1 if client.expiry_time == 0 else client.expiry_time
@@ -108,6 +108,9 @@ class VPNService:
             return None
 
     async def get_key(self, user: User) -> str | None:
+        async with self.session() as session:
+            user = await User.get(session=session, tg_id=user.tg_id)
+
         if not user.server_id:
             logger.debug(f"Server ID for user {user.tg_id} not found.")
             return None
@@ -147,7 +150,7 @@ class VPNService:
         )
 
         try:
-            await connection.api.client.add(inbound_id, [new_client])
+            await connection.api.client.add(inbound_id=inbound_id, clients=[new_client])
             logger.info(f"Successfully created client for {user.tg_id}")
             return True
         except Exception as exception:
@@ -179,7 +182,7 @@ class VPNService:
                 return False
 
             if not replace_devices:
-                current_device_limit = await self.get_limit_ip(user, client)
+                current_device_limit = await self.get_limit_ip(user=user, client=client)
                 devices = current_device_limit + devices
 
             current_time = get_current_timestamp()
@@ -189,7 +192,7 @@ class VPNService:
             else:
                 expiry_time_to_use = current_time
 
-            expiry_time = add_days_to_timestamp(expiry_time_to_use, duration)
+            expiry_time = add_days_to_timestamp(timestamp=expiry_time_to_use, days=duration)
 
             client.enable = enable
             client.id = user.vpn_id
@@ -208,7 +211,7 @@ class VPNService:
 
     async def create_subscription(self, user: User, devices: int, duration: int) -> bool:
         if not await self.is_client_exists(user):
-            return await self.create_client(user, devices, duration)
+            return await self.create_client(user=user, devices=devices, duration=duration)
 
         return await self.update_client(
             user,
@@ -219,29 +222,38 @@ class VPNService:
         )
 
     async def extend_subscription(self, user: User, devices: int, duration: int) -> bool:
-        return await self.update_client(user, devices, duration, replace_devices=True)
+        return await self.update_client(
+            user=user,
+            devices=devices,
+            duration=duration,
+            replace_devices=True,
+        )
 
     async def activate_promocode(self, user: User, promocode: Promocode) -> bool:
         async with self.session() as session:
-            activated = await Promocode.set_activated(session, promocode.code, user.tg_id)
+            activated = await Promocode.set_activated(
+                session=session,
+                code=promocode.code,
+                user_id=user.tg_id,
+            )
 
         if not activated:
             logger.critical(f"Failed to activate promocode {promocode.code} for user {user.tg_id}.")
             return False
 
         if await self.is_client_exists(user):
-            updated = await self.update_client(user, devices=0, duration=promocode.duration)
+            updated = await self.update_client(user=user, devices=0, duration=promocode.duration)
             if updated:
                 logger.info(f"Updated client {user.tg_id} with promocode {promocode.code}.")
                 return True
         else:
-            created = await self.create_client(user, devices=1, duration=promocode.duration)
+            created = await self.create_client(user=user, devices=1, duration=promocode.duration)
             if created:
                 logger.info(f"Created client {user.tg_id} with promocode {promocode.code}.")
                 return True
 
         async with self.session() as session:
-            await Promocode.set_deactivated(session, promocode.code)
+            await Promocode.set_deactivated(session=session, code=promocode.code)
 
         logger.warning(f"Promocode {promocode.code} not activated due to failure.")
         return False
