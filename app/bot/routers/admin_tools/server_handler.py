@@ -228,12 +228,16 @@ async def callback_confirmation(
     logger.info(f"Dev {user.tg_id} confirmed adding server.")
     data = await state.get_data()
 
+    ping = await ping_url(data.get(SERVER_HOST_KEY))
+    online = True if ping else False
+
     server = await Server.create(
         session=session,
         name=data.get(SERVER_NAME_KEY),
         host=data.get(SERVER_HOST_KEY),
         subscription=data.get(SERVER_SUBSCRIPTION_KEY),
         max_clients=data.get(SERVER_MAX_CLIENTS_KEY),
+        online=online,
     )
 
     if server:

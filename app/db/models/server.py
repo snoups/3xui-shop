@@ -78,52 +78,6 @@ class Server(Base):
         return query.scalars().all()
 
     @classmethod
-    async def get_least_loaded(cls, session: AsyncSession) -> Self | None:
-        filter = [Server.online == True]
-        query = await session.execute(
-            select(Server)
-            .options(selectinload(Server.users))
-            .where(*filter)
-            .order_by(Server.current_clients)
-        )
-        server = query.scalar_one_or_none()
-
-        if not server:
-            logger.warning(f"Server with least load not found in the database.")
-
-        return server
-
-    @classmethod
-    async def get_available(cls, session: AsyncSession) -> Self | None:
-        filter = [Server.online == True, Server.current_clients < Server.max_clients]
-        query = await session.execute(
-            select(Server)
-            .options(selectinload(Server.users))
-            .where(*filter)
-            .order_by(Server.current_clients)
-        )
-        server = query.scalar_one_or_none()
-
-        if server:
-            logger.debug(
-                f"Found server with free slots: {server.name} "
-                f"(clients: {server.current_clients}/{server.max_clients})"
-            )
-            return server
-
-        server = await Server.get_least_loaded(session)
-
-        if server:
-            logger.warning(
-                f"No servers with free slots. Using least loaded server: {server.name} "
-                f"(clients: {server.current_clients}/{server.max_clients})"
-            )
-            return server
-
-        logger.critical("No servers found")
-        return None
-
-    @classmethod
     async def create(cls, session: AsyncSession, name: str, **kwargs: Any) -> Self | None:
         server = await Server.get_by_name(session=session, name=name)
 

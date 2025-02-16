@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from py3xui import AsyncApi
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from app.bot.utils.network import ping_url
 from app.config import Config
 from app.db.models import Server, User
 
@@ -35,6 +36,10 @@ class ServerPoolService:
             )
             try:
                 await api.login()
+
+                async with self.session() as session:
+                    server.online = True
+                    await Server.update(session=session, name=server.name, online=server.online)
                 server_conn = Connection(server=server, api=api)
                 self._servers[server.id] = server_conn
                 logger.info(f"Server {server.name} ({server.host}) added successfully.")
@@ -97,6 +102,20 @@ class ServerPoolService:
             if server_id not in db_server_map:
                 self._remove_server(self._servers[server_id].server)
 
+        for server_id, conn in list(self._servers.items()):
+            if db_server := db_server_map.get(server_id):
+                conn.server = db_server
+                logger.debug(f"Updated server {db_server.name} data in pool")
+
+                ping = await ping_url(db_server.host)
+                online = True if ping else False
+                db_server.online = online
+                async with self.session() as session:
+                    await Server.update(session=session, name=db_server.name, online=online)
+
+                if not online:
+                    logger.warning(f"Server {db_server.name} ({db_server.host}) is offline!")
+
         for server in db_servers:
             if server.id not in self._servers:
                 await self._add_server(server)
@@ -105,5 +124,35 @@ class ServerPoolService:
 
     async def assign_server_to_user(self, user: User) -> None:
         async with self.session() as session:
-            server = await Server.get_available(session)
+            server = await self.get_available_server()
+            user.server_id = server.id
             await User.update(session=session, tg_id=user.tg_id, server_id=server.id)
+
+    async def get_available_server(self) -> Server | None:
+        await self.sync_servers()
+
+        servers_with_free_slots = [
+            conn.server
+            for conn in self._servers.values()
+            if conn.server.current_clients < conn.server.max_clients
+        ]
+
+        if servers_with_free_slots:
+            server = sorted(servers_with_free_slots, key=lambda s: s.current_clients)[0]
+            logger.debug(
+                f"Found server with free slots: {server.name} "
+                f"(clients: {server.current_clients}/{server.max_clients})"
+            )
+            return server
+
+        servers_least_loaded = [conn.server for conn in self._servers.values()]
+        if servers_least_loaded:
+            server = sorted(servers_least_loaded, key=lambda s: s.current_clients)[0]
+            logger.warning(
+                f"No servers with free slots. Using least loaded server: {server.name} "
+                f"(clients: {server.current_clients}/{server.max_clients})"
+            )
+            return server
+
+        logger.critical("No available servers found in pool")
+        return None

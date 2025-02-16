@@ -79,9 +79,9 @@ class Promocode(Base):
             logger.warning(f"Promocode {code} not found for update.")
             return None
 
-        if promocode.is_activated:
-            logger.warning(f"Promocode {code} is active and cannot be updated.")
-            return None
+        # if promocode.is_activated:
+        #     logger.warning(f"Promocode {code} is activated and cannot be updated.")
+        #     return None
 
         filter = [Promocode.code == code]
         await session.execute(update(Promocode).where(*filter).values(**kwargs))
