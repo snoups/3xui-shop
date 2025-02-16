@@ -44,14 +44,20 @@ async def callback_payment_method_selected(
 
     pay_url = await gateway.create_payment(callback_data)
 
-    text = _("payment:message:order").format(
-        devices=devices,
-        duration=format_subscription_period(duration),
-        price=price,
-        currency=gateway.symbol.value,
-    )
+    if callback_data.is_extend:
+        text = _("payment:message:order_extend")
+    elif callback_data.is_change:
+        text = _("payment:message:order_change")
+    else:
+        text = _("payment:message:order")
+
     await callback.message.edit_text(
-        text=text,
+        text=text.format(
+            devices=devices,
+            duration=format_subscription_period(duration),
+            price=price,
+            currency=gateway.symbol.value,
+        ),
         reply_markup=pay_keyboard(pay_url=pay_url, callback_data=callback_data),
     )
 

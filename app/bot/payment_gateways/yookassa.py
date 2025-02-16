@@ -163,9 +163,20 @@ class Yookassa(PaymentGateway):
                     devices=data.devices,
                     duration=data.duration,
                 )
-                logger.info(f"Subscription extended for user {data.user_id}")
+                logger.info(f"Subscription extended for user {user.tg_id}")
                 await self.services.notification.notify_extend_success(
-                    user_id=data.user_id,
+                    user_id=user.tg_id,
+                    data=data,
+                )
+            elif data.is_change:
+                await self.services.vpn.change_subscription(
+                    user=user,
+                    devices=data.devices,
+                    duration=data.duration,
+                )
+                logger.info(f"Subscription changed for user {user.tg_id}")
+                await self.services.notification.notify_change_success(
+                    user_id=user.tg_id,
                     data=data,
                 )
             else:
@@ -174,10 +185,10 @@ class Yookassa(PaymentGateway):
                     devices=data.devices,
                     duration=data.duration,
                 )
-                logger.info(f"Subscription created for user {data.user_id}")
+                logger.info(f"Subscription created for user {user.tg_id}")
                 key = await self.services.vpn.get_key(user)
                 await self.services.notification.notify_purchase_success(
-                    user_id=data.user_id,
+                    user_id=user.tg_id,
                     key=key,
                 )
 

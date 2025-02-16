@@ -74,7 +74,15 @@ class TelegramStars(PaymentGateway):
                 duration=data.duration,
             )
             logger.info(f"Subscription extented for user {user.tg_id}")
-            await self.services.notification.notify_extend_success(user_id=data.user_id, data=data)
+            await self.services.notification.notify_extend_success(user_id=user.tg_id, data=data)
+        elif data.is_change:
+            await self.services.vpn.change_subscription(
+                user=user,
+                devices=data.devices,
+                duration=data.duration,
+            )
+            logger.info(f"Subscription changed for user {user.tg_id}")
+            await self.services.notification.notify_change_success(user_id=user.tg_id, data=data)
         else:
             await self.services.vpn.create_subscription(
                 user=user,
@@ -83,7 +91,7 @@ class TelegramStars(PaymentGateway):
             )
             logger.info(f"Subscription created for user {user.tg_id}")
             key = await self.services.vpn.get_key(user)
-            await self.services.notification.notify_purchase_success(user_id=data.user_id, key=key)
+            await self.services.notification.notify_purchase_success(user_id=user.tg_id, key=key)
 
     async def handle_payment_canceled(self, payment_id: str) -> None:
         logger.info(f"Payment canceled {payment_id}")

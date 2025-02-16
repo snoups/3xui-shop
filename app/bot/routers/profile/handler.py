@@ -52,10 +52,14 @@ async def callback_profile(
     logger.info(f"User {user.tg_id} opened profile page.")
     await state.update_data({PREVIOUS_CALLBACK_KEY: NavProfile.MAIN})
 
+    client_data = None
     if user.server_id:
         client_data = await services.vpn.get_client_data(user)
-    else:
-        client_data = None
+        if not client_data:
+            await services.notification.show_popup(
+                callback=callback,
+                text=_("subscription:popup:error_fetching_data"),
+            )
 
     reply_markup = (
         profile_keyboard()

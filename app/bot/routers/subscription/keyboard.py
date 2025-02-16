@@ -49,6 +49,11 @@ def subscription_keyboard(
             text=_("subscription:button:extend"),
             callback_data=callback_data,
         )
+        callback_data.state = NavSubscription.CHANGE
+        builder.button(
+            text=_("subscription:button:change"),
+            callback_data=callback_data,
+        )
 
     builder.button(
         text=_("subscription:button:activate_promocode"),

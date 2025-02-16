@@ -1,4 +1,7 @@
 services:
+  redis:
+        image: redis:latest
+        restart: always
   bot:
     build: .
     container_name: 3xui-shop-bot
@@ -15,3 +18,5 @@ services:
       poetry run pybabel compile -d /app/locales -D bot &&
       poetry run alembic -c /app/db/alembic.ini upgrade head &&
       poetry run python /app/__main__.py"
+    depends_on:
+      - redis

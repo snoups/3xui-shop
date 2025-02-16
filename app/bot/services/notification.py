@@ -18,7 +18,7 @@ from app.bot.models.subscription_data import SubscriptionData
 from app.bot.routers.misc.keyboard import close_notification_keyboard
 from app.bot.routers.subscription.keyboard import payment_success_keyboard
 from app.bot.utils.constants import MESSAGE_EFFECT_IDS
-from app.bot.utils.formatting import format_subscription_period
+from app.bot.utils.formatting import format_device_count, format_subscription_period
 from app.config import Config
 
 logger = logging.getLogger(__name__)
@@ -183,6 +183,21 @@ class NotificationService:
             chat_id=user_id,
             text=__("payment:message:extend_success").format(
                 duration=format_subscription_period(data.duration)
+            ),
+            message_effect_id=message_effect_id,
+        )
+
+    async def notify_change_success(
+        self,
+        user_id: int,
+        data: SubscriptionData,
+        message_effect_id: str = MESSAGE_EFFECT_IDS["🎉"],
+    ) -> None:
+        await self.notify_by_id(
+            chat_id=user_id,
+            text=__("payment:message:change_success").format(
+                device=format_device_count(data.devices),
+                duration=format_subscription_period(data.duration),
             ),
             message_effect_id=message_effect_id,
         )
