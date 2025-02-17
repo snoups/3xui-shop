@@ -38,7 +38,7 @@ async def on_shutdown(db: Database, bot: Bot, services: ServicesContainer) -> No
 
 
 async def on_startup(config: Config, bot: Bot, services: ServicesContainer) -> None:
-    webhook_url = urljoin(config.bot.HOST, TELEGRAM_WEBHOOK)
+    webhook_url = urljoin(config.bot.DOMAIN, TELEGRAM_WEBHOOK)
 
     if await bot.get_webhook_info() != webhook_url:
         await bot.set_webhook(webhook_url)

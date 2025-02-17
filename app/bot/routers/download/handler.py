@@ -88,5 +88,5 @@ async def callback_platform(
 
     await callback.message.edit_text(
         text=_("download:message:connect_to_vpn").format(platform=platform),
-        reply_markup=download_keyboard(platform=callback.data, key=key, url=config.bot.HOST),
+        reply_markup=download_keyboard(platform=callback.data, key=key, url=config.bot.DOMAIN),
     )

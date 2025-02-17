@@ -1,7 +1,30 @@
 services:
+  traefik:
+    image: "traefik:v3.0"
+    container_name: "traefik"
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file:
+      - .env
+    environment:
+      - CF_API_EMAIL=${CF_API_EMAIL}
+      - CF_API_KEY=${CF_API_KEY}
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik.yml:/traefik.yml:ro"
+      - "./acme.json:/acme.json"
+    labels:
+      - "traefik.enable=true"
+
   redis:
-        image: redis:latest
-        restart: always
+    image: redis:latest
+    container_name: 3xui-shop-redis
+    restart: always
+    volumes:
+      - redis_data:/data
+
   bot:
     build: .
     container_name: 3xui-shop-bot
@@ -12,11 +35,17 @@ services:
       - ./app/logs:/app/logs
     env_file:
       - .env
-    restart: always
     stop_signal: SIGINT
-    command: sh -c "
-      poetry run pybabel compile -d /app/locales -D bot &&
-      poetry run alembic -c /app/db/alembic.ini upgrade head &&
+    restart: unless-stopped
+    command: sh -c " 
+      poetry run pybabel compile -d /app/locales -D bot && 
+      poetry run alembic -c /app/db/alembic.ini upgrade head && 
       poetry run python /app/__main__.py"
     depends_on:
       - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bot.rule=Host(`${BOT_DOMAIN}`)"
+      - "traefik.http.routers.bot.entrypoints=websecure"
+      - "traefik.http.routers.bot.tls.certresolver=letsencrypt"
+      - "traefik.http.services.bot.loadbalancer.server.port=8080"

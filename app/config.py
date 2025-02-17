@@ -18,11 +18,11 @@ DEFAULT_DATA_DIR = BASE_DIR / "data"
 DEFAULT_LOCALES_DIR = BASE_DIR / "locales"
 DEFAULT_PLANS_DIR = DEFAULT_DATA_DIR / "plans.json"
 
-DEFAULT_BOT_HOST = "localhost"
+DEFAULT_BOT_HOST = "0.0.0.0"
 DEFAULT_BOT_PORT = 8080
 
 DEFAULT_SHOP_EMAIL = "support@3xui-shop.com"
-DEFAULT_SHOP_CURRENCY = Currency.RUB
+DEFAULT_SHOP_CURRENCY = Currency.RUB.value
 DEFAULT_SHOP_TRIAL_ENABLED = True
 DEFAULT_SHOP_TRIAL_PERIOD = 3
 DEFAULT_SHOP_PAYMENT_STARS_ENABLED = True
@@ -32,7 +32,7 @@ DEFAULT_SHOP_PAYMENT_YOOKASSA_ENABLED = False
 DEFAULT_DB_NAME = "bot_database"
 
 DEFAULT_REDIS_DB_NAME = "0"
-DEFAULT_REDIS_HOST = "localhost"
+DEFAULT_REDIS_HOST = "3xui-shop-redis"
 DEFAULT_REDIS_PORT = 6379
 
 DEFAULT_LOG_LEVEL = "INFO"
@@ -57,7 +57,7 @@ class BotConfig:
         ADMINS (list[int]): List of admin IDs (user IDs) for admin tools.
         DEV_ID (int): Developer ID (user ID) for notifications.
         SUPPORT_ID (int): Support ID (user ID) for support.
-        HOST (str): Base URL for the application.
+        DOMAIN (str): Domain for the application.
         PORT (int): Port for the application.
 
     """
@@ -66,7 +66,7 @@ class BotConfig:
     ADMINS: list[int]
     DEV_ID: int
     SUPPORT_ID: int
-    HOST: str
+    DOMAIN: str
     PORT: int
 
 
@@ -282,7 +282,7 @@ def load_config() -> Config:
             ADMINS=bot_admins,
             DEV_ID=env.int("BOT_DEV_ID"),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
-            HOST=env.str("BOT_HOST"),
+            DOMAIN=f"https://{env.str('BOT_DOMAIN')}/",
             PORT=env.int("BOT_PORT", default=DEFAULT_BOT_PORT),
         ),
         shop=ShopConfig(
