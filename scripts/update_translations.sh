@@ -9,7 +9,7 @@ fi
 
 # Variables
 LOCALES_DIR="app/locales"                   # Directory containing locale files
-MESSAGES_POT="$LOCALES_DIR/messages.pot"    # Path to the messages template
+MESSAGES_POT="$LOCALES_DIR/bot.pot"    # Path to the messages template
 PROJECT_NAME="bot"                          # Project name
 VERSION="0.1"                               # Project version
 COPYRIGHT_HOLDER="snoups"                   # Copyright holder

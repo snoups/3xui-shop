@@ -3,42 +3,21 @@ from typing import Any, Awaitable, Callable, MutableMapping
 
 from aiogram import BaseMiddleware
 from aiogram.dispatcher.flags import get_flag
-from aiogram.types import TelegramObject, Update, User
+from aiogram.types import TelegramObject, Update
+from aiogram.types import User as TelegramUser
 from cachetools import TTLCache
 
 logger = logging.getLogger(__name__)
 
 
 class ThrottlingMiddleware(BaseMiddleware):
-    """
-    Middleware for controlling the rate of requests from users.
-
-    This middleware prevents spamming and ensures that users cannot make requests
-    too quickly by implementing a time-to-live (TTL) cache for user actions. It
-    manages rate limiting by checking whether a user has exceeded the allowed
-    request frequency.
-
-    Attributes:
-        default_key (str | None): The default key used for throttling.
-        default_ttl (float): The default TTL (time-to-live) for user actions, in seconds.
-        caches (dict[str, MutableMapping[int, None]]): TTL caches for each throttling key.
-    """
-
     def __init__(
         self,
         *,
         default_key: str | None = "default",
         default_ttl: float = 0.5,
-        **ttl_map: float,
+        **ttl_map: dict[str, float],
     ) -> None:
-        """
-        Initializes the middleware with specified throttling settings.
-
-        Arguments:
-            default_key (Optional[str]): The default key used for throttling.
-            default_ttl (float): The default time-to-live (TTL) for the default key.
-            ttl_map (float): A dictionary of specific TTL values for each throttling key.
-        """
         if default_key:
             ttl_map[default_key] = default_ttl
 
@@ -47,7 +26,8 @@ class ThrottlingMiddleware(BaseMiddleware):
 
         for name, ttl in ttl_map.items():
             self.caches[name] = TTLCache(maxsize=10_000, ttl=ttl)
-        logger.debug("ThrottlingMiddleware initialized.")
+
+        logger.debug("Throttling Middleware initialized.")
 
     async def __call__(
         self,
@@ -55,20 +35,6 @@ class ThrottlingMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: dict[str, Any],
     ) -> Any:
-        """
-        Middleware handler that manages the throttling logic.
-
-        This method checks if a user has exceeded the request frequency limit. If
-        throttling is applied, it returns None to prevent the handler from being called.
-
-        Arguments:
-            handler (Callable): The handler function that processes the incoming event.
-            event (TelegramObject): The incoming Telegram event (message, callback, etc.).
-            data (dict): The data dictionary passed to the handler.
-
-        Returns:
-            Optional[Any]: The result of the handler, or None if the request is throttled.
-        """
         if not isinstance(event, Update):
             logger.debug(f"Received event of type {type(event)}, skipping throttling.")
             return await handler(event, data)
@@ -81,22 +47,18 @@ class ThrottlingMiddleware(BaseMiddleware):
             logger.debug("Successful payment event, skipping throttling.")
             return await handler(event, data)
 
-        user: User | None = data.get("event_from_user", None)
+        user: TelegramUser | None = event.event.from_user
 
         if user is not None:
-            key = get_flag(data, "throttling_key", default=self.default_key)
+            key = get_flag(handler=data, name="throttling_key", default=self.default_key)
 
             if key:
                 if user.id in self.caches[key]:
-                    logger.warning(f"User {user.id} is being throttled with key: {key}")
+                    logger.warning(f"User {user.id} throttled.")
                     return None
-                logger.debug(
-                    f"User {user.id} is allowed to proceed, adding to cache with key: {key}",
-                )
+                logger.debug(f"User {user.id} not throttled.")
                 self.caches[key][user.id] = None
             else:
-                logger.debug(
-                    f"No throttling key provided for user {user.id}, proceeding without throttle."
-                )
+                logger.debug(f"No throttle key for user {user.id}")
 
         return await handler(event, data)

@@ -5,7 +5,9 @@ from typing import Self
 from sqlalchemy import *
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
+
+from app.bot.utils.misc import generate_code
 
 from . import Base
 
@@ -14,25 +16,31 @@ logger = logging.getLogger(__name__)
 
 class Promocode(Base):
     """
-    Model representing the Promocode table in the database.
+    Represents a promocode entity in the database.
 
     Attributes:
-        id (int): The unique promocode ID (primary key).
-        code (str): The unique promocode code (maximum 8 characters).
-        duration (int): The duration of the subscription associated with the promocode.
-        is_activated (bool): Indicates whether the promocode has been activated.
-        activated_by (int | None): The ID of the user who activated the promocode, if any.
-        created_at (datetime): The timestamp when the promocode was created.
+        id (int): Unique identifier (primary key)
+        code (str): Unique promocode value (8 characters max)
+        duration (int): Associated subscription duration in days
+        is_activated (bool): Flag indicating activation status
+        activated_by (int | None): Telegram ID of activating user
+        created_at (datetime): Timestamp of creation
+        activated_user (User | None): Relationship to User model
     """
 
     __tablename__ = "promocodes"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    code: Mapped[str] = mapped_column(String(length=8), unique=True, nullable=False)
+    code: Mapped[str] = mapped_column(
+        String(length=8), unique=True, default=generate_code(), nullable=False
+    )
     duration: Mapped[int] = mapped_column(nullable=False)
     is_activated: Mapped[bool] = mapped_column(default=False, nullable=False)
-    activated_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    activated_by: Mapped[int | None] = mapped_column(ForeignKey("users.tg_id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
+    activated_user: Mapped["User | None"] = relationship(  # type: ignore
+        "User", back_populates="activated_promocodes"
+    )
 
     def __repr__(self) -> str:
         return (
@@ -43,110 +51,83 @@ class Promocode(Base):
 
     @classmethod
     async def get(cls, session: AsyncSession, code: str) -> Self | None:
-        """
-        Get a promocode by its code.
-
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            code (str): The promocode code to search for.
-
-        Returns:
-            Promocode | None: The promocode object if found, or None if not found.
-
-        Example:
-            promocode = await Promocode.get(session, code="ABC123")
-        """
         filter = [Promocode.code == code]
-        query = await session.execute(select(Promocode).where(*filter))
+        query = await session.execute(
+            select(Promocode).options(selectinload(Promocode.activated_user)).where(*filter)
+        )
         return query.scalar_one_or_none()
 
     @classmethod
-    async def create(cls, session: AsyncSession, code: str, **kwargs) -> Self | None:
-        """
-        Create a new promocode in the database.
-
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            code (str): The unique promocode code.
-            kwargs (dict): Additional attributes for the new promocode (e.g., duration).
-
-        Returns:
-            Promocode | None: The created promocode if successful, None if creation failed.
-
-        Example:
-            promocode = await Promocode.create(session, code="ABC123", duration=3600)
-        """
-        filter = [Promocode.code == code]
-        query = await session.execute(select(Promocode).where(*filter))
-        promocode = query.scalar_one_or_none()
+    async def create(cls, session: AsyncSession, **kwargs: Any) -> Self | None:
+        promocode = Promocode(**kwargs)
+        session.add(promocode)
 
         try:
             await session.commit()
+            logger.info(f"Promocode {promocode.code} created.")
+            return promocode
         except IntegrityError as exception:
             await session.rollback()
-            logger.error(f"Error occurred while creating promocode {code}: {exception}")
+            logger.error(f"Error occurred while creating promocode {promocode.code}: {exception}")
             return None
 
-        return promocode
-
     @classmethod
-    async def update(cls, session: AsyncSession, code: str, **kwargs) -> None:
-        """
-        Update attributes of a promocode.
+    async def update(cls, session: AsyncSession, code: str, **kwargs: Any) -> Self | None:
+        promocode = await Promocode.get(session=session, code=code)
 
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            code (str): The promocode code to update.
-            kwargs (dict): Attributes to update (e.g., duration=30, is_activated=True).
+        if not promocode:
+            logger.warning(f"Promocode {code} not found for update.")
+            return None
 
-        Example:
-            await Promocode.update(session, code="ABC123", is_activated=True)
-        """
+        # if promocode.is_activated:
+        #     logger.warning(f"Promocode {code} is activated and cannot be updated.")
+        #     return None
+
         filter = [Promocode.code == code]
         await session.execute(update(Promocode).where(*filter).values(**kwargs))
         await session.commit()
-
-    @classmethod
-    async def exists(cls, session: AsyncSession, code: str) -> bool:
-        """
-        Check if a promocode exists.
-
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            code (str): The promocode code to check.
-
-        Returns:
-            bool: True if the promocode exists, otherwise False.
-
-        Example:
-            exists = await Promocode.exists(session, code="ABC123")
-        """
-        filter = [Promocode.code == code]
-        query = await session.execute(select(Promocode).where(*filter))
-        return query.scalar_one_or_none() is not None
+        logger.info(f"Promocode {code} updated.")
+        return promocode
 
     @classmethod
     async def delete(cls, session: AsyncSession, code: str) -> bool:
-        """
-        Delete a promocode by its code.
-
-        Arguments:
-            session (AsyncSession): The asynchronous SQLAlchemy session.
-            code (str): The promocode code to delete.
-
-        Returns:
-            bool: True if the promocode was deleted, False otherwise.
-
-        Example:
-            deleted = await Promocode.delete(session, code="ABC123")
-        """
-        filter = [Promocode.code == code]
-        query = await session.execute(select(Promocode).where(*filter))
-        promocode = query.scalar_one_or_none()
+        promocode = await Promocode.get(session=session, code=code)
 
         if promocode:
             await session.delete(promocode)
             await session.commit()
+            logger.info(f"Promocode {code} deleted.")
             return True
-        else:
+
+        logger.warning(f"Promocode {code} not found for deletion.")
+        return False
+
+    @classmethod
+    async def set_activated(cls, session: AsyncSession, code: str, user_id: int) -> bool:
+        promocode = await Promocode.get(session=session, code=code)
+
+        if not promocode:
+            logger.warning(f"Promocode {code} not found for activation.")
             return False
+
+        if promocode.is_activated:
+            logger.warning(f"Promocode {code} is already activated.")
+            return False
+
+        await Promocode.update(session=session, code=code, is_activated=True, activated_by=user_id)
+        return True
+
+    @classmethod
+    async def set_deactivated(cls, session: AsyncSession, code: str) -> bool:
+        promocode = await Promocode.get(session=session, code=code)
+
+        if not promocode:
+            logger.warning(f"Promocode {code} not found for deactivation.")
+            return False
+
+        if not promocode.is_activated:
+            logger.warning(f"Promocode {code} is already deactivated.")
+            return False
+
+        await Promocode.update(session=session, code=code, is_activated=False, activated_by=None)
+        return True
