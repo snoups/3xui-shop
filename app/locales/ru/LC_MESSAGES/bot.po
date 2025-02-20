@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-02-16 18:07+0500\n"
+"POT-Creation-Date: 2025-02-19 08:12+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Generated-By: Babel 2.16.0\n"
 
 #: app/bot/middlewares/maintenance.py:41
-msgid "maintenance:notification:try_later"
+msgid "maintenance:ntf:try_later"
 msgstr ""
 "🚧 <i>Бот находится в режиме обслуживания. Пожалуйста, попробуйте "
 "позже.</i>"
@@ -42,9 +42,28 @@ msgstr "Подписка | {devices} на {duration}"
 msgid "payment:invoice:description"
 msgstr "Подписка | {devices} на {duration}"
 
+#: app/bot/payment_gateways/telegram_stars.py:69
+#: app/bot/payment_gateways/yookassa.py:157
+msgid "payment:event:payment_succeeded"
+msgstr ""
+"💳 <b>Событие: Покупка завершена!</b>\n"
+"\n"
+"ID платежа: <blockquote><code>{payment_id}</code></blockquote>\n"
+"ID пользователя: <code>{user_id}</code>\n"
+"<code>{devices}</code> | <code>{duration}</code>"
+
 #: app/bot/payment_gateways/yookassa.py:53
 msgid "payment:gateway:yookassa"
 msgstr "ЮKassa"
+
+#: app/bot/payment_gateways/yookassa.py:217
+msgid "payment:event:payment_canceled"
+msgstr ""
+"💳 <b>Событие: Покупка отменена!</b>\n"
+"\n"
+"ID платежа: <tg-spoiler><code>{payment_id}</code></tg-spoiler>\n"
+"ID пользователя: <code>{user_id}</code>\n"
+"<code>{devices}</code> | <code>{duration}</code>"
 
 #: app/bot/routers/admin_tools/admin_tools_handler.py:23
 msgid "admin_tools:message:main"
@@ -66,84 +85,108 @@ msgstr "❌ Не удалось отправить резервную копию
 msgid "backup:popup:error"
 msgstr "❌ Возникла ошибка при создании резервной копии."
 
-#: app/bot/routers/admin_tools/keyboard.py:16
+#: app/bot/routers/admin_tools/keyboard.py:20
 msgid "admin_tools:button:server_management"
 msgstr "🌐 Управление серверами"
 
-#: app/bot/routers/admin_tools/keyboard.py:23
+#: app/bot/routers/admin_tools/keyboard.py:27
 msgid "admin_tools:button:statistics"
 msgstr "📈 Статистика"
 
-#: app/bot/routers/admin_tools/keyboard.py:29
+#: app/bot/routers/admin_tools/keyboard.py:33
 msgid "admin_tools:button:user_editor"
 msgstr "👤 Редактор пользователей"
 
-#: app/bot/routers/admin_tools/keyboard.py:35
+#: app/bot/routers/admin_tools/keyboard.py:39
 msgid "admin_tools:button:promocode_editor"
 msgstr "🎟 Редактор промокодов"
 
-#: app/bot/routers/admin_tools/keyboard.py:41
-msgid "admin_tools:button:send_notification"
-msgstr "📩 Отправить уведомление"
+#: app/bot/routers/admin_tools/keyboard.py:45
+msgid "admin_tools:button:notification"
+msgstr "📣 Отправить уведомление"
 
-#: app/bot/routers/admin_tools/keyboard.py:47
+#: app/bot/routers/admin_tools/keyboard.py:51
 msgid "admin_tools:button:create_backup"
 msgstr "💾 Создать резервную копию"
 
-#: app/bot/routers/admin_tools/keyboard.py:53
+#: app/bot/routers/admin_tools/keyboard.py:57
 msgid "admin_tools:button:maintenance_mode"
 msgstr "🚧 Режим обслуживания"
 
-#: app/bot/routers/admin_tools/keyboard.py:59
+#: app/bot/routers/admin_tools/keyboard.py:63
 msgid "admin_tools:button:restart_bot"
 msgstr "🔄 Перезапустить бота"
 
-#: app/bot/routers/admin_tools/keyboard.py:65
+#: app/bot/routers/admin_tools/keyboard.py:69
 msgid "admin_tools:button:test_button"
 msgstr "🔍 Тестовая кнопка"
 
-#: app/bot/routers/admin_tools/keyboard.py:79
+#: app/bot/routers/admin_tools/keyboard.py:83
 msgid "promocode_editor:button:create"
 msgstr "🆕 Создать"
 
-#: app/bot/routers/admin_tools/keyboard.py:85
+#: app/bot/routers/admin_tools/keyboard.py:89
 msgid "promocode_editor:button:delete"
 msgstr "🗑 Удалить"
 
-#: app/bot/routers/admin_tools/keyboard.py:91
+#: app/bot/routers/admin_tools/keyboard.py:95
 msgid "promocode_editor:button:edit"
 msgstr "✏️ Изменить"
 
-#: app/bot/routers/admin_tools/keyboard.py:106 app/bot/utils/formatting.py:72
+#: app/bot/routers/admin_tools/keyboard.py:110 app/bot/utils/formatting.py:72
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] "1 день"
 msgstr[1] "{} дня"
 msgstr[2] "{} дней"
 
-#: app/bot/routers/admin_tools/keyboard.py:125
+#: app/bot/routers/admin_tools/keyboard.py:129
 msgid "maintenance_mode:button:disable"
 msgstr "🔴 Выключить"
 
-#: app/bot/routers/admin_tools/keyboard.py:132
+#: app/bot/routers/admin_tools/keyboard.py:136
 msgid "maintenance_mode:button:enable"
 msgstr "🟢 Включить"
 
-#: app/bot/routers/admin_tools/keyboard.py:147
+#: app/bot/routers/admin_tools/keyboard.py:151
 msgid "server_management:button:add"
 msgstr "🆕 Добавить"
 
-#: app/bot/routers/admin_tools/keyboard.py:171
+#: app/bot/routers/admin_tools/keyboard.py:175
 msgid "server_management:button:ping"
 msgstr "📶 Пинг"
 
-#: app/bot/routers/admin_tools/keyboard.py:177
+#: app/bot/routers/admin_tools/keyboard.py:181
 msgid "server_management:button:delete"
 msgstr "🗑 Удалить"
 
-#: app/bot/routers/admin_tools/keyboard.py:192
+#: app/bot/routers/admin_tools/keyboard.py:196
 msgid "server_management:button:confirm"
 msgstr "✅ Подтвердить"
+
+#: app/bot/routers/admin_tools/keyboard.py:211
+msgid "notification:button:send_to_user"
+msgstr "📩 Пользователю"
+
+#: app/bot/routers/admin_tools/keyboard.py:215
+msgid "notification:button:send_to_all"
+msgstr "📣 Всем"
+
+#: app/bot/routers/admin_tools/keyboard.py:222
+msgid "notification:button:last_notification"
+msgstr "💬 Последнее уведомление"
+
+#: app/bot/routers/admin_tools/keyboard.py:236
+msgid "notification:button:edit"
+msgstr "✏️ Изменить"
+
+#: app/bot/routers/admin_tools/keyboard.py:243
+msgid "notification:button:delete"
+msgstr "🗑 Удалить"
+
+#: app/bot/routers/admin_tools/keyboard.py:257
+msgid "notification:button:confirm"
+msgstr "✅ Подтвердить и отправить"
 
 #: app/bot/routers/admin_tools/maintenance_handler.py:24
 #: app/bot/routers/admin_tools/maintenance_handler.py:45
@@ -173,12 +216,138 @@ msgstr ""
 "🔴 Режим обслуживания выключен.\n"
 "Бот доступен для пользователей."
 
-#: app/bot/routers/admin_tools/notification_handler.py:18
-#: app/bot/routers/admin_tools/statistics_handler.py:18
-#: app/bot/routers/admin_tools/user_handler.py:18
-#: app/bot/routers/referral/handler.py:17
-msgid "global:popup:development"
-msgstr "В разработке!"
+#: app/bot/routers/admin_tools/notification_handler.py:45
+msgid "notification:message:main"
+msgstr "<b>📣 Отправить уведомление:</b>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:70
+msgid "notification:message:send_to_user"
+msgstr ""
+"<b>📣 Отправить уведомление:</b> (для пользователя)\n"
+"\n"
+"<i>Отправьте id пользователя или пересланное сообщение от пользователя</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:98
+msgid "notification:message:send_message_for_user"
+msgstr ""
+"<b>📣 Отправить уведомление:</b> (для пользователя)\n"
+"\n"
+"<i>Отправьте сообщение для <code>{user_id}</code> (имя: {first_name})</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:109
+msgid "notification:ntf:user_not_found"
+msgstr "<i>❌ Пользователь не найден.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:115
+msgid "notification:ntf:invalid_user_id"
+msgstr "<i>❌ Некорректный id пользователя.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:136
+#: app/bot/routers/admin_tools/notification_handler.py:220
+#: app/bot/routers/admin_tools/notification_handler.py:342
+msgid "notification:message:confirm_send_notification"
+msgstr ""
+"💬 <b>Подтвердите отправку уведомления:</b>\n"
+"<i>Для редактирования, отправьте новый текст.</i>\n"
+"\n"
+"{text}"
+
+#: app/bot/routers/admin_tools/notification_handler.py:144
+#: app/bot/routers/admin_tools/notification_handler.py:166
+#: app/bot/routers/admin_tools/notification_handler.py:228
+#: app/bot/routers/admin_tools/notification_handler.py:251
+#: app/bot/routers/admin_tools/notification_handler.py:350
+#: app/bot/routers/admin_tools/notification_handler.py:375
+msgid "notification:ntf:invalid_message_text"
+msgstr "<i>❌ Некорректный текст уведомления.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:180
+msgid "notification:ntf:sent_success"
+msgstr "<i>✅ Уведомление успешно отправлено.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:186
+msgid "notification:ntf:failed_to_send_message"
+msgstr "<i>❌ Не удалось отправить уведомление.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:199
+msgid "notification:message:send_to_all"
+msgstr ""
+"<b>📣 Отправить уведомление:</b> (для всех)\n"
+"\n"
+"<i>Отправьте сообщение для всех</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:260
+msgid "notification:ntf:sending_to_all"
+msgstr "<i>📣 Отправка {count} уведомлений...</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:280
+msgid "notification:ntf:sent_success_all"
+msgstr ""
+"<i>✅ Уведомления успешно отправлены.\n"
+"\n"
+"Успешно: {success}\n"
+"Не удалось: {failed}</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:300
+msgid "notification:message:last_notification"
+msgstr ""
+"<b>💬 Последнее уведомление:</b>\n"
+"\n"
+"<i>Количество:</i> {message_count}\n"
+"<i>Текст:</i>\n"
+"{message_text}"
+
+#: app/bot/routers/admin_tools/notification_handler.py:309
+msgid "notification:ntf:last_notification_not_found"
+msgstr "<i>❌ Последнее уведомление не найдено.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:322
+msgid "notification:message:edit_notification"
+msgstr ""
+"<b>💬 Редактирование последнего уведомления:</b>\n"
+"\n"
+"<i>Отправьте новое сообщение</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:386
+msgid "notification:ntf:editing_notification"
+msgstr "<i>💬 Редактирование {count} уведомлений...</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:420
+msgid "notification:ntf:edited_failed"
+msgstr "<i>❌ Не удалось изменить уведомление.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:428
+msgid "notification:ntf:edited_success_all"
+msgstr ""
+"<i>✅ Уведомления успешно отредактированы.\n"
+"\n"
+"Успешно: {success}\n"
+"Не удалось: {failed}</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:437
+msgid "notification:ntf:edited_success"
+msgstr "<i>✅ Уведомление успешно отредактировано.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:443
+msgid "notification:ntf:no_messages_to_edit"
+msgstr "<i>❌ Нет сообщений для редактирования.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:485
+#: app/bot/routers/admin_tools/notification_handler.py:508
+msgid "notification:ntf:deleted_failed"
+msgstr "<i>❌ Не удалось удалить уведомление.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:493
+msgid "notification:ntf:deleted_success_all"
+msgstr ""
+"<i>✅ Уведомления успешно удалены.\n"
+"\n"
+"Успешно: {success}\n"
+"Не удалось: {failed}</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:502
+msgid "notification:ntf:deleted_success"
+msgstr "<i>✅ Уведомление успешно удалено.</i>"
 
 #: app/bot/routers/admin_tools/promocode_handler.py:41
 msgid "promocode_editor:message:main"
@@ -192,7 +361,7 @@ msgstr ""
 "<i>Укажите длительность</i>"
 
 #: app/bot/routers/admin_tools/promocode_handler.py:79
-msgid "promocode_editor:notification:created_success"
+msgid "promocode_editor:ntf:created_success"
 msgstr ""
 "✅ <i>Созданный промокод:</i>\n"
 "<pre>{promocode}</pre>\n"
@@ -206,21 +375,21 @@ msgstr ""
 "<i>Отправьте промокод для удаления</i>"
 
 #: app/bot/routers/admin_tools/promocode_handler.py:115
-msgid "promocode_editor:notification:deleted_success"
+msgid "promocode_editor:ntf:deleted_success"
 msgstr "✅ <i>Промокод {promocode} успешно удален.</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:123
-msgid "promocode_editor:notification:delete_failed"
+#: app/bot/routers/admin_tools/promocode_handler.py:121
+msgid "promocode_editor:ntf:delete_failed"
 msgstr "❌ <i>Не удалось удалить промокод.</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:137
+#: app/bot/routers/admin_tools/promocode_handler.py:135
 msgid "promocode_editor:message:edit"
 msgstr ""
 "🎟️ <b>Изменить промокод:</b>\n"
 "\n"
 "<i>Отправьте промокод для редактирования</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:159
+#: app/bot/routers/admin_tools/promocode_handler.py:157
 msgid "promocode_editor:message:edit_duration"
 msgstr ""
 "🎟️ <b>Изменить промокод:</b>\n"
@@ -230,12 +399,12 @@ msgstr ""
 "\n"
 "<i>Укажите новую длительность</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:170
-msgid "promocode_editor:notification:edit_failed"
+#: app/bot/routers/admin_tools/promocode_handler.py:168
+msgid "promocode_editor:ntf:edit_failed"
 msgstr "❌ <i>Промокод не найден или уже активирован.</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:193
-msgid "promocode_editor:notification:edited_success"
+#: app/bot/routers/admin_tools/promocode_handler.py:191
+msgid "promocode_editor:ntf:edited_success"
 msgstr ""
 "✅ <i>Измененный промокод:</i>\n"
 "<pre>{promocode}</pre>\n"
@@ -245,91 +414,79 @@ msgstr ""
 msgid "restart_bot:popup:process"
 msgstr "🔄 Перезапуск бота..."
 
-#: app/bot/routers/admin_tools/server_handler.py:49
+#: app/bot/routers/admin_tools/server_handler.py:47
 msgid "server_management:message:main"
 msgstr ""
 "🌐 <b>Управление серверами:</b>\n"
 "\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:58
+#: app/bot/routers/admin_tools/server_handler.py:56
 msgid "server_management:message:empty"
 msgstr "<i>Список серверов пуст.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:69
+#: app/bot/routers/admin_tools/server_handler.py:67
 msgid "server_management:message:add"
 msgstr ""
 "🌐 <b>Добавить сервер:</b>\n"
 "\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:70
+#: app/bot/routers/admin_tools/server_handler.py:68
 msgid "server_management:message:name"
 msgstr "- name: {server_name}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:71
+#: app/bot/routers/admin_tools/server_handler.py:69
 msgid "server_management:message:host"
 msgstr "- host: {server_host}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:72
-msgid "server_management:message:subscription"
-msgstr "- subscription: {server_subscription}\n"
-
-#: app/bot/routers/admin_tools/server_handler.py:75
+#: app/bot/routers/admin_tools/server_handler.py:70
 msgid "server_management:message:max_clients"
 msgstr "- max clients: {server_max_clients}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:82
+#: app/bot/routers/admin_tools/server_handler.py:77
 msgid "server_management:message:enter_name"
 msgstr "<i>Введите имя сервера</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:86
+#: app/bot/routers/admin_tools/server_handler.py:81
 msgid "server_management:message:enter_host"
 msgstr "<i>Введите хост сервера</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:89
-msgid "server_management:message:enter_subscription"
-msgstr "<i>Введите хост подписки</i>"
-
-#: app/bot/routers/admin_tools/server_handler.py:92
+#: app/bot/routers/admin_tools/server_handler.py:84
 msgid "server_management:message:enter_max_clients"
 msgstr "<i>Введите максимальное количество клиентов</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:95
+#: app/bot/routers/admin_tools/server_handler.py:87
 msgid "server_management:message:confirm"
 msgstr "<i>Нажмите подтвердить для добавления сервера</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:149
-msgid "server_management:notification:name_exists"
+#: app/bot/routers/admin_tools/server_handler.py:139
+msgid "server_management:ntf:name_exists"
 msgstr "❌ <i>Сервер с таким именем уже существует. Введите другое имя.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:171
-msgid "server_management:notification:invalid_host"
+#: app/bot/routers/admin_tools/server_handler.py:161
+msgid "server_management:ntf:invalid_host"
 msgstr "❌ <i>Введите корректный URL или IP адрес.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:193
-msgid "server_management:notification:invalid_subscription"
-msgstr "❌ <i>Введите корректный URL или IP адрес.</i>"
-
-#: app/bot/routers/admin_tools/server_handler.py:215
-msgid "server_management:notification:invalid_max_clients"
+#: app/bot/routers/admin_tools/server_handler.py:183
+msgid "server_management:ntf:invalid_max_clients"
 msgstr "❌ <i>Введите корректное число.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:249
+#: app/bot/routers/admin_tools/server_handler.py:216
 msgid "server_management:popup:added_success"
 msgstr "✅ Сервер успешно добавлен."
 
-#: app/bot/routers/admin_tools/server_handler.py:255
+#: app/bot/routers/admin_tools/server_handler.py:222
 msgid "server_management:popup:add_failed"
 msgstr "❌ Не удалось добавить сервер."
 
-#: app/bot/routers/admin_tools/server_handler.py:273
+#: app/bot/routers/admin_tools/server_handler.py:240
 msgid "server_management:message:status_online"
 msgstr "🟢"
 
-#: app/bot/routers/admin_tools/server_handler.py:275
+#: app/bot/routers/admin_tools/server_handler.py:242
 msgid "server_management:message:status_offline"
 msgstr "🔴"
 
-#: app/bot/routers/admin_tools/server_handler.py:277
+#: app/bot/routers/admin_tools/server_handler.py:244
 msgid "server_management:message:server_info"
 msgstr ""
 "🌐 <b>Сервер {server_name}:</b>\n"
@@ -338,40 +495,46 @@ msgstr ""
 "<b>Статус:</b> {status}\n"
 "<b>Клиенты:</b> {clients}/{max_clients}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:307
+#: app/bot/routers/admin_tools/server_handler.py:274
 msgid "server_management:popup:ping"
 msgstr "🟢 Пинг: {ping} ms."
 
-#: app/bot/routers/admin_tools/server_handler.py:312
+#: app/bot/routers/admin_tools/server_handler.py:279
 msgid "server_management:popup:ping_failed"
 msgstr "❌ Не удалось пингануть сервер {server_name}."
 
-#: app/bot/routers/admin_tools/server_handler.py:333
+#: app/bot/routers/admin_tools/server_handler.py:300
 msgid "server_management:popup:deleted_success"
 msgstr "✅ Сервер успешно удален."
 
-#: app/bot/routers/admin_tools/server_handler.py:338
+#: app/bot/routers/admin_tools/server_handler.py:305
 msgid "server_management:popup:delete_failed"
 msgstr "❌ Не удалось удалить сервер."
 
-#: app/bot/routers/download/handler.py:59
-#: app/bot/routers/download/handler.py:66
+#: app/bot/routers/admin_tools/statistics_handler.py:18
+#: app/bot/routers/admin_tools/user_handler.py:18
+#: app/bot/routers/referral/handler.py:17
+msgid "global:popup:development"
+msgstr "В разработке!"
+
+#: app/bot/routers/download/handler.py:58
+#: app/bot/routers/download/handler.py:65
 msgid "download:message:choose_platform"
 msgstr "📲 <b>Выберите вашу платформу:</b>"
 
-#: app/bot/routers/download/handler.py:83
+#: app/bot/routers/download/handler.py:82
 msgid "download:message:platform_ios"
 msgstr "🍏 IOS"
 
-#: app/bot/routers/download/handler.py:85
+#: app/bot/routers/download/handler.py:84
 msgid "download:message:platform_android"
 msgstr "🤖 Android"
 
-#: app/bot/routers/download/handler.py:87
+#: app/bot/routers/download/handler.py:86
 msgid "download:message:platform_windows"
 msgstr "💻 Windows"
 
-#: app/bot/routers/download/handler.py:90
+#: app/bot/routers/download/handler.py:89
 msgid "download:message:connect_to_vpn"
 msgstr ""
 "<b>{platform}:</b>\n"
@@ -402,8 +565,8 @@ msgid "download:button:connect"
 msgstr "🔌 Подключиться"
 
 #: app/bot/routers/main_menu/handler.py:38
-#: app/bot/routers/main_menu/handler.py:52
-#: app/bot/routers/main_menu/handler.py:76
+#: app/bot/routers/main_menu/handler.py:51
+#: app/bot/routers/main_menu/handler.py:75
 msgid "main_menu:message:main"
 msgstr ""
 "Добро пожаловать, {name}! 🎉\n"
@@ -566,7 +729,7 @@ msgstr "◀️ Изменить длительность"
 msgid "subscription:button:download_app"
 msgstr "🔌 Подключиться"
 
-#: app/bot/routers/subscription/payment_handler.py:48
+#: app/bot/routers/subscription/payment_handler.py:46
 msgid "payment:message:order_extend"
 msgstr ""
 "🛒 <b>Подтверждение продления:</b>\n"
@@ -578,7 +741,7 @@ msgstr ""
 "<i>Количество устройств останется прежним, а новый срок подписки "
 "добавится к оставшемуся времени!</i>"
 
-#: app/bot/routers/subscription/payment_handler.py:50
+#: app/bot/routers/subscription/payment_handler.py:48
 msgid "payment:message:order_change"
 msgstr ""
 "🛒 <b>Подтверждение изменения:</b>\n"
@@ -590,7 +753,7 @@ msgstr ""
 "<i>Количество устройств и срок подписки будут изменены, без перерасчета "
 "предыдущих данных!</i>"
 
-#: app/bot/routers/subscription/payment_handler.py:52
+#: app/bot/routers/subscription/payment_handler.py:50
 msgid "payment:message:order"
 msgstr ""
 "🛒 <b>Подтверждение покупки:</b>\n"
@@ -617,11 +780,11 @@ msgstr ""
 "<i>Вы получили {duration} к своей подписке.</i>"
 
 #: app/bot/routers/subscription/promocode_handler.py:61
-msgid "promocode:notification:activate_failed"
+msgid "promocode:ntf:activate_failed"
 msgstr "❌ <i>Не удалось активировать промокод, попробуйте позже.</i>"
 
 #: app/bot/routers/subscription/promocode_handler.py:64
-msgid "promocode:notification:activate_invalid"
+msgid "promocode:ntf:activate_invalid"
 msgstr "❌ <i>Промокод недействителен или уже активирован.</i>"
 
 #: app/bot/routers/subscription/subscription_handler.py:34

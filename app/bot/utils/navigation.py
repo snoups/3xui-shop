@@ -69,7 +69,14 @@ class NavAdminTools(str, Enum):
     DELETE_PROMOCODE = "delete_promocode"
     EDIT_PROMOCODE = "edit_promocode"
 
-    SEND_NOTIFICATION = "send_notification"
+    NOTIFICATION = "notification"
+    SEND_NOTIFICATION_USER = "send_notification_user"
+    SEND_NOTIFICATION_ALL = "send_notification_all"
+    CONFIRM_SEND_NOTIFICATION = "confirm_send_notification"
+    LAST_NOTIFICATION = "last_notification"
+    EDIT_NOTIFICATION = "edit_notification"
+    DELETE_NOTIFICATION = "delete_notification"
+
     CREATE_BACKUP = "create_backup"
 
     MAINTENANCE_MODE = "maintenance_mode"

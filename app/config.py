@@ -22,7 +22,7 @@ DEFAULT_BOT_HOST = "0.0.0.0"
 DEFAULT_BOT_PORT = 8080
 
 DEFAULT_SHOP_EMAIL = "support@3xui-shop.com"
-DEFAULT_SHOP_CURRENCY = Currency.RUB.value
+DEFAULT_SHOP_CURRENCY = Currency.RUB.code
 DEFAULT_SHOP_TRIAL_ENABLED = True
 DEFAULT_SHOP_TRIAL_PERIOD = 3
 DEFAULT_SHOP_PAYMENT_STARS_ENABLED = True
@@ -35,9 +35,8 @@ DEFAULT_REDIS_DB_NAME = "0"
 DEFAULT_REDIS_HOST = "3xui-shop-redis"
 DEFAULT_REDIS_PORT = 6379
 
-DEFAULT_LOG_LEVEL = "INFO"
+DEFAULT_LOG_LEVEL = "DEBUG"
 DEFAULT_LOG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
-DEFAULT_LOG_DIR = "logs"
 DEFAULT_LOG_ARCHIVE_FORMAT = LOG_ZIP_ARCHIVE_FORMAT
 
 logger = logging.getLogger(__name__)
@@ -78,7 +77,8 @@ class ShopConfig:
     Attributes:
         EMAIL (str): Email address for receipts.
         CURRENCY (str): Default currency for buttons.
-        TRIAL_PERIOD_ENABLED (bool): Flag indicating if trial period is enabled.
+        TRIAL_ENABLED (bool): Flag indicating if trial period is enabled.
+        TRIAL_PERIOD (int): Trial period in days.
         PAYMENT_STARS_ENABLED (bool): Flag indicating if Stars payment method is enabled.
         PAYMENT_CRYPTOMUS_ENABLED (bool): Flag indicating if Cryptomus payment method is enabled.
         PAYMENT_YOOKASSA_ENABLED (bool): Flag indicating if Yookassa payment method is enabled.
@@ -192,13 +192,11 @@ class LoggingConfig:
     Attributes:
         LEVEL (str): Logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).
         FORMAT (str): Format string for log messages.
-        DIR (str): Directory where log files are stored.
         ARCHIVE_FORMAT (str): Archive format for log archiving (either "zip" or "gz").
     """
 
     LEVEL: str
     FORMAT: str
-    DIR: str
     ARCHIVE_FORMAT: str
 
 
@@ -291,8 +289,8 @@ def load_config() -> Config:
                 "SHOP_CURRENCY",
                 default=DEFAULT_SHOP_CURRENCY,
                 validate=OneOf(
-                    [currency.value for currency in Currency]
-                    + [currency.value.lower() for currency in Currency],
+                    [currency.code for currency in Currency]
+                    + [currency.code.lower() for currency in Currency],
                     error="SHOP_CURRENCY must be one of: {choices}",
                 ),
             ).upper(),
@@ -328,7 +326,6 @@ def load_config() -> Config:
         logging=LoggingConfig(
             LEVEL=env.str("LOG_LEVEL", default=DEFAULT_LOG_LEVEL),
             FORMAT=env.str("LOG_FORMAT", default=DEFAULT_LOG_FORMAT),
-            DIR=BASE_DIR / env.path("LOG_DIR", default=DEFAULT_LOG_DIR),
             ARCHIVE_FORMAT=env.str(
                 "LOG_ARCHIVE_FORMAT",
                 default=DEFAULT_LOG_ARCHIVE_FORMAT,

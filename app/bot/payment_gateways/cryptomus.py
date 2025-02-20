@@ -5,7 +5,7 @@ from aiogram.utils.i18n import lazy_gettext as __
 
 from app.bot.models import SubscriptionData
 from app.bot.payment_gateways import PaymentGateway
-from app.bot.utils.constants import Currency, CurrencySymbol
+from app.bot.utils.constants import Currency
 from app.bot.utils.navigation import NavSubscription
 from app.config import Config
 
@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 class Cryptomus(PaymentGateway):
     name = ""
     currency = Currency.USD
-    symbol = CurrencySymbol.USD
     callback = NavSubscription.PAY_CRYPTOMUS
 
     def __init__(self, config: Config, bot: Bot) -> None:

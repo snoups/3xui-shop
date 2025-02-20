@@ -16,7 +16,6 @@ from app.bot.utils.constants import (
     SERVER_HOST_KEY,
     SERVER_MAX_CLIENTS_KEY,
     SERVER_NAME_KEY,
-    SERVER_SUBSCRIPTION_KEY,
 )
 from app.bot.utils.navigation import NavAdminTools
 from app.bot.utils.network import ping_url
@@ -32,7 +31,6 @@ router = Router(name=__name__)
 class AddServerStates(StatesGroup):
     name = State()
     host = State()
-    subscription = State()
     max_clients = State()
     confirmation = State()
 
@@ -64,14 +62,11 @@ async def callback_server_management(
 async def show_add_server(message: Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     data = await state.get_data()
-    message_id = data.get(MAIN_MESSAGE_ID_KEY)
+    main_message_id = data.get(MAIN_MESSAGE_ID_KEY)
 
     text = _("server_management:message:add")
     name = _("server_management:message:name").format(server_name=data.get(SERVER_NAME_KEY))
     host = _("server_management:message:host").format(server_host=data.get(SERVER_HOST_KEY))
-    subscription = _("server_management:message:subscription").format(
-        server_subscription=data.get(SERVER_SUBSCRIPTION_KEY)
-    )
     max_clients = _("server_management:message:max_clients").format(
         server_max_clients=data.get(SERVER_MAX_CLIENTS_KEY)
     )
@@ -84,21 +79,18 @@ async def show_add_server(message: Message, state: FSMContext) -> None:
         case AddServerStates.host:
             text += name + "\n"
             text += _("server_management:message:enter_host")
-        case AddServerStates.subscription:
-            text += name + host + "\n"
-            text += _("server_management:message:enter_subscription")
         case AddServerStates.max_clients:
-            text += name + host + subscription + "\n"
+            text += name + host + "\n"
             text += _("server_management:message:enter_max_clients")
         case AddServerStates.confirmation:
-            text += name + host + subscription + max_clients + "\n"
+            text += name + host + max_clients + "\n"
             text += _("server_management:message:confirm")
             reply_markup = confirm_add_server_keyboard()
 
     await message.bot.edit_message_text(
         text=text,
         chat_id=message.chat.id,
-        message_id=message_id,
+        message_id=main_message_id,
         reply_markup=reply_markup,
     )
 
@@ -110,10 +102,8 @@ async def callback_add_server_back(callback: CallbackQuery, state: FSMContext) -
     match current_state:
         case AddServerStates.host:
             await state.set_state(AddServerStates.name)
-        case AddServerStates.subscription:
-            await state.set_state(AddServerStates.host)
         case AddServerStates.max_clients:
-            await state.set_state(AddServerStates.subscription)
+            await state.set_state(AddServerStates.host)
         case AddServerStates.confirmation:
             await state.set_state(AddServerStates.max_clients)
 
@@ -146,7 +136,7 @@ async def message_name(
     else:
         await services.notification.notify_by_message(
             message=message,
-            text=_("server_management:notification:name_exists"),
+            text=_("server_management:ntf:name_exists"),
             duration=5,
         )
 
@@ -162,35 +152,13 @@ async def message_host(
     logger.info(f"Dev {user.tg_id} entered server host: {server_host}")
 
     if is_valid_host(server_host):
-        await state.set_state(AddServerStates.subscription)
+        await state.set_state(AddServerStates.max_clients)
         await state.update_data({SERVER_HOST_KEY: server_host})
         await show_add_server(message=message, state=state)
     else:
         await services.notification.notify_by_message(
             message=message,
-            text=_("server_management:notification:invalid_host"),
-            duration=5,
-        )
-
-
-@router.message(AddServerStates.subscription, IsDev())
-async def message_subscription(
-    message: Message,
-    user: User,
-    state: FSMContext,
-    services: ServicesContainer,
-) -> None:
-    server_subscription = message.text.strip()
-    logger.info(f"Dev {user.tg_id} entered server subscription: {server_subscription}")
-
-    if is_valid_host(server_subscription):
-        await state.set_state(AddServerStates.max_clients)
-        await state.update_data({SERVER_SUBSCRIPTION_KEY: server_subscription})
-        await show_add_server(message=message, state=state)
-    else:
-        await services.notification.notify_by_message(
-            message=message,
-            text=_("server_management:notification:invalid_subscription"),
+            text=_("server_management:ntf:invalid_host"),
             duration=5,
         )
 
@@ -212,7 +180,7 @@ async def message_max_clients(
     else:
         await services.notification.notify_by_message(
             message=message,
-            text=_("server_management:notification:invalid_max_clients"),
+            text=_("server_management:ntf:invalid_max_clients"),
             duration=5,
         )
 
@@ -235,7 +203,6 @@ async def callback_confirmation(
         session=session,
         name=data.get(SERVER_NAME_KEY),
         host=data.get(SERVER_HOST_KEY),
-        subscription=data.get(SERVER_SUBSCRIPTION_KEY),
         max_clients=data.get(SERVER_MAX_CLIENTS_KEY),
         online=online,
     )

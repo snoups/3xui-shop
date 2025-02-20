@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.bot.utils.constants import Currency
+
 if TYPE_CHECKING:
     from app.bot.services import PlanService
 
@@ -17,11 +19,7 @@ from app.bot.routers.misc.keyboard import (
     back_to_main_menu_button,
     close_notification_button,
 )
-from app.bot.utils.formatting import (
-    format_device_count,
-    format_subscription_period,
-    get_currency_symbol,
-)
+from app.bot.utils.formatting import format_device_count, format_subscription_period
 from app.bot.utils.navigation import NavMain, NavSubscription
 
 
@@ -89,6 +87,7 @@ def duration_keyboard(
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     durations = plan_service.get_durations()
+    currency: Currency = Currency.from_code(currency)
 
     for duration in durations:
         callback_data.duration = duration
@@ -96,7 +95,7 @@ def duration_keyboard(
         plan = plan_service.get_plan(callback_data.devices)
         price = plan.get_price(currency=currency, duration=duration)
         builder.button(
-            text=f"{period} | {price} {get_currency_symbol(currency)}",
+            text=f"{period} | {price} {currency.symbol}",
             callback_data=callback_data,
         )
 
@@ -146,7 +145,7 @@ def payment_method_keyboard(
         callback_data.state = gateway.callback
         builder.row(
             InlineKeyboardButton(
-                text=f"{gateway.name} | {price} {gateway.symbol.value}",
+                text=f"{gateway.name} | {price} {gateway.currency.symbol}",
                 callback_data=callback_data.pack(),
             )
         )

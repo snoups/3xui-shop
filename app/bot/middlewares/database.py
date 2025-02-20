@@ -39,7 +39,7 @@ class DBSessionMiddleware(BaseMiddleware):
                         username=tg_user.username,
                         language_code=tg_user.language_code,
                     )
-                    logger.info(f"New user {user.tg_id} created.")  # TODO: Notify new user
+                    logger.info(f"New user {user.tg_id} created.")
 
                 data["user"] = user
                 data["session"] = session

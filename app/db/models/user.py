@@ -7,6 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 
+from app.bot.utils.constants import DEFAULT_LANGUAGE
+
 from . import Base
 
 logger = logging.getLogger(__name__)
@@ -39,7 +41,11 @@ class User(Base):
     )
     first_name: Mapped[str] = mapped_column(String(length=32), nullable=False)
     username: Mapped[str | None] = mapped_column(String(length=32), nullable=True)
-    language_code: Mapped[str] = mapped_column(String(length=5), nullable=False, default="en")
+    language_code: Mapped[str] = mapped_column(
+        String(length=5),
+        nullable=False,
+        default=DEFAULT_LANGUAGE,
+    )
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     server: Mapped["Server | None"] = relationship("Server", back_populates="users", uselist=False)  # type: ignore
     transactions: Mapped[list["Transaction"]] = relationship("Transaction", back_populates="user")  # type: ignore
@@ -75,6 +81,11 @@ class User(Base):
 
         logger.debug(f"User {tg_id} not found in the database.")
         return None
+
+    @classmethod
+    async def get_all(cls, session: AsyncSession) -> list[Self]:
+        query = await session.execute(select(User).options(selectinload(User.server)))
+        return query.scalars().all()
 
     @classmethod
     async def create(cls, session: AsyncSession, tg_id: int, **kwargs: Any) -> Self | None:

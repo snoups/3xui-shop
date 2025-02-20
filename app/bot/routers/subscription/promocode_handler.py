@@ -46,7 +46,7 @@ async def handle_promocode_input(
     promocode = await Promocode.get(session=session, code=input_promocode)
     if promocode and not promocode.is_activated:
         success = await services.vpn.activate_promocode(user=user, promocode=promocode)
-        message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
+        main_message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
         if success:
             await message.bot.edit_message_text(
                 text=_("promocode:message:activated_success").format(
@@ -54,12 +54,12 @@ async def handle_promocode_input(
                     duration=format_subscription_period(promocode.duration),
                 ),
                 chat_id=message.chat.id,
-                message_id=message_id,
+                message_id=main_message_id,
                 reply_markup=back_keyboard(NavSubscription.MAIN),
             )
         else:
-            text = _("promocode:notification:activate_failed")
+            text = _("promocode:ntf:activate_failed")
             await services.notification.notify_by_message(message=message, text=text, duration=5)
     else:
-        text = _("promocode:notification:activate_invalid").format(promocode=input_promocode)
+        text = _("promocode:ntf:activate_invalid").format(promocode=input_promocode)
         await services.notification.notify_by_message(message=message, text=text, duration=5)

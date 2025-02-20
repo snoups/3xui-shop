@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-02-16 18:07+0500\n"
+"POT-Creation-Date: 2025-02-19 08:12+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Generated-By: Babel 2.16.0\n"
 
 #: app/bot/middlewares/maintenance.py:41
-msgid "maintenance:notification:try_later"
+msgid "maintenance:ntf:try_later"
 msgstr "🚧 <i>The bot is in maintenance mode. Please try again later.</i>"
 
 #: app/bot/payment_gateways/cryptomus.py:22
@@ -39,9 +39,28 @@ msgstr "Subscription | {devices} for {duration}"
 msgid "payment:invoice:description"
 msgstr "Subscription | {devices} for {duration}"
 
+#: app/bot/payment_gateways/telegram_stars.py:69
+#: app/bot/payment_gateways/yookassa.py:157
+msgid "payment:event:payment_succeeded"
+msgstr ""
+"💳 <b>Event: Purchase completed!</b>\n"
+"\n"
+"Payment ID: <tg-spoiler><code>{payment_id}</code></tg-spoiler>\n"
+"User ID: <code>{user_id}</code>\n"
+"<code>{devices}</code> | <code>{duration}</code>"
+
 #: app/bot/payment_gateways/yookassa.py:53
 msgid "payment:gateway:yookassa"
 msgstr "YooKassa"
+
+#: app/bot/payment_gateways/yookassa.py:217
+msgid "payment:event:payment_canceled"
+msgstr ""
+"💳 <b>Event: Purchase canceled!</b>\n"
+"\n"
+"Payment ID: {payment_id}\n"
+"User ID: {user_id}\n"
+"<code>{devices}</code> | <code>{duration}</code>"
 
 #: app/bot/routers/admin_tools/admin_tools_handler.py:23
 msgid "admin_tools:message:main"
@@ -63,83 +82,107 @@ msgstr "❌ Failed to send backup."
 msgid "backup:popup:error"
 msgstr "❌ An error occurred during backup."
 
-#: app/bot/routers/admin_tools/keyboard.py:16
+#: app/bot/routers/admin_tools/keyboard.py:20
 msgid "admin_tools:button:server_management"
 msgstr "🌐 Server management"
 
-#: app/bot/routers/admin_tools/keyboard.py:23
+#: app/bot/routers/admin_tools/keyboard.py:27
 msgid "admin_tools:button:statistics"
 msgstr "📈 Statistics"
 
-#: app/bot/routers/admin_tools/keyboard.py:29
+#: app/bot/routers/admin_tools/keyboard.py:33
 msgid "admin_tools:button:user_editor"
 msgstr "👤 User editor"
 
-#: app/bot/routers/admin_tools/keyboard.py:35
+#: app/bot/routers/admin_tools/keyboard.py:39
 msgid "admin_tools:button:promocode_editor"
 msgstr "🎟 Promocode editor"
 
-#: app/bot/routers/admin_tools/keyboard.py:41
-msgid "admin_tools:button:send_notification"
-msgstr "📩 Send notification"
+#: app/bot/routers/admin_tools/keyboard.py:45
+msgid "admin_tools:button:notification"
+msgstr "📣 Send notification"
 
-#: app/bot/routers/admin_tools/keyboard.py:47
+#: app/bot/routers/admin_tools/keyboard.py:51
 msgid "admin_tools:button:create_backup"
 msgstr "💾 Create backup"
 
-#: app/bot/routers/admin_tools/keyboard.py:53
+#: app/bot/routers/admin_tools/keyboard.py:57
 msgid "admin_tools:button:maintenance_mode"
 msgstr "🚧 Maintenance mode"
 
-#: app/bot/routers/admin_tools/keyboard.py:59
+#: app/bot/routers/admin_tools/keyboard.py:63
 msgid "admin_tools:button:restart_bot"
 msgstr "🔄 Restart bot"
 
-#: app/bot/routers/admin_tools/keyboard.py:65
+#: app/bot/routers/admin_tools/keyboard.py:69
 msgid "admin_tools:button:test_button"
 msgstr "🔍 Test button"
 
-#: app/bot/routers/admin_tools/keyboard.py:79
+#: app/bot/routers/admin_tools/keyboard.py:83
 msgid "promocode_editor:button:create"
 msgstr "🆕 Create"
 
-#: app/bot/routers/admin_tools/keyboard.py:85
+#: app/bot/routers/admin_tools/keyboard.py:89
 msgid "promocode_editor:button:delete"
 msgstr "🗑 Delete"
 
-#: app/bot/routers/admin_tools/keyboard.py:91
+#: app/bot/routers/admin_tools/keyboard.py:95
 msgid "promocode_editor:button:edit"
 msgstr "✏️ Edit"
 
-#: app/bot/routers/admin_tools/keyboard.py:106 app/bot/utils/formatting.py:72
+#: app/bot/routers/admin_tools/keyboard.py:110 app/bot/utils/formatting.py:72
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/routers/admin_tools/keyboard.py:125
+#: app/bot/routers/admin_tools/keyboard.py:129
 msgid "maintenance_mode:button:disable"
 msgstr "🔴 Disable"
 
-#: app/bot/routers/admin_tools/keyboard.py:132
+#: app/bot/routers/admin_tools/keyboard.py:136
 msgid "maintenance_mode:button:enable"
 msgstr "🟢 Enable"
 
-#: app/bot/routers/admin_tools/keyboard.py:147
+#: app/bot/routers/admin_tools/keyboard.py:151
 msgid "server_management:button:add"
 msgstr "🆕 Add"
 
-#: app/bot/routers/admin_tools/keyboard.py:171
+#: app/bot/routers/admin_tools/keyboard.py:175
 msgid "server_management:button:ping"
 msgstr "📶 Ping"
 
-#: app/bot/routers/admin_tools/keyboard.py:177
+#: app/bot/routers/admin_tools/keyboard.py:181
 msgid "server_management:button:delete"
 msgstr "🗑 Delete"
 
-#: app/bot/routers/admin_tools/keyboard.py:192
+#: app/bot/routers/admin_tools/keyboard.py:196
 msgid "server_management:button:confirm"
 msgstr "✅ Confirm"
+
+#: app/bot/routers/admin_tools/keyboard.py:211
+msgid "notification:button:send_to_user"
+msgstr "📩 Send to user"
+
+#: app/bot/routers/admin_tools/keyboard.py:215
+msgid "notification:button:send_to_all"
+msgstr "📣 Send to all"
+
+#: app/bot/routers/admin_tools/keyboard.py:222
+msgid "notification:button:last_notification"
+msgstr "💬 Last notification"
+
+#: app/bot/routers/admin_tools/keyboard.py:236
+msgid "notification:button:edit"
+msgstr "✏️ Edit"
+
+#: app/bot/routers/admin_tools/keyboard.py:243
+msgid "notification:button:delete"
+msgstr "🗑 Delete"
+
+#: app/bot/routers/admin_tools/keyboard.py:257
+msgid "notification:button:confirm"
+msgstr "✅ Confirm and send"
 
 #: app/bot/routers/admin_tools/maintenance_handler.py:24
 #: app/bot/routers/admin_tools/maintenance_handler.py:45
@@ -169,12 +212,138 @@ msgstr ""
 "🔴 Maintenance mode disabled.\n"
 "The bot is available for users."
 
-#: app/bot/routers/admin_tools/notification_handler.py:18
-#: app/bot/routers/admin_tools/statistics_handler.py:18
-#: app/bot/routers/admin_tools/user_handler.py:18
-#: app/bot/routers/referral/handler.py:17
-msgid "global:popup:development"
-msgstr "Under development!"
+#: app/bot/routers/admin_tools/notification_handler.py:45
+msgid "notification:message:main"
+msgstr "<b>📣 Send notification:</b>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:70
+msgid "notification:message:send_to_user"
+msgstr ""
+"<b>📣 Send notification:</b>\n"
+"\n"
+"<i>Send user id or forward message from user</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:98
+msgid "notification:message:send_message_for_user"
+msgstr ""
+"<b>📣 Send notification:</b>\n"
+"\n"
+"<i>Send message for <code>{user_id}</code> (first name: {first_name})</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:109
+msgid "notification:ntf:user_not_found"
+msgstr "<i>❌ User not found.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:115
+msgid "notification:ntf:invalid_user_id"
+msgstr "<i>❌ Invalid user id.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:136
+#: app/bot/routers/admin_tools/notification_handler.py:220
+#: app/bot/routers/admin_tools/notification_handler.py:342
+msgid "notification:message:confirm_send_notification"
+msgstr ""
+"<b>💬 Confirm notification with text:</b>\n"
+"<i>To edit, resend the text.</i>\n"
+"\n"
+"{text}"
+
+#: app/bot/routers/admin_tools/notification_handler.py:144
+#: app/bot/routers/admin_tools/notification_handler.py:166
+#: app/bot/routers/admin_tools/notification_handler.py:228
+#: app/bot/routers/admin_tools/notification_handler.py:251
+#: app/bot/routers/admin_tools/notification_handler.py:350
+#: app/bot/routers/admin_tools/notification_handler.py:375
+msgid "notification:ntf:invalid_message_text"
+msgstr "<i>❌ Invalid message text.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:180
+msgid "notification:ntf:sent_success"
+msgstr "<i>✅ Notification sent successfully.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:186
+msgid "notification:ntf:failed_to_send_message"
+msgstr "<i>❌ Failed to send notification.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:199
+msgid "notification:message:send_to_all"
+msgstr ""
+"<b>📣 Send notification:</b>\n"
+"\n"
+"<i>Send message for all</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:260
+msgid "notification:ntf:sending_to_all"
+msgstr "<i>📣 Sending {count} notifications...</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:280
+msgid "notification:ntf:sent_success_all"
+msgstr ""
+"<i>✅ Notifications sent successfully.\n"
+"\n"
+"Success: {success}\n"
+"Failed: {failed}</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:300
+msgid "notification:message:last_notification"
+msgstr ""
+"<b>💬 Last notification:</b>\n"
+"\n"
+"<i>Count:</i> {message_count}\n"
+"<i>Text:</i>\n"
+"{message_text}"
+
+#: app/bot/routers/admin_tools/notification_handler.py:309
+msgid "notification:ntf:last_notification_not_found"
+msgstr "<i>❌ Last notification not found.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:322
+msgid "notification:message:edit_notification"
+msgstr ""
+"<b>💬 Edit last notification:</b>\n"
+"\n"
+"<i>Send new message</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:386
+msgid "notification:ntf:editing_notification"
+msgstr "<i>💬 Editing {count} notifications...</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:420
+msgid "notification:ntf:edited_failed"
+msgstr "<i>❌ Failed to edit notification.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:428
+msgid "notification:ntf:edited_success_all"
+msgstr ""
+"<i>✅ Notifications edited successfully.\n"
+"\n"
+"Success: {success}\n"
+"Failed: {failed}</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:437
+msgid "notification:ntf:edited_success"
+msgstr "<i>✅ Notification edited successfully.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:443
+msgid "notification:ntf:no_messages_to_edit"
+msgstr "<i>❌ No messages to edit.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:485
+#: app/bot/routers/admin_tools/notification_handler.py:508
+msgid "notification:ntf:deleted_failed"
+msgstr "<i>❌ Failed to delete notification.</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:493
+msgid "notification:ntf:deleted_success_all"
+msgstr ""
+"<i>✅ Notifications deleted successfully.\n"
+"\n"
+"Success: {success}\n"
+"Failed: {failed}</i>"
+
+#: app/bot/routers/admin_tools/notification_handler.py:502
+msgid "notification:ntf:deleted_success"
+msgstr "<i>✅ Notification deleted successfully.</i>"
 
 #: app/bot/routers/admin_tools/promocode_handler.py:41
 msgid "promocode_editor:message:main"
@@ -188,7 +357,7 @@ msgstr ""
 "<i>Specify the duration</i>"
 
 #: app/bot/routers/admin_tools/promocode_handler.py:79
-msgid "promocode_editor:notification:created_success"
+msgid "promocode_editor:ntf:created_success"
 msgstr ""
 "✅ <i>Created promocode:</i>\n"
 "<pre>{promocode}</pre>\n"
@@ -202,21 +371,21 @@ msgstr ""
 "<i>Send promocode to delete</i>"
 
 #: app/bot/routers/admin_tools/promocode_handler.py:115
-msgid "promocode_editor:notification:deleted_success"
+msgid "promocode_editor:ntf:deleted_success"
 msgstr "✅ <i>Promocode {promocode} deleted successfully.</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:123
-msgid "promocode_editor:notification:delete_failed"
+#: app/bot/routers/admin_tools/promocode_handler.py:121
+msgid "promocode_editor:ntf:delete_failed"
 msgstr "❌ <i>Promocode not found.</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:137
+#: app/bot/routers/admin_tools/promocode_handler.py:135
 msgid "promocode_editor:message:edit"
 msgstr ""
 "🎟️ <b>Edit promocode:</b>\n"
 "\n"
 "<i>Send promocode to edit</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:159
+#: app/bot/routers/admin_tools/promocode_handler.py:157
 msgid "promocode_editor:message:edit_duration"
 msgstr ""
 "🎟️ <b>Edit promocode:</b>\n"
@@ -226,12 +395,12 @@ msgstr ""
 "\n"
 "<i>Specify the new duration</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:170
-msgid "promocode_editor:notification:edit_failed"
+#: app/bot/routers/admin_tools/promocode_handler.py:168
+msgid "promocode_editor:ntf:edit_failed"
 msgstr "❌ <i>Promocode not found or already activated.</i>"
 
-#: app/bot/routers/admin_tools/promocode_handler.py:193
-msgid "promocode_editor:notification:edited_success"
+#: app/bot/routers/admin_tools/promocode_handler.py:191
+msgid "promocode_editor:ntf:edited_success"
 msgstr ""
 "✅ <i>Edited promocode:</i>\n"
 "<pre>{promocode}</pre>\n"
@@ -241,91 +410,79 @@ msgstr ""
 msgid "restart_bot:popup:process"
 msgstr "🔄 Bot restarting..."
 
-#: app/bot/routers/admin_tools/server_handler.py:49
+#: app/bot/routers/admin_tools/server_handler.py:47
 msgid "server_management:message:main"
 msgstr ""
 "🌐 <b>Server management:</b>\n"
 "\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:58
+#: app/bot/routers/admin_tools/server_handler.py:56
 msgid "server_management:message:empty"
 msgstr "<i>The list of servers is empty.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:69
+#: app/bot/routers/admin_tools/server_handler.py:67
 msgid "server_management:message:add"
 msgstr ""
 "🌐 <b>Add server:</b>\n"
 "\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:70
+#: app/bot/routers/admin_tools/server_handler.py:68
 msgid "server_management:message:name"
 msgstr "- name: {server_name}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:71
+#: app/bot/routers/admin_tools/server_handler.py:69
 msgid "server_management:message:host"
 msgstr "- host: {server_host}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:72
-msgid "server_management:message:subscription"
-msgstr "- subscription: {server_subscription}\n"
-
-#: app/bot/routers/admin_tools/server_handler.py:75
+#: app/bot/routers/admin_tools/server_handler.py:70
 msgid "server_management:message:max_clients"
 msgstr "- max clients: {server_max_clients}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:82
+#: app/bot/routers/admin_tools/server_handler.py:77
 msgid "server_management:message:enter_name"
 msgstr "<i>Enter the server name</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:86
+#: app/bot/routers/admin_tools/server_handler.py:81
 msgid "server_management:message:enter_host"
 msgstr "<i>Enter the server host</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:89
-msgid "server_management:message:enter_subscription"
-msgstr "<i>Enter the subscription host</i>"
-
-#: app/bot/routers/admin_tools/server_handler.py:92
+#: app/bot/routers/admin_tools/server_handler.py:84
 msgid "server_management:message:enter_max_clients"
 msgstr "<i>Enter the maximum number of clients</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:95
+#: app/bot/routers/admin_tools/server_handler.py:87
 msgid "server_management:message:confirm"
 msgstr "<i>Press confirm to add the server</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:149
-msgid "server_management:notification:name_exists"
+#: app/bot/routers/admin_tools/server_handler.py:139
+msgid "server_management:ntf:name_exists"
 msgstr "❌ <i>A server with that name already exists. Enter a different name.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:171
-msgid "server_management:notification:invalid_host"
+#: app/bot/routers/admin_tools/server_handler.py:161
+msgid "server_management:ntf:invalid_host"
 msgstr "❌ <i>Enter a valid URL or IP address.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:193
-msgid "server_management:notification:invalid_subscription"
-msgstr "❌ <i>Enter a valid URL or IP address.</i>"
-
-#: app/bot/routers/admin_tools/server_handler.py:215
-msgid "server_management:notification:invalid_max_clients"
+#: app/bot/routers/admin_tools/server_handler.py:183
+msgid "server_management:ntf:invalid_max_clients"
 msgstr "❌ <i>Enter a valid number.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:249
+#: app/bot/routers/admin_tools/server_handler.py:216
 msgid "server_management:popup:added_success"
 msgstr "✅ Server added successfully."
 
-#: app/bot/routers/admin_tools/server_handler.py:255
+#: app/bot/routers/admin_tools/server_handler.py:222
 msgid "server_management:popup:add_failed"
 msgstr "❌ Failed to add the server."
 
-#: app/bot/routers/admin_tools/server_handler.py:273
+#: app/bot/routers/admin_tools/server_handler.py:240
 msgid "server_management:message:status_online"
 msgstr "🟢"
 
-#: app/bot/routers/admin_tools/server_handler.py:275
+#: app/bot/routers/admin_tools/server_handler.py:242
 msgid "server_management:message:status_offline"
 msgstr "🔴"
 
-#: app/bot/routers/admin_tools/server_handler.py:277
+#: app/bot/routers/admin_tools/server_handler.py:244
 msgid "server_management:message:server_info"
 msgstr ""
 "️️️️🌐 <b>Server {server_name}:</b>\n"
@@ -334,40 +491,46 @@ msgstr ""
 "<b>Status:</b> {status}\n"
 "<b>Clients:</b> {clients}/{max_clients}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:307
+#: app/bot/routers/admin_tools/server_handler.py:274
 msgid "server_management:popup:ping"
 msgstr "🟢 Ping: {ping} ms."
 
-#: app/bot/routers/admin_tools/server_handler.py:312
+#: app/bot/routers/admin_tools/server_handler.py:279
 msgid "server_management:popup:ping_failed"
 msgstr "❌ Failed to ping server {server_name}."
 
-#: app/bot/routers/admin_tools/server_handler.py:333
+#: app/bot/routers/admin_tools/server_handler.py:300
 msgid "server_management:popup:deleted_success"
 msgstr "✅ Server deleted successfully."
 
-#: app/bot/routers/admin_tools/server_handler.py:338
+#: app/bot/routers/admin_tools/server_handler.py:305
 msgid "server_management:popup:delete_failed"
 msgstr "❌ Failed to delete the server."
 
-#: app/bot/routers/download/handler.py:59
-#: app/bot/routers/download/handler.py:66
+#: app/bot/routers/admin_tools/statistics_handler.py:18
+#: app/bot/routers/admin_tools/user_handler.py:18
+#: app/bot/routers/referral/handler.py:17
+msgid "global:popup:development"
+msgstr "Under development!"
+
+#: app/bot/routers/download/handler.py:58
+#: app/bot/routers/download/handler.py:65
 msgid "download:message:choose_platform"
 msgstr "📲 <b>Choose your platform:</b>"
 
-#: app/bot/routers/download/handler.py:83
+#: app/bot/routers/download/handler.py:82
 msgid "download:message:platform_ios"
 msgstr "🍏 IOS"
 
-#: app/bot/routers/download/handler.py:85
+#: app/bot/routers/download/handler.py:84
 msgid "download:message:platform_android"
 msgstr "🤖 Android"
 
-#: app/bot/routers/download/handler.py:87
+#: app/bot/routers/download/handler.py:86
 msgid "download:message:platform_windows"
 msgstr "💻 Windows"
 
-#: app/bot/routers/download/handler.py:90
+#: app/bot/routers/download/handler.py:89
 msgid "download:message:connect_to_vpn"
 msgstr ""
 "<b>{platform}:</b>\n"
@@ -397,8 +560,8 @@ msgid "download:button:connect"
 msgstr "🔌 Connect"
 
 #: app/bot/routers/main_menu/handler.py:38
-#: app/bot/routers/main_menu/handler.py:52
-#: app/bot/routers/main_menu/handler.py:76
+#: app/bot/routers/main_menu/handler.py:51
+#: app/bot/routers/main_menu/handler.py:75
 msgid "main_menu:message:main"
 msgstr ""
 "Welcome, {name}! 🎉\n"
@@ -559,7 +722,7 @@ msgstr "◀️ Change duration"
 msgid "subscription:button:download_app"
 msgstr "🔌 Connect"
 
-#: app/bot/routers/subscription/payment_handler.py:48
+#: app/bot/routers/subscription/payment_handler.py:46
 msgid "payment:message:order_extend"
 msgstr ""
 "🛒 <b>Confirmation of extension:</b>\n"
@@ -571,7 +734,7 @@ msgstr ""
 "<i>The number of devices will remain the same, and the new subscription "
 "duration will be added to the remaining time!</i>"
 
-#: app/bot/routers/subscription/payment_handler.py:50
+#: app/bot/routers/subscription/payment_handler.py:48
 msgid "payment:message:order_change"
 msgstr ""
 "🛒 <b>Confirmation of change:</b>\n"
@@ -583,7 +746,7 @@ msgstr ""
 "<i>The number of devices and subscription duration will be changed "
 "without recalculating the previous data!</i>"
 
-#: app/bot/routers/subscription/payment_handler.py:52
+#: app/bot/routers/subscription/payment_handler.py:50
 msgid "payment:message:order"
 msgstr ""
 "🛒 <b>Confirmation of purchase:</b>\n"
@@ -610,11 +773,11 @@ msgstr ""
 "<i>You have received {duration} to your subscription.</i>"
 
 #: app/bot/routers/subscription/promocode_handler.py:61
-msgid "promocode:notification:activate_failed"
+msgid "promocode:ntf:activate_failed"
 msgstr "❌ <i>Failed to activate promocode, please try again later.</i>"
 
 #: app/bot/routers/subscription/promocode_handler.py:64
-msgid "promocode:notification:activate_invalid"
+msgid "promocode:ntf:activate_invalid"
 msgstr "❌ <i>Promocode is invalid or has already been activated.</i>"
 
 #: app/bot/routers/subscription/subscription_handler.py:34

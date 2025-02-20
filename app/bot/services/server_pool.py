@@ -1,7 +1,8 @@
 import logging
 from dataclasses import dataclass
 
-from py3xui import AsyncApi
+from py3xui import AsyncApi, Inbound
+from py3xui.inbound import Settings, Sniffing, StreamSettings
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.bot.utils.network import ping_url
@@ -31,7 +32,7 @@ class ServerPoolService:
                 username=self.config.xui.USERNAME,
                 password=self.config.xui.PASSWORD,
                 token=self.config.xui.TOKEN,
-                use_tls_verify=False,
+                # use_tls_verify=False,
                 logger=logging.getLogger(f"xui_{server.name}"),
             )
             try:
@@ -40,6 +41,7 @@ class ServerPoolService:
                 async with self.session() as session:
                     server.online = True
                     await Server.update(session=session, name=server.name, online=server.online)
+
                 server_conn = Connection(server=server, api=api)
                 self._servers[server.id] = server_conn
                 logger.info(f"Server {server.name} ({server.host}) added successfully.")
@@ -55,6 +57,14 @@ class ServerPoolService:
                 logger.info(f"Server {server.name} removed successfully.")
             except Exception as exception:
                 logger.error(f"Failed to remove server {server.name}: {exception}")
+
+    async def get_inbound_id(self, api: AsyncApi) -> int | None:
+        try:
+            inbounds = await api.inbound.get_list()
+        except Exception as exception:
+            logger.error(f"Failed to fetch inbounds: {exception}")
+            return None
+        return inbounds[0].id
 
     async def get_connection(self, user: User) -> Connection | None:
         if not user.server_id:

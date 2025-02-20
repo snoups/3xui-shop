@@ -24,6 +24,6 @@ class Plan:
 
     def get_price(self, currency: Currency | str, duration: int) -> float:
         if isinstance(currency, str):
-            currency = Currency(currency)
+            currency = Currency.from_code(currency)
 
-        return self.prices[currency.value][duration]
+        return self.prices[currency.code][duration]

@@ -21,7 +21,6 @@ class Server(Base):
         id (int): Unique identifier for the server.
         name (str): Unique server name.
         host (str): Server host address or IP.
-        subscription (str): VPN subscription address.
         max_clients (int): Maximum allowed number of clients.
         location (str | None): Server location if available.
         online (bool): Indicates whether the server is online.
@@ -33,7 +32,6 @@ class Server(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     host: Mapped[str] = mapped_column(String(255), nullable=False)
-    subscription: Mapped[str] = mapped_column(String(255), nullable=False)
     max_clients: Mapped[int] = mapped_column(Integer, nullable=False)
     location: Mapped[str | None] = mapped_column(String(32), nullable=True)
     online: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
@@ -52,8 +50,7 @@ class Server(Base):
     def __repr__(self) -> str:
         return (
             f"<Server(id={self.id}, name='{self.name}', host={self.host}, "
-            f"subscription={self.subscription}, max_clients={self.max_clients}, "
-            f"location={self.location}, online={self.online})>"
+            f"max_clients={self.max_clients}, location={self.location}, online={self.online})>"
         )
 
     @classmethod

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.bot.models import ServicesContainer, SubscriptionData
 from app.bot.payment_gateways import PaymentGateway
 from app.bot.routers.main_menu.handler import redirect_to_main_menu
-from app.bot.utils.constants import Currency, CurrencySymbol
+from app.bot.utils.constants import EVENT_PAYMENT_SUCCEEDED_TAG, Currency
 from app.bot.utils.formatting import format_device_count, format_subscription_period
 from app.bot.utils.navigation import NavSubscription
 from app.config import Config
@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 class TelegramStars(PaymentGateway):
     name = ""
     currency = Currency.XTR
-    symbol = CurrencySymbol.XTR
     callback = NavSubscription.PAY_TELEGRAM_STARS
 
     def __init__(
@@ -40,8 +39,8 @@ class TelegramStars(PaymentGateway):
         logger.info("TelegramStars payment gateway initialized.")
 
     async def create_payment(self, data: SubscriptionData) -> str:
-        prices = [LabeledPrice(label=self.currency.value, amount=1)]
-        # prices = [LabeledPrice(label=self.currency.value, amount=data.price)]
+        prices = [LabeledPrice(label=self.currency.code, amount=1)]
+        # prices = [LabeledPrice(label=self.currency.code, amount=data.price)]
         devices = format_device_count(data.devices)
         duration = format_subscription_period(data.duration)
         title = _("payment:invoice:title").format(devices=devices, duration=duration)
@@ -51,7 +50,7 @@ class TelegramStars(PaymentGateway):
             description=description,
             prices=prices,
             payload=data.pack(),
-            currency=self.currency.value,
+            currency=self.currency.code,
         )
         logger.info(f"Payment link created for user {data.user_id}: {pay_url}")
         return pay_url
@@ -64,6 +63,17 @@ class TelegramStars(PaymentGateway):
             data = SubscriptionData.unpack(transaction.subscription)
             logger.debug(f"Subscription data unpacked: {data}")
             user = await User.get(session=session, tg_id=data.user_id)
+
+        await self.services.notification.notify_developer(
+            text=EVENT_PAYMENT_SUCCEEDED_TAG
+            + "\n\n"
+            + _("payment:event:payment_succeeded").format(
+                payment_id=payment_id,
+                user_id=user.tg_id,
+                devices=format_device_count(data.devices),
+                duration=format_subscription_period(data.duration),
+            ),
+        )
 
         await redirect_to_main_menu(bot=self.bot, user=user, state=state)
 

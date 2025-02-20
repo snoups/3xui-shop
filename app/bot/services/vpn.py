@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.bot.utils.network import extract_base_url
+
 if TYPE_CHECKING:
     from .server_pool import ServerPoolService
 
@@ -115,7 +117,7 @@ class VPNService:
             logger.debug(f"Server ID for user {user.tg_id} not found.")
             return None
 
-        subscription = user.server.subscription
+        subscription = extract_base_url(user.server.host)
         key = f"{subscription}{user.vpn_id}"
         logger.debug(f"Fetched key for {user.tg_id}: {key}.")
         return key
@@ -128,7 +130,7 @@ class VPNService:
         enable: bool = True,
         flow: str = "xtls-rprx-vision",
         total_gb: int = 0,
-        inbound_id: int = 7,
+        inbound_id: int = 1,
     ) -> bool:
         logger.info(f"Creating new client {user.tg_id} | {devices} devices {duration} days.")
 
@@ -148,6 +150,7 @@ class VPNService:
             sub_id=user.vpn_id,
             total_gb=total_gb,
         )
+        inbound_id = await self.server_pool_service.get_inbound_id(connection.api)
 
         try:
             await connection.api.client.add(inbound_id=inbound_id, clients=[new_client])

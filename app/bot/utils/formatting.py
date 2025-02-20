@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from aiogram.utils.i18n import gettext as _
 
-from app.bot.utils.constants import UNLIMITED, Currency, CurrencySymbol
+from app.bot.utils.constants import UNLIMITED
 
 logger = logging.getLogger(__name__)
 
@@ -70,9 +70,3 @@ def format_subscription_period(days: int) -> str:
     if days % 30 == 0:
         return _("1 month", "{} months", days // 30).format(days // 30)
     return _("1 day", "{} days", days).format(days)
-
-
-def get_currency_symbol(currency: Currency | str) -> str:
-    if isinstance(currency, str):
-        currency = Currency(currency.upper())
-    return CurrencySymbol[currency.name].value

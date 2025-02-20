@@ -20,7 +20,6 @@ router = Router(name=__name__)
 
 
 async def redirect_to_connection(request: Request) -> Response:
-    # TODO: add profile-title=namevpn
     query_string = request.query_string
 
     if not query_string:
@@ -33,7 +32,7 @@ async def redirect_to_connection(request: Request) -> Response:
     if not app or not key:
         raise Response(status=400, reason="Invalid parameters.")
 
-    redirect_url = f"{app}://import/{key}#namevpn"
+    redirect_url = f"{app}://import/{key}"  # TODO: #namevpn
     if app in {"v2raytun", "hiddify"}:  # TODO: hiddify need test
         raise HTTPFound(redirect_url)
 

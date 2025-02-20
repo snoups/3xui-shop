@@ -40,8 +40,6 @@ async def callback_payment_method_selected(
     price = plan.get_price(currency=gateway.currency, duration=duration)
     callback_data.price = price
 
-    # TODO: Make a check for the existence of a subscription
-
     pay_url = await gateway.create_payment(callback_data)
 
     if callback_data.is_extend:
@@ -56,7 +54,7 @@ async def callback_payment_method_selected(
             devices=devices,
             duration=format_subscription_period(duration),
             price=price,
-            currency=gateway.symbol.value,
+            currency=gateway.currency.symbol,
         ),
         reply_markup=pay_keyboard(pay_url=pay_url, callback_data=callback_data),
     )

@@ -2,7 +2,11 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from app.bot.routers.misc.keyboard import back_button, back_to_main_menu_button
+from app.bot.routers.misc.keyboard import (
+    back_button,
+    back_to_main_menu_button,
+    cancel_button,
+)
 from app.bot.utils.navigation import NavAdminTools
 from app.db.models import Server
 
@@ -38,8 +42,8 @@ def admin_tools_keyboard(is_dev: bool) -> InlineKeyboardMarkup:
     )
     builder.row(
         InlineKeyboardButton(
-            text=_("admin_tools:button:send_notification"),
-            callback_data=NavAdminTools.SEND_NOTIFICATION,
+            text=_("admin_tools:button:notification"),
+            callback_data=NavAdminTools.NOTIFICATION,
         )
     )
     builder.row(
@@ -196,4 +200,63 @@ def confirm_add_server_keyboard() -> InlineKeyboardMarkup:
 
     builder.adjust(2)
     builder.row(back_button(NavAdminTools.ADD_SERVER_BACK))
+    return builder.as_markup()
+
+
+def notification_keyboard() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("notification:button:send_to_user"),
+            callback_data=NavAdminTools.SEND_NOTIFICATION_USER,
+        ),
+        InlineKeyboardButton(
+            text=_("notification:button:send_to_all"),
+            callback_data=NavAdminTools.SEND_NOTIFICATION_ALL,
+        ),
+    )
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("notification:button:last_notification"),
+            callback_data=NavAdminTools.LAST_NOTIFICATION,
+        )
+    )
+
+    builder.row(back_button(NavAdminTools.MAIN))
+    return builder.as_markup()
+
+
+def last_notification_keyboard() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.add(
+        InlineKeyboardButton(
+            text=_("notification:button:edit"),
+            callback_data=NavAdminTools.EDIT_NOTIFICATION,
+        )
+    )
+
+    builder.add(
+        InlineKeyboardButton(
+            text=_("notification:button:delete"),
+            callback_data=NavAdminTools.DELETE_NOTIFICATION,
+        )
+    )
+
+    builder.row(back_button(NavAdminTools.NOTIFICATION))
+    return builder.as_markup()
+
+
+def confirm_send_notification_keyboard() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("notification:button:confirm"),
+            callback_data=NavAdminTools.CONFIRM_SEND_NOTIFICATION,
+        )
+    )
+    builder.row(cancel_button(NavAdminTools.NOTIFICATION))
     return builder.as_markup()

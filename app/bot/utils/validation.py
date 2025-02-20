@@ -15,3 +15,11 @@ def is_valid_host(data: str) -> bool:
 
 def is_valid_client_count(data: str) -> bool:
     return data.isdigit() and 1 <= int(data) <= 10000
+
+
+def is_valid_user_id(data: str) -> bool:
+    return data.isdigit() and 1 <= int(data) <= 1000000000000
+
+
+def is_valid_message_text(data: str) -> bool:
+    return len(data) <= 4096

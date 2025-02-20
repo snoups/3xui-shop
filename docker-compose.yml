@@ -49,3 +49,6 @@ services:
       - "traefik.http.routers.bot.entrypoints=websecure"
       - "traefik.http.routers.bot.tls.certresolver=letsencrypt"
       - "traefik.http.services.bot.loadbalancer.server.port=8080"
+
+volumes:
+  redis_data:

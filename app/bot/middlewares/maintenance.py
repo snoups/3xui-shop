@@ -38,7 +38,7 @@ class MaintenanceMiddleware(BaseMiddleware):
                     if message:
                         await NotificationService.notify_by_message(
                             message=message,
-                            text=_("maintenance:notification:try_later"),
+                            text=_("maintenance:ntf:try_later"),
                             duration=5,
                         )
 

@@ -1,4 +1,5 @@
 import logging
+from mailbox import Message
 from typing import Any, Awaitable, Callable
 
 from aiogram import BaseMiddleware
@@ -24,15 +25,15 @@ class GarbageMiddleware(BaseMiddleware):
 
             if user_id == event.bot.id:
                 logger.debug(f"Message from bot {event.bot.id} skipped.")
-            elif event.message.text and NavMain.START not in event.message.text:
+            elif (
+                event.message.text
+                and not event.message.text.endswith(NavMain.START)
+                or event.message.forward_from
+            ):
                 try:
                     await event.message.delete()
                     logger.debug(f"Message {event.message.text} from user {user_id} deleted.")
                 except Exception as exception:
                     logger.error(f"Failed to delete message from user {user_id}: {exception}")
-            else:
-                logger.debug(f"Message from user {user_id} contains start command, not deleted.")
-        else:
-            logger.debug("Event is not a message, skipping.")
 
         return await handler(event, data)

@@ -39,7 +39,6 @@ async def command_main_menu(message: Message, user: User, state: FSMContext) -> 
         reply_markup=main_menu_keyboard(is_admin),
     )
     await state.update_data({MAIN_MESSAGE_ID_KEY: main_menu.message_id})
-    await message.delete()
 
 
 @router.callback_query(F.data == NavMain.MAIN_MENU)

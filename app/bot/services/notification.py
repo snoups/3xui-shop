@@ -88,8 +88,8 @@ class NotificationService:
         reply_markup: ReplyMarkupType = None,
         document: InputFile | None = None,
         message_effect_id: str | None = None,
-    ) -> None:
-        await self._notify(
+    ) -> Message | None:
+        return await self._notify(
             text=text,
             duration=duration,
             chat_id=chat_id,
@@ -106,8 +106,8 @@ class NotificationService:
         duration: int = 0,
         reply_markup: ReplyMarkupType = None,
         document: InputFile | None = None,
-    ) -> None:
-        await NotificationService._notify(
+    ) -> Message | None:
+        return await NotificationService._notify(
             text=text,
             duration=duration,
             message=message,

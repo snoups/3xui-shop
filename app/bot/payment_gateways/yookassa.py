@@ -21,9 +21,11 @@ from app.bot.models import ServicesContainer, SubscriptionData
 from app.bot.payment_gateways import PaymentGateway
 from app.bot.routers.main_menu.handler import redirect_to_main_menu
 from app.bot.utils.constants import (
+    DEFAULT_LANGUAGE,
+    EVENT_PAYMENT_CANCELED_TAG,
+    EVENT_PAYMENT_SUCCEEDED_TAG,
     YOOKASSA_WEBHOOK,
     Currency,
-    CurrencySymbol,
     TransactionStatus,
 )
 from app.bot.utils.formatting import format_device_count, format_subscription_period
@@ -37,7 +39,6 @@ logger = logging.getLogger(__name__)
 class Yookassa(PaymentGateway):
     name = ""
     currency = Currency.RUB
-    symbol = CurrencySymbol.RUB
     callback = NavSubscription.PAY_YOOKASSA
 
     def __init__(
@@ -72,7 +73,6 @@ class Yookassa(PaymentGateway):
             duration=format_subscription_period(data.duration),
         )
 
-        currency = self.currency.value
         price = str(data.price)
 
         receipt = Receipt(
@@ -81,14 +81,14 @@ class Yookassa(PaymentGateway):
                 ReceiptItem(
                     description=description,
                     quantity=1,
-                    amount={"value": price, "currency": currency},
+                    amount={"value": price, "currency": self.currency.code},
                     vat_code=1,
                 )
             ],
         )
 
         request = PaymentRequest(
-            amount={"value": price, "currency": currency},
+            amount={"value": price, "currency": self.currency.code},
             confirmation={"type": ConfirmationType.REDIRECT, "return_url": redirect_url},
             capture=True,
             save_payment_method=False,
@@ -150,10 +150,21 @@ class Yookassa(PaymentGateway):
             await Transaction.update(
                 session=session,
                 payment_id=payment_id,
-                status=TransactionStatus.COMPLETED,  # TODO: notify dev
+                status=TransactionStatus.COMPLETED,
             )
 
-        locale = user.language_code if user else "en"
+        await self.services.notification.notify_developer(
+            text=EVENT_PAYMENT_SUCCEEDED_TAG
+            + "\n\n"
+            + _("payment:event:payment_succeeded").format(
+                payment_id=payment_id,
+                user_id=user.tg_id,
+                devices=format_device_count(data.devices),
+                duration=format_subscription_period(data.duration),
+            ),
+        )
+
+        locale = user.language_code if user else DEFAULT_LANGUAGE
         with self.i18n.use_locale(locale):
             await redirect_to_main_menu(bot=self.bot, user=user, storage=self.storage)
 
@@ -201,5 +212,16 @@ class Yookassa(PaymentGateway):
             await Transaction.update(
                 session=session,
                 payment_id=payment_id,
-                status=TransactionStatus.CANCELED,  # TODO: notify dev and user
+                status=TransactionStatus.CANCELED,
             )
+
+        await self.services.notification.notify_developer(
+            text=EVENT_PAYMENT_CANCELED_TAG
+            + "\n\n"
+            + _("payment:event:payment_canceled").format(
+                payment_id=payment_id,
+                user_id=data.user_id,
+                devices=format_device_count(data.devices),
+                duration=format_subscription_period(data.duration),
+            ),
+        )

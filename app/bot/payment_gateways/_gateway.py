@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 
 from app.bot.models import SubscriptionData
-from app.bot.utils.constants import Currency, CurrencySymbol
+from app.bot.utils.constants import Currency
 
 
 class PaymentGateway(ABC):
     name: str
     currency: Currency
-    symbol: CurrencySymbol
     callback: str
 
     @abstractmethod

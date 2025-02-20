@@ -34,13 +34,13 @@ class EditPromocodeStates(StatesGroup):
     selecting_duration = State()
 
 
-async def show_promocode_editor(message: Message, state: FSMContext) -> None:
+async def show_promocode_editor_main(message: Message, state: FSMContext) -> None:
     await state.set_state(None)
-    message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
+    main_message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
     await message.bot.edit_message_text(
         text=_("promocode_editor:message:main"),
         chat_id=message.chat.id,
-        message_id=message_id,
+        message_id=main_message_id,
         reply_markup=promocode_editor_keyboard(),
     )
 
@@ -48,7 +48,7 @@ async def show_promocode_editor(message: Message, state: FSMContext) -> None:
 @router.callback_query(F.data == NavAdminTools.PROMOCODE_EDITOR, IsAdmin())
 async def callback_promocode_editor(callback: CallbackQuery, user: User, state: FSMContext) -> None:
     logger.info(f"Admin {user.tg_id} opened promocode editor.")
-    await show_promocode_editor(message=callback.message, state=state)
+    await show_promocode_editor_main(message=callback.message, state=state)
 
 
 # region: Create Promocode
@@ -72,11 +72,11 @@ async def callback_duration_selected(
 ) -> None:
     logger.info(f"Admin {user.tg_id} selected {callback.data} days for promocode.")
     promocode = await Promocode.create(session=session, duration=int(callback.data))
-    await show_promocode_editor(message=callback.message, state=state)
+    await show_promocode_editor_main(message=callback.message, state=state)
 
     await services.notification.notify_by_message(
         message=callback.message,
-        text=_("promocode_editor:notification:created_success").format(
+        text=_("promocode_editor:ntf:created_success").format(
             promocode=promocode.code,
             duration=format_subscription_period(promocode.duration),
         ),
@@ -109,18 +109,16 @@ async def handle_promocode_input(
     logger.info(f"Admin {user.tg_id} entered promocode: {input_promocode} for deleting.")
 
     if await Promocode.delete(session=session, code=input_promocode):
-        await show_promocode_editor(message=message, state=state)
+        await show_promocode_editor_main(message=message, state=state)
         await services.notification.notify_by_message(
             message=message,
-            text=_("promocode_editor:notification:deleted_success").format(
-                promocode=input_promocode
-            ),
+            text=_("promocode_editor:ntf:deleted_success").format(promocode=input_promocode),
             duration=5,
         )
     else:
         await services.notification.notify_by_message(
             message=message,
-            text=_("promocode_editor:notification:delete_failed"),
+            text=_("promocode_editor:ntf:delete_failed"),
             duration=5,
         )
 
@@ -154,20 +152,20 @@ async def handle_promocode_input(
     if promocode and not promocode.is_activated:
         await state.set_state(EditPromocodeStates.selecting_duration)
         await state.update_data({INPUT_PROMOCODE_KEY: input_promocode})
-        message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
+        main_message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
         await message.bot.edit_message_text(
             text=_("promocode_editor:message:edit_duration").format(
                 promocode=promocode.code,
                 duration=promocode.duration,
             ),
             chat_id=message.chat.id,
-            message_id=message_id,
+            message_id=main_message_id,
             reply_markup=promocode_duration_keyboard(),
         )
     else:
         await services.notification.notify_by_message(
             message=message,
-            text=_("promocode_editor:notification:edit_failed"),
+            text=_("promocode_editor:ntf:edit_failed"),
             duration=5,
         )
 
@@ -187,10 +185,10 @@ async def callback_duration_selected(
         code=input_promocode,
         duration=int(callback.data),
     )
-    await show_promocode_editor(message=callback.message, state=state)
+    await show_promocode_editor_main(message=callback.message, state=state)
     await services.notification.notify_by_message(
         message=callback.message,
-        text=_("promocode_editor:notification:edited_success").format(
+        text=_("promocode_editor:ntf:edited_success").format(
             promocode=promocode.code,
             duration=format_subscription_period(promocode.duration),
         ),

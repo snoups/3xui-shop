@@ -9,6 +9,7 @@ from logging.handlers import TimedRotatingFileHandler
 from app.bot.utils.constants import LOG_GZ_ARCHIVE_FORMAT, LOG_ZIP_ARCHIVE_FORMAT
 from app.config import LoggingConfig, memory_handler
 
+LOG_DIR = "logs"
 LOG_FILENAME = "app.log"
 LOG_WHEN = "midnight"
 LOG_INTERVAL = 1
@@ -47,7 +48,7 @@ class ArchiveRotatingFileHandler(TimedRotatingFileHandler):
         dir_name = os.path.dirname(self.baseFilename)
         archive_name = os.path.join(dir_name, f"{timestamp}.{self.archive_format}")
 
-        self._archive_log_file(archive_name)  # TODO: send archive to developer
+        self._archive_log_file(archive_name)
         self._remove_old_logs()
 
     def _archive_log_file(self, archive_name: str) -> None:
@@ -88,9 +89,8 @@ class ArchiveRotatingFileHandler(TimedRotatingFileHandler):
 
 
 def setup_logging(config: LoggingConfig) -> None:
-    log_dir = config.DIR
-    os.makedirs(log_dir, exist_ok=True)
-    log_file = os.path.join(log_dir, LOG_FILENAME)
+    os.makedirs(LOG_DIR, exist_ok=True)
+    log_file = os.path.join(LOG_DIR, LOG_FILENAME)
 
     logging.basicConfig(
         level=getattr(logging, config.LEVEL.upper(), logging.INFO),
