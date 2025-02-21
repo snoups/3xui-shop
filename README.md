@@ -153,6 +153,8 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | XUI_USERNAME | 🔴 | - | Username for authentication in the 3X-UI panel |
 | XUI_PASSWORD | 🔴 | - | Password for authentication in the 3X-UI panel |
 | XUI_TOKEN | ⭕ | - | Token for authentication (if configured in the panel) |
+| XUI_SUBSCRIPTION_PORT | ⭕ | 2096 | Port for subscription |
+| XUI_SUBSCRIPTION_PATH | ⭕ | /user/ | Path for subscription |
 | | | |
 | YOOKASSA_TOKEN | ⭕ | - | Token for YooKassa payment |
 | YOOKASSA_SHOP_ID | ⭕ | - | Shop ID for YooKassa payment |

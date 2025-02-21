@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from app.bot.utils.network import extract_base_url
+from app.config import Config
 
 if TYPE_CHECKING:
     from .server_pool import ServerPoolService
@@ -24,7 +25,13 @@ logger = logging.getLogger(__name__)
 
 
 class VPNService:
-    def __init__(self, session: async_sessionmaker, server_pool_service: ServerPoolService) -> None:
+    def __init__(
+        self,
+        config: Config,
+        session: async_sessionmaker,
+        server_pool_service: ServerPoolService,
+    ) -> None:
+        self.config = config
         self.session = session
         self.server_pool_service = server_pool_service
         logger.info("VPN Service initialized.")
@@ -117,7 +124,11 @@ class VPNService:
             logger.debug(f"Server ID for user {user.tg_id} not found.")
             return None
 
-        subscription = extract_base_url(user.server.host)
+        subscription = extract_base_url(
+            url=user.server.host,
+            port=self.config.xui.SUBSCRIPTION_PORT,
+            path=self.config.xui.SUBSCRIPTION_PATH,
+        )
         key = f"{subscription}{user.vpn_id}"
         logger.debug(f"Fetched key for {user.tg_id}: {key}.")
         return key

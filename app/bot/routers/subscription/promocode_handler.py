@@ -43,6 +43,16 @@ async def handle_promocode_input(
     input_promocode = message.text.strip()
     logger.info(f"User {user.tg_id} entered promocode: {input_promocode} for activating.")
 
+    server = await services.server_pool.get_available_server()
+
+    if not server:
+        await services.notification.notify_by_message(
+            message=message,
+            text=_("promocode:ntf:no_available_servers"),
+            duration=5,
+        )
+        return
+
     promocode = await Promocode.get(session=session, code=input_promocode)
     if promocode and not promocode.is_activated:
         success = await services.vpn.activate_promocode(user=user, promocode=promocode)

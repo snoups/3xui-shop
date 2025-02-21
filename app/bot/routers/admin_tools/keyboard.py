@@ -146,7 +146,14 @@ def maintenance_mode_keyboard() -> InlineKeyboardMarkup:
 def servers_keyboard(servers: list) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
-    builder.row(
+    builder.add(
+        InlineKeyboardButton(
+            text=_("server_management:button:sync"),
+            callback_data=NavAdminTools.SYNC_SERVERS,
+        )
+    )
+
+    builder.add(
         InlineKeyboardButton(
             text=_("server_management:button:add"),
             callback_data=NavAdminTools.ADD_SERVER,

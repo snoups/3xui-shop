@@ -74,13 +74,20 @@ async def callback_duration_selected(
     promocode = await Promocode.create(session=session, duration=int(callback.data))
     await show_promocode_editor_main(message=callback.message, state=state)
 
-    await services.notification.notify_by_message(
-        message=callback.message,
-        text=_("promocode_editor:ntf:created_success").format(
-            promocode=promocode.code,
-            duration=format_subscription_period(promocode.duration),
-        ),
-    )
+    if promocode:
+        await services.notification.notify_by_message(
+            message=callback.message,
+            text=_("promocode_editor:ntf:created_success").format(
+                promocode=promocode.code,
+                duration=format_subscription_period(promocode.duration),
+            ),
+        )
+    else:
+        await services.notification.notify_by_message(
+            message=callback.message,
+            text=_("promocode_editor:ntf:create_failed"),
+            duration=5,
+        )
 
 
 # endregion

@@ -102,7 +102,7 @@ class Server(Base):
             filter = [Server.id == server.id]
             await session.execute(update(Server).where(*filter).values(**kwargs))
             await session.commit()
-            logger.info(f"Server {name} updated.")
+            logger.debug(f"Server {name} updated.")
             return server
 
         logger.warning(f"Server {name} not found for update.")

@@ -43,8 +43,6 @@ I18N_DOMAIN = "bot"
 # endregion
 
 # region: Constants
-PORT_SUBSCRIPTION = 2096
-URL_PATH_SUBSCRIPTION = "/user/"
 UNLIMITED = "∞"
 DB_FORMAT = "sqlite3"
 LOG_ZIP_ARCHIVE_FORMAT = "zip"

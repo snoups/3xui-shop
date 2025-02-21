@@ -31,9 +31,7 @@ class Promocode(Base):
     __tablename__ = "promocodes"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    code: Mapped[str] = mapped_column(
-        String(length=8), unique=True, default=generate_code(), nullable=False
-    )
+    code: Mapped[str] = mapped_column(String(length=32), unique=True, nullable=False)
     duration: Mapped[int] = mapped_column(nullable=False)
     is_activated: Mapped[bool] = mapped_column(default=False, nullable=False)
     activated_by: Mapped[int | None] = mapped_column(ForeignKey("users.tg_id"), nullable=True)
@@ -59,7 +57,13 @@ class Promocode(Base):
 
     @classmethod
     async def create(cls, session: AsyncSession, **kwargs: Any) -> Self | None:
-        promocode = Promocode(**kwargs)
+        while True:
+            code = generate_code()
+            promocode = await Promocode.get(session=session, code=code)
+            if not promocode:
+                break
+
+        promocode = Promocode(code=code, **kwargs)
         session.add(promocode)
 
         try:

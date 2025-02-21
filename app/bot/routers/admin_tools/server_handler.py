@@ -46,16 +46,38 @@ async def callback_server_management(
     await state.set_state(None)
     text = _("server_management:message:main")
     servers = await Server.get_all(session)
-    for server in servers:
-        ping = await ping_url(server.host)
-        online = True if ping else False
-        if online != server.online:
-            await Server.update(session=session, name=server.name, online=online)
+    # for server in servers:
+    #     ping = await ping_url(server.host)
+    #     online = True if ping else False
+    #     if online != server.online:
+    #         await Server.update(session=session, name=server.name, online=online)
 
     if not servers:
         text += _("server_management:message:empty")
 
     await callback.message.edit_text(text=text, reply_markup=servers_keyboard(servers))
+
+
+@router.callback_query(F.data == NavAdminTools.SYNC_SERVERS, IsDev())
+async def callback_sync_servers(
+    callback: CallbackQuery,
+    user: User,
+    session: AsyncSession,
+    state: FSMContext,
+    services: ServicesContainer,
+) -> None:
+    logger.info(f"Dev {user.tg_id} sync servers.")
+    await services.server_pool.sync_servers()
+
+    try:
+        await callback_server_management(callback=callback, user=user, session=session, state=state)
+    except Exception:
+        pass
+
+    await services.notification.show_popup(
+        callback=callback,
+        text=_("server_management:popup:synced"),
+    )
 
 
 # region Add Server
@@ -196,15 +218,15 @@ async def callback_confirmation(
     logger.info(f"Dev {user.tg_id} confirmed adding server.")
     data = await state.get_data()
 
-    ping = await ping_url(data.get(SERVER_HOST_KEY))
-    online = True if ping else False
+    # ping = await ping_url(data.get(SERVER_HOST_KEY))
+    # online = True if ping else False
 
     server = await Server.create(
         session=session,
         name=data.get(SERVER_NAME_KEY),
         host=data.get(SERVER_HOST_KEY),
         max_clients=data.get(SERVER_MAX_CLIENTS_KEY),
-        online=online,
+        # online=online,
     )
 
     if server:
@@ -265,9 +287,9 @@ async def callback_ping_server(
     logger.info(f"Dev {user.tg_id} pinging server {server_name}.")
     server = await Server.get_by_name(session=session, name=server_name)
     ping = await ping_url(server.host)
-    online = True if ping else False
-    if online != server.online:
-        await Server.update(session=session, name=server.name, online=online)
+    # online = True if ping else False
+    # if online != server.online:
+    #    await Server.update(session=session, name=server.name, online=online)
     if ping:
         await services.notification.show_popup(
             callback=callback,

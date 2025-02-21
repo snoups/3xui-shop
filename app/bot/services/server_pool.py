@@ -37,26 +37,30 @@ class ServerPoolService:
             )
             try:
                 await api.login()
-
-                async with self.session() as session:
-                    server.online = True
-                    await Server.update(session=session, name=server.name, online=server.online)
-
+                server.online = True
                 server_conn = Connection(server=server, api=api)
                 self._servers[server.id] = server_conn
-                logger.info(f"Server {server.name} ({server.host}) added successfully.")
+                logger.info(f"Server {server.name} ({server.host}) added to pool successfully.")
             except Exception as exception:
-                logger.error(
-                    f"Failed to initialize server {server.name} ({server.host}): {exception}"
-                )
+                server.online = False
+                logger.error(f"Failed to add server {server.name} ({server.host}): {exception}")
+
+            async with self.session() as session:
+                await Server.update(session=session, name=server.name, online=server.online)
 
     def _remove_server(self, server: Server) -> None:
         if server.id in self._servers:
             try:
                 del self._servers[server.id]
-                logger.info(f"Server {server.name} removed successfully.")
             except Exception as exception:
                 logger.error(f"Failed to remove server {server.name}: {exception}")
+
+    async def refresh_server(self, server: Server) -> None:
+        if server.id in self._servers:
+            self._remove_server(server)
+
+        await self._add_server(server)
+        logger.info(f"Server {server.name} reinitialized successfully.")
 
     async def get_inbound_id(self, api: AsyncApi) -> int | None:
         try:
@@ -115,16 +119,7 @@ class ServerPoolService:
         for server_id, conn in list(self._servers.items()):
             if db_server := db_server_map.get(server_id):
                 conn.server = db_server
-                logger.debug(f"Updated server {db_server.name} data in pool")
-
-                ping = await ping_url(db_server.host)
-                online = True if ping else False
-                db_server.online = online
-                async with self.session() as session:
-                    await Server.update(session=session, name=db_server.name, online=online)
-
-                if not online:
-                    logger.warning(f"Server {db_server.name} ({db_server.host}) is offline!")
+            await self.refresh_server(conn.server)
 
         for server in db_servers:
             if server.id not in self._servers:

@@ -7,7 +7,7 @@ entryPoints:
 certificatesResolvers:
     letsencrypt:
         acme:
-            email: "3xui-shop@example.com"
+            email: "${CF_API_EMAIL}"
             storage: "acme.json"
             httpChallenge:
                 entryPoint: web

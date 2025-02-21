@@ -17,7 +17,7 @@ async def initialize(
 ) -> ServicesContainer:
     server_pool = ServerPoolService(config=config, session=session)
     plan = PlanService()
-    vpn = VPNService(session=session, server_pool_service=server_pool)
+    vpn = VPNService(config=config, session=session, server_pool_service=server_pool)
     notification = NotificationService(config=config, bot=bot)
 
     return ServicesContainer(

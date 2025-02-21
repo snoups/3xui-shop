@@ -9,7 +9,7 @@ from logging.handlers import TimedRotatingFileHandler
 from app.bot.utils.constants import LOG_GZ_ARCHIVE_FORMAT, LOG_ZIP_ARCHIVE_FORMAT
 from app.config import LoggingConfig, memory_handler
 
-LOG_DIR = "logs"
+LOG_DIR = "app/logs"
 LOG_FILENAME = "app.log"
 LOG_WHEN = "midnight"
 LOG_INTERVAL = 1

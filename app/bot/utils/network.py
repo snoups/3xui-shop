@@ -3,8 +3,6 @@ from urllib.parse import parse_qs, urljoin, urlparse
 
 import aiohttp
 
-from .constants import PORT_SUBSCRIPTION, URL_PATH_SUBSCRIPTION
-
 
 def parse_redirect_url(query_string: str) -> dict[str, str]:
     return {key: value[0] for key, value in parse_qs(query_string).items() if value}
@@ -22,7 +20,7 @@ async def ping_url(url: str, timeout: int = 5) -> float | None:
         return None
 
 
-def extract_base_url(url: str) -> str:
+def extract_base_url(url: str, port: int, path: str) -> str:
     parsed_url = urlparse(url)
-    base_url = f"{parsed_url.scheme}://{parsed_url.hostname}:{PORT_SUBSCRIPTION}"
-    return urljoin(base_url, URL_PATH_SUBSCRIPTION)
+    base_url = f"{parsed_url.scheme}://{parsed_url.hostname}:{port}"
+    return urljoin(base_url, path)

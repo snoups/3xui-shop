@@ -35,6 +35,9 @@ DEFAULT_REDIS_DB_NAME = "0"
 DEFAULT_REDIS_HOST = "3xui-shop-redis"
 DEFAULT_REDIS_PORT = 6379
 
+DEFAULT_SUBSCRIPTION_PORT = 2096
+DEFAULT_SUBSCRIPTION_PATH = "/user/"
+
 DEFAULT_LOG_LEVEL = "DEBUG"
 DEFAULT_LOG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
 DEFAULT_LOG_ARCHIVE_FORMAT = LOG_ZIP_ARCHIVE_FORMAT
@@ -103,11 +106,15 @@ class XUIConfig:
         USERNAME (str): Username for XUI authentication.
         PASSWORD (str): Password for XUI authentication.
         TOKEN (str | None): API token for XUI (if provided).
+        SUBSCRIPTION_PORT (int): Port number for subscription.
+        SUBSCRIPTION_PATH (str): URL path for subscription.
     """
 
     USERNAME: str
     PASSWORD: str
     TOKEN: str | None
+    SUBSCRIPTION_PORT: int
+    SUBSCRIPTION_PATH: str
 
 
 @dataclass
@@ -304,6 +311,11 @@ def load_config() -> Config:
             USERNAME=env.str("XUI_USERNAME"),
             PASSWORD=env.str("XUI_PASSWORD"),
             TOKEN=xui_token,
+            SUBSCRIPTION_PORT=env.int("XUI_SUBSCRIPTION_PORT", default=DEFAULT_SUBSCRIPTION_PORT),
+            SUBSCRIPTION_PATH=env.str(
+                "XUI_SUBSCRIPTION_PATH",
+                default=DEFAULT_SUBSCRIPTION_PATH,
+            ),
         ),
         yookassa=YooKassaConfig(
             TOKEN=env.str("YOOKASSA_TOKEN", default=None),
