@@ -14,6 +14,8 @@
 ![GitHub License](https://img.shields.io/github/license/snoups/3xui-shop)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/snoups/3xui-shop/total)
 ![GitHub Release](https://img.shields.io/github/v/release/snoups/3xui-shop)
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/snoups/3xui-shop)
+
 
 [![Static Badge](https://img.shields.io/badge/public_channel-white?style=social&logo=Telegram&logoColor=blue&logoSize=auto&labelColor=white&link=https%3A%2F%2Ft.me%2Fsn0ups)](https://t.me/sn0ups)
 [![Static Badge](https://img.shields.io/badge/contact_me-white?style=social&logo=Telegram&logoColor=blue&logoSize=auto&labelColor=white&link=https%3A%2F%2Ft.me%2Fsnoups)](https://t.me/snoups)
@@ -114,19 +116,12 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
     > Update .env file with your configuration. [(Environment Variables Configuration)](#environment-variables-configuration)
 
-1. **Create acme.json file:**
-   ```bash
-   touch acme.json
-   chmod 600 acme.json
-   ```
-   > This file is required for Traefik to generate certificates.
-
-2. **Build the Docker image:**
+3. **Build the Docker image:**
    ```bash
    docker compose build
    ```
 
-3. **Run the Docker container::**
+4. **Run the Docker container::**
    ```bash
    docker compose up -d
    ```
@@ -212,35 +207,45 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
 ### Cloudflare Configuration
 
-To ensure Cloudflare works correctly:
+1. **Domain and SSL/TLS Setup:**
+   
+    - Add an A record in the DNS section:
+        - Name: Your bot’s subdomain (e.g., bot)
+        - IPv4 address: Your server’s IP address
+        - Proxy status: DNS only (disable proxy)
+    - Enable Full (strict) SSL/TLS mode under the SSL/TLS section.
 
-- Set `CF_API_KEY` and `CF_API_EMAIL` in the environment variables.
-- Configure Cloudflare:
-    - Add the bot’s domain.
-    - Enable **Full (strict)** SSL/TLS mode.
-    - Disable Proxy for the domain.
-- `CF_API_KEY` can be found in the Cloudflare dashboard under API Tokens → Global API Key.
-- Certificates are automatically configured when the container starts with Traefik, which also proxies requests to the bot.
+2. **Environment Variables Setup:**
+
+    - Visit [API Tokens](https://dash.cloudflare.com/profile/api-tokens).
+    - Click `View Global API Key` and set:
+        - `CF_API_KEY`: Your Global API Key
+        - `CF_API_EMAIL`: Your Cloudflare email
 
 ### YooKassa Configuration
 
-For YooKassa to work correctly:
+1. **Webhook Setup:**
+    - Visit [HTTP Notifications](https://yookassa.ru/my/merchant/integration/http-notifications).
+    - Specify the bot’s domain in the notification URL with `/yookassa` at the end (e.g., `https://3xui-shop.com/yookassa`).
+    - Select the following events:
+        - `payment.succeeded`
+        - `payment.waiting_for_capture`
+        - `payment.canceled`
 
-- Specify the bot’s domain in the notification URL with `/yookassa` at the end (e.g., `https://3xui-shop.com/yookassa`).
-- Select the following events:
-    - `payment.succeeded`
-    - `payment.waiting_for_capture`
-    - `payment.canceled`
-
+2. **Environment Variables Setup:**
+    - Set the following environment variables:
+        - `YOOKASSA_TOKEN`: Your Secret Key
+        - `YOOKASSA_SHOP_ID`: Your Shop ID
 
 ### 3X-UI Configuration
 
 To ensure the bot functions correctly, you must configure the 3X-UI panel:
 
+- [Set up SSL certificates from Cloudflare.](https://github.com/MHSanaei/3x-ui?tab=readme-ov-file#ssl-certificate)
 - Set up an Inbound **(the first one will be used)** for adding clients.
 - Enable the subscription service with port `2096` and path `/user/`.
     > **Don’t forget to specify certificates for the subscription.**
-- It is recommended to disable configuration encryption.
+- Disabling configuration encryption is recommended.
 
 <a id="bugs-and-feature-requests"></a>
 

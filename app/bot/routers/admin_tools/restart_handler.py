@@ -28,8 +28,4 @@ async def callback_restart_bot(
         text=_("restart_bot:popup:process"),
     )
 
-    name = os.getenv("HOSTNAME", None)
-    if name:
-        os.system(f"docker restart {name}")  # TODO: Test docker
-    else:
-        os.execv(sys.executable, [sys.executable, *sys.argv])
+    os.execv(sys.executable, [sys.executable, *sys.argv])

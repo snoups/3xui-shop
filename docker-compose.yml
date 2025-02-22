@@ -9,12 +9,20 @@ services:
     env_file:
       - .env
     environment:
-      - CF_API_EMAIL=${CF_API_EMAIL}
-      - CF_API_KEY=${CF_API_KEY}
+      - CLOUDFLARE_API_KEY=${CF_API_KEY}
+      - CLOUDFLARE_API_EMAIL=${CF_API_EMAIL}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik.yml:/traefik.yml:ro"
-      - "./acme.json:/acme.json"
+      - "letsencrypt_data:/letsencrypt"
+    command:
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--certificatesresolvers.letsencrypt.acme.email=${CF_API_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
+      - "--log.level=INFO"
     labels:
       - "traefik.enable=true"
 
@@ -52,3 +60,4 @@ services:
 
 volumes:
   redis_data:
+  letsencrypt_data:
