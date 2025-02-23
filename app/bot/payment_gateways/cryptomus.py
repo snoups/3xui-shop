@@ -80,7 +80,7 @@ class Cryptomus(PaymentGateway):
                 session=session,
                 tg_id=data.user_id,
                 subscription=data.pack(),
-                payment_id=response.id,
+                payment_id=result["result"]["order_id"],
                 status=TransactionStatus.PENDING,
             )
 
