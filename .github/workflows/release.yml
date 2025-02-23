@@ -20,5 +20,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: dist/3xui-shop-${{ github.ref_name }}.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
