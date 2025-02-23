@@ -88,6 +88,7 @@ class Cryptomus(PaymentGateway):
         return pay_url
 
     async def webhook_handler(self, request: Request) -> Response:
+        # используйте список доверенных ip-адресов и разрешайте запросы к url_callback только с наших ip-адресов. Мы отправляем веб-ссылки с ip. 91.227.144.54
         try:
             event_json = await request.json()
 
