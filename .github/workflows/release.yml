@@ -1,0 +1,24 @@
+name: Generate and Upload Source Archive
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate source archive
+        run: |
+          mkdir -p dist
+          git archive --format=tar.gz --output=dist/3xui-shop-${{ github.ref_name }}.tar.gz ${{ github.ref }}
+
+      - name: Upload archive to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/3xui-shop-${{ github.ref_name }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
