@@ -131,6 +131,20 @@ class YooKassaConfig:
     SHOP_ID: int | None
 
 
+@dataclass  
+class CryptomusConfig:
+    """
+    Configuration for Cryptomus.
+
+    API_KEY: str
+    MERCHANT_ID: str
+    """
+
+    API_KEY: str
+    MERCHANT_ID: str
+
+
+
 @dataclass
 class DatabaseConfig:
     """
@@ -229,6 +243,7 @@ class Config:
     shop: ShopConfig
     xui: XUIConfig
     yookassa: YooKassaConfig
+    cryptomus: CryptomusConfig
     database: DatabaseConfig
     redis: RedisConfig
     logging: LoggingConfig
@@ -275,7 +290,11 @@ def load_config() -> Config:
         default=DEFAULT_SHOP_PAYMENT_CRYPTOMUS_ENABLED,
     )
     if payment_cryptomus_enabled:
-        pass
+        cryptomus_api_key = env.str("CRYPTOMUS_API_KEY", default=None)
+        cryptomus_merchant_id = env.str("CRYPTOMUS_MERCHANT_ID", default=None)
+        if not cryptomus_api_key or not cryptomus_merchant_id:
+            logger.error("CRYPTOMUS_API_KEY or CRYPTOMUS_MERCHANT_ID is not set. Payment Cryptomus is disabled.")
+            payment_cryptomus_enabled = False
 
     if not payment_yookassa_enabled and not payment_cryptomus_enabled and not payment_stars_enabled:
         logger.warning("No payment methods are enabled. Enabling Stars payment method.")
@@ -320,6 +339,10 @@ def load_config() -> Config:
         yookassa=YooKassaConfig(
             TOKEN=env.str("YOOKASSA_TOKEN", default=None),
             SHOP_ID=env.int("YOOKASSA_SHOP_ID", default=None),
+        ),
+        cryptomus=CryptomusConfig(
+            API_KEY=env.str("CRYPTOMUS_API_KEY", default=None),
+            MERCHANT_ID=env.str("CRYPTOMUS_MERCHANT_ID", default=None),
         ),
         database=DatabaseConfig(
             HOST=env.str("DB_HOST", default=None),

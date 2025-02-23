@@ -10,6 +10,7 @@ from app.config import Config
 from ._gateway import PaymentGateway
 from .telegram_stars import TelegramStars
 from .yookassa import Yookassa
+from .cryptomus import Cryptomus
 
 
 class GatewayFactory:
@@ -51,6 +52,18 @@ class GatewayFactory:
         if config.shop.PAYMENT_YOOKASSA_ENABLED:
             self.register_gateway(
                 Yookassa(
+                    app=app,
+                    config=config,
+                    session=session,
+                    storage=storage,
+                    bot=bot,
+                    i18n=i18n,
+                    services=services,
+                )
+            )
+        if config.shop.PAYMENT_CRYPTOMUS_ENABLED:
+            self.register_gateway(
+                Cryptomus(
                     app=app,
                     config=config,
                     session=session,
