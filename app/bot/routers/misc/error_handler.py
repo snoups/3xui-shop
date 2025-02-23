@@ -21,6 +21,12 @@ async def errors_handler(event: ErrorEvent, config: Config, services: ServicesCo
         logger.info(f"User {event.update.message.from_user.id} blocked the bot.")
         return True
 
+    if isinstance(event.exception, TelegramBadRequest):
+        logger.warning(
+            f"User {event.update.callback_query.from_user.id} bad request for edit/send message."
+        )
+        return True
+
     logger.exception(f"Update: {event.update}\nException: {event.exception}")
 
     if not config.bot.DEV_ID:

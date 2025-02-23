@@ -4,9 +4,13 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.routers.misc.keyboard import back_button, back_to_main_menu_button
 from app.bot.utils.constants import (
-    HIDDIFY_WINDOWS_LINK,
-    V2RAYTUN_ANDROID_LINK,
-    V2RAYTUN_IOS_LINK,
+    APP_ANDROID_LINK,
+    APP_ANDROID_SCHEME,
+    APP_IOS_LINK,
+    APP_IOS_SCHEME,
+    APP_WINDOWS_LINK,
+    APP_WINDOWS_SCHEME,
+    CONNECTION_WEBHOOK,
 )
 from app.bot.utils.navigation import NavDownload, NavMain, NavSubscription, NavSupport
 
@@ -43,16 +47,16 @@ def download_keyboard(platform: NavDownload, url: str, key: str) -> InlineKeyboa
 
     match platform:
         case NavDownload.PLATFORM_IOS:
-            app = "v2raytun"
-            download = V2RAYTUN_IOS_LINK
+            scheme = APP_IOS_SCHEME
+            download = APP_IOS_LINK
         case NavDownload.PLATFORM_ANDROID:
-            app = "v2raytun"
-            download = V2RAYTUN_ANDROID_LINK
+            scheme = APP_ANDROID_SCHEME
+            download = APP_ANDROID_LINK
         case _:
-            app = "hiddify"
-            download = HIDDIFY_WINDOWS_LINK
+            scheme = APP_WINDOWS_SCHEME
+            download = APP_WINDOWS_LINK
 
-    connect = f"{url}connection?app={app}&key={key}"
+    connect = f"{url}{CONNECTION_WEBHOOK}?scheme={scheme}&key={key}"
 
     builder.button(text=_("download:button:download"), url=download)
 

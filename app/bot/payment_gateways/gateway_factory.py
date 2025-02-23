@@ -8,8 +8,10 @@ from app.bot.models import ServicesContainer
 from app.config import Config
 
 from ._gateway import PaymentGateway
+from .cryptomus import Cryptomus
 from .telegram_stars import TelegramStars
 from .yookassa import Yookassa
+from .yoomoney import Yoomoney
 
 
 class GatewayFactory:
@@ -38,25 +40,15 @@ class GatewayFactory:
         i18n: I18n,
         services: ServicesContainer,
     ) -> None:
-        if config.shop.PAYMENT_STARS_ENABLED:
-            self.register_gateway(
-                TelegramStars(
-                    config=config,
-                    session=session,
-                    bot=bot,
-                    services=services,
-                )
-            )
+        dependencies = [app, config, session, storage, bot, i18n, services]
 
-        if config.shop.PAYMENT_YOOKASSA_ENABLED:
-            self.register_gateway(
-                Yookassa(
-                    app=app,
-                    config=config,
-                    session=session,
-                    storage=storage,
-                    bot=bot,
-                    i18n=i18n,
-                    services=services,
-                )
-            )
+        gateways = [
+            (config.shop.PAYMENT_STARS_ENABLED, TelegramStars),
+            (config.shop.PAYMENT_YOOKASSA_ENABLED, Yookassa),
+            (config.shop.PAYMENT_YOOMONEY_ENABLED, Yoomoney),
+            (config.shop.PAYMENT_CRYPTOMUS_ENABLED, Cryptomus),
+        ]
+
+        for enabled, gateway_cls in gateways:
+            if enabled:
+                self.register_gateway(gateway_cls(*dependencies))

@@ -28,7 +28,7 @@
 
 **3X-UI-SHOP** is a comprehensive solution designed to automate the sale of VPN subscriptions through Telegram.
 The bot uses the **3X-UI** panel API for client management and supports multiple payment methods, including
-**~~Cryptomus~~**, **YooKassa**, and **Telegram Stars**.
+**~~Cryptomus~~**, **YooKassa**, **YooMoney**, and **Telegram Stars**.
 
 The bot enables efficient subscription sales with advanced features:
 
@@ -144,6 +144,7 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | SHOP_PAYMENT_STARS_ENABLED | ⭕ | True | Enable Telegram stars payment |
 | ~~SHOP_PAYMENT_CRYPTOMUS_ENABLED~~ | ⭕ | ~~False~~ | ~~Enable Cryptomus payment~~ |
 | SHOP_PAYMENT_YOOKASSA_ENABLED | ⭕ | False | Enable Yookassa payment |
+| SHOP_PAYMENT_YOOMONEY_ENABLED | ⭕ | False | Enable Yoomoney payment |
 | | | |
 | XUI_USERNAME | 🔴 | - | Username for authentication in the 3X-UI panel |
 | XUI_PASSWORD | 🔴 | - | Password for authentication in the 3X-UI panel |
@@ -153,6 +154,9 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | | | |
 | YOOKASSA_TOKEN | ⭕ | - | Token for YooKassa payment |
 | YOOKASSA_SHOP_ID | ⭕ | - | Shop ID for YooKassa payment |
+| | | |
+| YOOMONEY_WALLET_ID | ⭕ | - | Wallet ID for Yoomoney payment |
+| YOOMONEY_NOTIFICATION_SECRET | ⭕ | - | Notification secret key for Yoomoney payment |
 | | | |
 | REDIS_HOST | ⭕ | 3xui-shop-redis | Host of the Redis server |
 | REDIS_PORT | ⭕ | 6379 | Port of the Redis server |
@@ -217,16 +221,16 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
 2. **Environment Variables Setup:**
 
-    - Visit [API Tokens](https://dash.cloudflare.com/profile/api-tokens).
+    - Visit the [API Tokens](https://dash.cloudflare.com/profile/api-tokens) page.
     - Click `View Global API Key` and set:
-        - `CF_API_KEY`: Your Global API Key
+        - `CF_API_KEY`: Your global API key
         - `CF_API_EMAIL`: Your Cloudflare email
 
 ### YooKassa Configuration
 
 1. **Webhook Setup:**
-    - Visit [HTTP Notifications](https://yookassa.ru/my/merchant/integration/http-notifications).
-    - Specify the bot’s domain in the notification URL with `/yookassa` at the end (e.g., `https://3xui-shop.com/yookassa`).
+    - Visit the [HTTP Notifications](https://yookassa.ru/my/merchant/integration/http-notifications) page.
+    - Enter the bot’s domain in the notification URL, ending with `/yookassa` (e.g., `https://3xui-shop.com/yookassa`).
     - Select the following events:
         - `payment.succeeded`
         - `payment.waiting_for_capture`
@@ -234,8 +238,22 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
 2. **Environment Variables Setup:**
     - Set the following environment variables:
-        - `YOOKASSA_TOKEN`: Your Secret Key
-        - `YOOKASSA_SHOP_ID`: Your Shop ID
+        - `YOOKASSA_TOKEN`: Your secret key
+        - `YOOKASSA_SHOP_ID`: Your shop ID
+
+### YooMoney Configuration
+
+1. **Webhook Setup:**
+    - Visit the [HTTP Notifications](https://yoomoney.ru/transfer/myservices/http-notification) page.
+    - Enter the bot’s domain in the notification URL, ending with `/yoomoney` (e.g., `https://3xui-shop.com/yoomoney`).
+    - Copy the notification secret key.
+    - Check the box for `sending HTTP-notifications`.
+    - Save the changes.
+
+2. **Environment Variables Setup:**
+    - Set the following environment variables:
+        - `YOOMONEY_WALLET_ID`: Your wallet ID
+        - `YOOMONEY_NOTIFICATION_SECRET`: Your notification secret key
 
 ### 3X-UI Configuration
 
@@ -263,6 +281,7 @@ A special thanks to the following individuals for their generous support:
 - **Boto**
 - [**@olshevskii-sergey**](https://github.com/olshevskii-sergey/)
 - **Aleksey**
+- [**@DmitryKryloff**](https://t.me/DmitryKryloff)
 
 You can support me via the following methods:
 

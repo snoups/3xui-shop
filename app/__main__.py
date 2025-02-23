@@ -12,7 +12,7 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 from aiohttp.web import Application, _run_app
 
 from app import logger
-from app.bot import filters, middlewares, routers, services
+from app.bot import filters, middlewares, routers, services, tasks
 from app.bot.middlewares import MaintenanceMiddleware
 from app.bot.models import ServicesContainer
 from app.bot.payment_gateways import GatewayFactory
@@ -37,7 +37,7 @@ async def on_shutdown(db: Database, bot: Bot, services: ServicesContainer) -> No
     logging.info("Bot stopped.")
 
 
-async def on_startup(config: Config, bot: Bot, services: ServicesContainer) -> None:
+async def on_startup(config: Config, bot: Bot, services: ServicesContainer, db: Database) -> None:
     webhook_url = urljoin(config.bot.DOMAIN, TELEGRAM_WEBHOOK)
 
     if await bot.get_webhook_info() != webhook_url:
@@ -48,6 +48,8 @@ async def on_startup(config: Config, bot: Bot, services: ServicesContainer) -> N
 
     await services.notification.notify_developer(BOT_STARTED_TAG)
     logging.info("Bot started.")
+
+    tasks.transactions.start_scheduler(db.session)
 
 
 async def main() -> None:
@@ -110,7 +112,7 @@ async def main() -> None:
     dispatcher.shutdown.register(on_shutdown)
 
     # Enable Maintenance mode for developing # WARNING: remove before production
-    # MaintenanceMiddleware.set_mode(True)
+    MaintenanceMiddleware.set_mode(True)
 
     # Register middlewares
     middlewares.register(dispatcher=dispatcher, i18n=i18n, session=db.session)

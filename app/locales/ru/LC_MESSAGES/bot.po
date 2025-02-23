@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-02-21 19:20+0500\n"
+"POT-Creation-Date: 2025-02-23 22:16+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -25,25 +25,7 @@ msgstr ""
 "🚧 <i>Бот находится в режиме обслуживания. Пожалуйста, попробуйте "
 "позже.</i>"
 
-#: app/bot/payment_gateways/cryptomus.py:21
-msgid "payment:gateway:cryptomus"
-msgstr "Cryptomus"
-
-#: app/bot/payment_gateways/telegram_stars.py:34
-msgid "payment:gateway:telegram_stars"
-msgstr "Звёзды Telegram"
-
-#: app/bot/payment_gateways/telegram_stars.py:46
-msgid "payment:invoice:title"
-msgstr "Подписка | {devices} на {duration}"
-
-#: app/bot/payment_gateways/telegram_stars.py:47
-#: app/bot/payment_gateways/yookassa.py:71
-msgid "payment:invoice:description"
-msgstr "Подписка | {devices} на {duration}"
-
-#: app/bot/payment_gateways/telegram_stars.py:70
-#: app/bot/payment_gateways/yookassa.py:159
+#: app/bot/payment_gateways/_gateway.py:85
 msgid "payment:event:payment_succeeded"
 msgstr ""
 "💳 <b>Событие: Покупка завершена!</b>\n"
@@ -52,11 +34,7 @@ msgstr ""
 "ID пользователя: <code>{user_id}</code>\n"
 "<code>{devices}</code> | <code>{duration}</code>"
 
-#: app/bot/payment_gateways/yookassa.py:54
-msgid "payment:gateway:yookassa"
-msgstr "ЮKassa"
-
-#: app/bot/payment_gateways/yookassa.py:221
+#: app/bot/payment_gateways/_gateway.py:147
 msgid "payment:event:payment_canceled"
 msgstr ""
 "💳 <b>Событие: Покупка отменена!</b>\n"
@@ -64,6 +42,32 @@ msgstr ""
 "ID платежа: <tg-spoiler><code>{payment_id}</code></tg-spoiler>\n"
 "ID пользователя: <code>{user_id}</code>\n"
 "<code>{devices}</code> | <code>{duration}</code>"
+
+#: app/bot/payment_gateways/cryptomus.py:34
+msgid "payment:gateway:cryptomus"
+msgstr "Cryptomus"
+
+#: app/bot/payment_gateways/telegram_stars.py:38
+msgid "payment:gateway:telegram_stars"
+msgstr "Звёзды Telegram"
+
+#: app/bot/payment_gateways/telegram_stars.py:57
+msgid "payment:invoice:title"
+msgstr "Подписка | {devices} на {duration}"
+
+#: app/bot/payment_gateways/telegram_stars.py:58
+#: app/bot/payment_gateways/yookassa.py:63
+#: app/bot/payment_gateways/yoomoney.py:56
+msgid "payment:invoice:description"
+msgstr "Подписка | {devices} на {duration}"
+
+#: app/bot/payment_gateways/yookassa.py:46
+msgid "payment:gateway:yookassa"
+msgstr "ЮKassa"
+
+#: app/bot/payment_gateways/yoomoney.py:40
+msgid "payment:gateway:yoomoney"
+msgstr "ЮMoney"
 
 #: app/bot/routers/admin_tools/admin_tools_handler.py:23
 msgid "admin_tools:message:main"
@@ -432,73 +436,73 @@ msgstr ""
 msgid "server_management:message:empty"
 msgstr "<i>Список серверов пуст.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:72
+#: app/bot/routers/admin_tools/server_handler.py:79
 msgid "server_management:popup:synced"
 msgstr "Серверы синхронизированы."
 
-#: app/bot/routers/admin_tools/server_handler.py:82
+#: app/bot/routers/admin_tools/server_handler.py:89
 msgid "server_management:message:add"
 msgstr ""
 "🌐 <b>Добавить сервер:</b>\n"
 "\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:83
+#: app/bot/routers/admin_tools/server_handler.py:90
 msgid "server_management:message:name"
 msgstr "- name: {server_name}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:84
+#: app/bot/routers/admin_tools/server_handler.py:91
 msgid "server_management:message:host"
 msgstr "- host: {server_host}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:85
+#: app/bot/routers/admin_tools/server_handler.py:92
 msgid "server_management:message:max_clients"
 msgstr "- max clients: {server_max_clients}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:92
+#: app/bot/routers/admin_tools/server_handler.py:99
 msgid "server_management:message:enter_name"
 msgstr "<i>Введите имя сервера</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:96
+#: app/bot/routers/admin_tools/server_handler.py:103
 msgid "server_management:message:enter_host"
 msgstr "<i>Введите хост сервера (ссылка на панель)</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:99
+#: app/bot/routers/admin_tools/server_handler.py:106
 msgid "server_management:message:enter_max_clients"
 msgstr "<i>Введите максимальное количество клиентов</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:102
+#: app/bot/routers/admin_tools/server_handler.py:109
 msgid "server_management:message:confirm"
 msgstr "<i>Нажмите подтвердить для добавления сервера</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:154
+#: app/bot/routers/admin_tools/server_handler.py:161
 msgid "server_management:ntf:name_exists"
 msgstr "❌ <i>Сервер с таким именем уже существует. Введите другое имя.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:176
+#: app/bot/routers/admin_tools/server_handler.py:183
 msgid "server_management:ntf:invalid_host"
 msgstr "❌ <i>Введите корректный URL или IP адрес.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:198
+#: app/bot/routers/admin_tools/server_handler.py:205
 msgid "server_management:ntf:invalid_max_clients"
 msgstr "❌ <i>Введите корректное число.</i>"
 
-#: app/bot/routers/admin_tools/server_handler.py:231
+#: app/bot/routers/admin_tools/server_handler.py:238
 msgid "server_management:popup:added_success"
 msgstr "✅ Сервер успешно добавлен."
 
-#: app/bot/routers/admin_tools/server_handler.py:237
+#: app/bot/routers/admin_tools/server_handler.py:244
 msgid "server_management:popup:add_failed"
 msgstr "❌ Не удалось добавить сервер."
 
-#: app/bot/routers/admin_tools/server_handler.py:255
+#: app/bot/routers/admin_tools/server_handler.py:262
 msgid "server_management:message:status_online"
 msgstr "🟢"
 
-#: app/bot/routers/admin_tools/server_handler.py:257
+#: app/bot/routers/admin_tools/server_handler.py:264
 msgid "server_management:message:status_offline"
 msgstr "🔴"
 
-#: app/bot/routers/admin_tools/server_handler.py:259
+#: app/bot/routers/admin_tools/server_handler.py:266
 msgid "server_management:message:server_info"
 msgstr ""
 "🌐 <b>Сервер {server_name}:</b>\n"
@@ -507,19 +511,19 @@ msgstr ""
 "<b>Статус:</b> {status}\n"
 "<b>Клиенты:</b> {clients}/{max_clients}\n"
 
-#: app/bot/routers/admin_tools/server_handler.py:289
+#: app/bot/routers/admin_tools/server_handler.py:296
 msgid "server_management:popup:ping"
 msgstr "🟢 Пинг: {ping} ms."
 
-#: app/bot/routers/admin_tools/server_handler.py:294
+#: app/bot/routers/admin_tools/server_handler.py:301
 msgid "server_management:popup:ping_failed"
 msgstr "❌ Не удалось пингануть сервер {server_name}."
 
-#: app/bot/routers/admin_tools/server_handler.py:315
+#: app/bot/routers/admin_tools/server_handler.py:322
 msgid "server_management:popup:deleted_success"
 msgstr "✅ Сервер успешно удален."
 
-#: app/bot/routers/admin_tools/server_handler.py:320
+#: app/bot/routers/admin_tools/server_handler.py:327
 msgid "server_management:popup:delete_failed"
 msgstr "❌ Не удалось удалить сервер."
 
@@ -529,24 +533,24 @@ msgstr "❌ Не удалось удалить сервер."
 msgid "global:popup:development"
 msgstr "В разработке!"
 
-#: app/bot/routers/download/handler.py:58
-#: app/bot/routers/download/handler.py:65
+#: app/bot/routers/download/handler.py:68
+#: app/bot/routers/download/handler.py:75
 msgid "download:message:choose_platform"
 msgstr "📲 <b>Выберите вашу платформу:</b>"
 
-#: app/bot/routers/download/handler.py:82
+#: app/bot/routers/download/handler.py:92
 msgid "download:message:platform_ios"
 msgstr "🍏 IOS"
 
-#: app/bot/routers/download/handler.py:84
+#: app/bot/routers/download/handler.py:94
 msgid "download:message:platform_android"
 msgstr "🤖 Android"
 
-#: app/bot/routers/download/handler.py:86
+#: app/bot/routers/download/handler.py:96
 msgid "download:message:platform_windows"
 msgstr "💻 Windows"
 
-#: app/bot/routers/download/handler.py:89
+#: app/bot/routers/download/handler.py:99
 msgid "download:message:connect_to_vpn"
 msgstr ""
 "<b>{platform}:</b>\n"
@@ -556,23 +560,23 @@ msgstr ""
 "автоматически подключён в приложении)</i> или скопировать свой ключ и "
 "вставить его вручную."
 
-#: app/bot/routers/download/keyboard.py:19
+#: app/bot/routers/download/keyboard.py:23
 msgid "download:button:ios"
 msgstr "🍏 IOS"
 
-#: app/bot/routers/download/keyboard.py:23
+#: app/bot/routers/download/keyboard.py:27
 msgid "download:button:android"
 msgstr "🤖 Android"
 
-#: app/bot/routers/download/keyboard.py:27
+#: app/bot/routers/download/keyboard.py:31
 msgid "download:button:windows"
 msgstr "💻 Windows"
 
-#: app/bot/routers/download/keyboard.py:57
+#: app/bot/routers/download/keyboard.py:61
 msgid "download:button:download"
 msgstr "📥 Скачать"
 
-#: app/bot/routers/download/keyboard.py:60
+#: app/bot/routers/download/keyboard.py:64
 msgid "download:button:connect"
 msgstr "🔌 Подключиться"
 

@@ -1,10 +1,15 @@
-# region: Download links
-V2RAYTUN_IOS_LINK = "https://apps.apple.com/ru/app/v2raytun/id6476628951"
-V2RAYTUN_ANDROID_LINK = "https://play.google.com/store/apps/details?id=com.v2raytun.android"
-HIDDIFY_WINDOWS_LINK = (
+# region: Download
+APP_IOS_LINK = "https://apps.apple.com/ru/app/v2raytun/id6476628951"
+APP_ANDROID_LINK = "https://play.google.com/store/apps/details?id=com.v2raytun.android"
+APP_WINDOWS_LINK = (
     "https://github.com/hiddify/hiddify-next/releases/download/"
     "v2.0.5/Hiddify-Windows-Setup-x64.exe"
 )
+
+APP_IOS_SCHEME = "v2raytun://import/"
+APP_ANDROID_SCHEME = "v2raytun://import/"
+APP_WINDOWS_SCHEME = "hiddify://import/"
+
 # endregion
 
 # region: Keys
@@ -26,6 +31,8 @@ NOTIFICATION_PRE_MESSAGE_TEXT_KEY = "notification_pre_message_text"
 # region: Webhook paths
 TELEGRAM_WEBHOOK = "/webhook"  # Webhook path for Telegram bot updates
 YOOKASSA_WEBHOOK = "/yookassa"  # Webhook path for receiving Yookassa payment notifications
+YOOMONEY_WEBHOOK = "/yoomoney"  # Webhook path for receiving Yoomoney payment notifications
+CRYPTOMUS_WEBHOOK = "/cryptomus"  # Webhook path for receiving Cryptomus payment notifications
 CONNECTION_WEBHOOK = "/connection"  # Webhook path for receiving connection requests
 # endregion
 

@@ -28,7 +28,7 @@ DEFAULT_SHOP_TRIAL_PERIOD = 3
 DEFAULT_SHOP_PAYMENT_STARS_ENABLED = True
 DEFAULT_SHOP_PAYMENT_CRYPTOMUS_ENABLED = False
 DEFAULT_SHOP_PAYMENT_YOOKASSA_ENABLED = False
-
+DEFAULT_SHOP_PAYMENT_YOOMONEY_ENABLED = False
 DEFAULT_DB_NAME = "bot_database"
 
 DEFAULT_REDIS_DB_NAME = "0"
@@ -51,19 +51,6 @@ logger.addHandler(memory_handler)
 
 @dataclass
 class BotConfig:
-    """
-    Configuration for the Telegram bot.
-
-    Attributes:
-        TOKEN (str): API token for the Telegram bot.
-        ADMINS (list[int]): List of admin IDs (user IDs) for admin tools.
-        DEV_ID (int): Developer ID (user ID) for notifications.
-        SUPPORT_ID (int): Support ID (user ID) for support.
-        DOMAIN (str): Domain for the application.
-        PORT (int): Port for the application.
-
-    """
-
     TOKEN: str
     ADMINS: list[int]
     DEV_ID: int
@@ -74,20 +61,6 @@ class BotConfig:
 
 @dataclass
 class ShopConfig:
-    """
-    Configuration for the shop.
-
-    Attributes:
-        EMAIL (str): Email address for receipts.
-        CURRENCY (str): Default currency for buttons.
-        TRIAL_ENABLED (bool): Flag indicating if trial period is enabled.
-        TRIAL_PERIOD (int): Trial period in days.
-        PAYMENT_STARS_ENABLED (bool): Flag indicating if Stars payment method is enabled.
-        PAYMENT_CRYPTOMUS_ENABLED (bool): Flag indicating if Cryptomus payment method is enabled.
-        PAYMENT_YOOKASSA_ENABLED (bool): Flag indicating if Yookassa payment method is enabled.
-
-    """
-
     EMAIL: str
     CURRENCY: str
     TRIAL_ENABLED: bool
@@ -95,21 +68,11 @@ class ShopConfig:
     PAYMENT_STARS_ENABLED: bool
     PAYMENT_CRYPTOMUS_ENABLED: bool
     PAYMENT_YOOKASSA_ENABLED: bool
+    PAYMENT_YOOMONEY_ENABLED: bool
 
 
 @dataclass
 class XUIConfig:
-    """
-    Configuration for XUI.
-
-    Attributes:
-        USERNAME (str): Username for XUI authentication.
-        PASSWORD (str): Password for XUI authentication.
-        TOKEN (str | None): API token for XUI (if provided).
-        SUBSCRIPTION_PORT (int): Port number for subscription.
-        SUBSCRIPTION_PATH (str): URL path for subscription.
-    """
-
     USERNAME: str
     PASSWORD: str
     TOKEN: str | None
@@ -119,31 +82,18 @@ class XUIConfig:
 
 @dataclass
 class YooKassaConfig:
-    """
-    Configuration for YooKassa.
-
-    Attributes:
-        TOKEN (str | None): API token for YooKassa.
-        SHOP_ID (int | None): Shop ID for YooKassa.
-    """
-
     TOKEN: str | None
     SHOP_ID: int | None
 
 
 @dataclass
+class YooMoneyConfig:
+    NOTIFICATION_SECRET: str | None
+    WALLET_ID: str | None
+
+
+@dataclass
 class DatabaseConfig:
-    """
-    Configuration for Database.
-
-    Attributes:
-        HOST (str | None): Host address of DataBase server.
-        PORT (int | None): Port number for Database server.
-        USERNAME (str | None): Username for Database authentication.
-        PASSWORD (str | None): Password for Database authentication.
-        NAME (str): Name of Database to connect to.
-    """
-
     HOST: str | None
     PORT: int | None
     NAME: str
@@ -151,16 +101,6 @@ class DatabaseConfig:
     PASSWORD: str | None
 
     def url(self, driver: str = "sqlite+aiosqlite") -> str:
-        """
-        Generates a database connection URL using the provided driver, username,
-        password, host, port, and database name.
-
-        Arguments:
-            driver (str): Driver to use for the connection. Defaults to "sqlite+aiosqlite".
-
-        Returns:
-            str: Generated connection URL.
-        """
         if driver.startswith("sqlite"):
             return f"{driver}:////{DEFAULT_DATA_DIR}/{self.NAME}.{DB_FORMAT}"
         return f"{driver}://{self.USERNAME}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.NAME}"
@@ -168,17 +108,6 @@ class DatabaseConfig:
 
 @dataclass
 class RedisConfig:
-    """
-    Configuration for Redis.
-
-    Attributes:
-        HOST (str): Host address of Redis server.
-        PORT (int): Port number for Redis server.
-        DB_NAME (str): Name of Redis database.
-        USERNAME (str | None): Username for Redis authentication.
-        PASSWORD (str | None): Password for Redis authentication.
-    """
-
     HOST: str
     PORT: int
     DB_NAME: str
@@ -193,15 +122,6 @@ class RedisConfig:
 
 @dataclass
 class LoggingConfig:
-    """
-    Configuration for logging.
-
-    Attributes:
-        LEVEL (str): Logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).
-        FORMAT (str): Format string for log messages.
-        ARCHIVE_FORMAT (str): Archive format for log archiving (either "zip" or "gz").
-    """
-
     LEVEL: str
     FORMAT: str
     ARCHIVE_FORMAT: str
@@ -209,41 +129,17 @@ class LoggingConfig:
 
 @dataclass
 class Config:
-    """
-    Main configuration class for the application.
-
-    Contains all configurations related to the Bot, Shop, XUI,
-    YooKassa, Database, Redis and Logging.
-
-    Attributes:
-        bot (BotConfig): Bot configuration.
-        shop (ShopConfig): Shop configuration.
-        xui (XUIConfig): XUI configuration.
-        yookassa (YooKassaConfig): YooKassa configuration.
-        database (DatabaseConfig): Database configuration.
-        redis (RedisConfig): Redis configuration.
-        logging (LoggingConfig): Logging configuration.
-    """
-
     bot: BotConfig
     shop: ShopConfig
     xui: XUIConfig
     yookassa: YooKassaConfig
+    yoomoney: YooMoneyConfig
     database: DatabaseConfig
     redis: RedisConfig
     logging: LoggingConfig
 
 
 def load_config() -> Config:
-    """
-    Load configuration from environment variables using `environs`.
-
-    This function reads the environment variables and returns a fully populated
-    `Config` object containing Bot, Shop, XUI, YooKassa, Database, Redis and Logging configurations.
-
-    Returns:
-        Config: A fully populated configuration object for the application.
-    """
     env = Env()
     env.read_env()
 
@@ -266,9 +162,25 @@ def load_config() -> Config:
     )
     if payment_yookassa_enabled:
         yookassa_token = env.str("YOOKASSA_TOKEN", default=None)
-        if not yookassa_token:
-            logger.error("YOOKASSA_TOKEN is not set. Payment YooKassa is disabled.")
+        yookassa_shop_id = env.int("YOOKASSA_SHOP_ID", default=None)
+        if not yookassa_token or not yookassa_shop_id:
+            logger.error(
+                "YOOKASSA_TOKEN or YOOKASSA_SHOP_ID is not set. Payment YooKassa is disabled."
+            )
             payment_yookassa_enabled = False
+
+    payment_yoomoney_enabled = env.bool(
+        "SHOP_PAYMENT_YOOMONEY_ENABLED",
+        default=DEFAULT_SHOP_PAYMENT_YOOMONEY_ENABLED,
+    )
+    if payment_yoomoney_enabled:
+        yoomoney_notification_secret = env.str("YOOMONEY_NOTIFICATION_SECRET", default=None)
+        yoomoney_wallet_id = env.str("YOOMONEY_WALLET_ID", default=None)
+        if not yoomoney_notification_secret or not yoomoney_wallet_id:
+            logger.error(
+                "YOOMONEY_NOTIFICATION_SECRET or YOOMONEY_WALLET_ID is not set. Payment YooMoney is disabled."
+            )
+            payment_yoomoney_enabled = False
 
     payment_cryptomus_enabled = env.bool(
         "SHOP_PAYMENT_CRYPTOMUS_ENABLED",
@@ -277,7 +189,12 @@ def load_config() -> Config:
     if payment_cryptomus_enabled:
         pass
 
-    if not payment_yookassa_enabled and not payment_cryptomus_enabled and not payment_stars_enabled:
+    if (
+        not payment_yookassa_enabled
+        and not payment_cryptomus_enabled
+        and not payment_stars_enabled
+        and not payment_yoomoney_enabled
+    ):
         logger.warning("No payment methods are enabled. Enabling Stars payment method.")
         payment_stars_enabled = True
 
@@ -287,7 +204,7 @@ def load_config() -> Config:
             ADMINS=bot_admins,
             DEV_ID=env.int("BOT_DEV_ID"),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
-            DOMAIN=f"https://{env.str('BOT_DOMAIN')}/",
+            DOMAIN=f"https://{env.str('BOT_DOMAIN')}",
             PORT=env.int("BOT_PORT", default=DEFAULT_BOT_PORT),
         ),
         shop=ShopConfig(
@@ -306,6 +223,7 @@ def load_config() -> Config:
             PAYMENT_STARS_ENABLED=payment_stars_enabled,
             PAYMENT_CRYPTOMUS_ENABLED=payment_cryptomus_enabled,
             PAYMENT_YOOKASSA_ENABLED=payment_yookassa_enabled,
+            PAYMENT_YOOMONEY_ENABLED=payment_yoomoney_enabled,
         ),
         xui=XUIConfig(
             USERNAME=env.str("XUI_USERNAME"),
@@ -320,6 +238,10 @@ def load_config() -> Config:
         yookassa=YooKassaConfig(
             TOKEN=env.str("YOOKASSA_TOKEN", default=None),
             SHOP_ID=env.int("YOOKASSA_SHOP_ID", default=None),
+        ),
+        yoomoney=YooMoneyConfig(
+            NOTIFICATION_SECRET=env.str("YOOMONEY_NOTIFICATION_SECRET", default=None),
+            WALLET_ID=env.str("YOOMONEY_WALLET_ID", default=None),
         ),
         database=DatabaseConfig(
             HOST=env.str("DB_HOST", default=None),

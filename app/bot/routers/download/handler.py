@@ -7,7 +7,13 @@ from aiogram.utils.i18n import gettext as _
 from aiohttp.web import HTTPFound, Request, Response
 
 from app.bot.models import ServicesContainer
-from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY, PREVIOUS_CALLBACK_KEY
+from app.bot.utils.constants import (
+    APP_ANDROID_SCHEME,
+    APP_IOS_SCHEME,
+    APP_WINDOWS_SCHEME,
+    MAIN_MESSAGE_ID_KEY,
+    PREVIOUS_CALLBACK_KEY,
+)
 from app.bot.utils.navigation import NavDownload, NavMain
 from app.bot.utils.network import parse_redirect_url
 from app.config import Config
@@ -26,14 +32,18 @@ async def redirect_to_connection(request: Request) -> Response:
         return Response(status=400, reason="Missing query string.")
 
     params = parse_redirect_url(query_string)
-    app = params.get("app")
+    scheme = params.get("scheme")
     key = params.get("key")
 
-    if not app or not key:
+    if not scheme or not key:
         raise Response(status=400, reason="Invalid parameters.")
 
-    redirect_url = f"{app}://import/{key}"  # TODO: #namevpn
-    if app in {"v2raytun", "hiddify"}:  # TODO: hiddify need test
+    redirect_url = f"{scheme}{key}"  # TODO: #namevpn
+    if scheme in {
+        APP_IOS_SCHEME,
+        APP_ANDROID_SCHEME,
+        APP_WINDOWS_SCHEME,
+    }:
         raise HTTPFound(redirect_url)
 
     return Response(status=400, reason="Unsupported application.")

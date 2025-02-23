@@ -19,19 +19,11 @@ from yookassa.domain.request.payment_request import PaymentRequest
 
 from app.bot.models import ServicesContainer, SubscriptionData
 from app.bot.payment_gateways import PaymentGateway
-from app.bot.routers.main_menu.handler import redirect_to_main_menu
-from app.bot.utils.constants import (
-    DEFAULT_LANGUAGE,
-    EVENT_PAYMENT_CANCELED_TAG,
-    EVENT_PAYMENT_SUCCEEDED_TAG,
-    YOOKASSA_WEBHOOK,
-    Currency,
-    TransactionStatus,
-)
+from app.bot.utils.constants import YOOKASSA_WEBHOOK, Currency, TransactionStatus
 from app.bot.utils.formatting import format_device_count, format_subscription_period
 from app.bot.utils.navigation import NavSubscription
 from app.config import Config
-from app.db.models import Transaction, User
+from app.db.models import Transaction
 
 logger = logging.getLogger(__name__)
 
@@ -111,13 +103,20 @@ class Yookassa(PaymentGateway):
         logger.info(f"Payment link created for user {data.user_id}: {pay_url}")
         return pay_url
 
+    async def handle_payment_succeeded(self, payment_id: str) -> None:
+        await self._on_payment_succeeded(payment_id)
+
+    async def handle_payment_canceled(self, payment_id: str) -> None:
+        await self._on_payment_canceled(payment_id)
+
     async def webhook_handler(self, request: Request) -> Response:
         ip = request.headers.get("X-Forwarded-For", request.remote)
+
         if not SecurityHelper().is_ip_trusted(ip):
             return Response(status=403)
 
-        event_json = await request.json()
         try:
+            event_json = await request.json()
             notification_object = WebhookNotificationFactory().create(event_json)
             response_object = notification_object.object
             payment_id = response_object.id
@@ -137,91 +136,3 @@ class Yookassa(PaymentGateway):
         except Exception as exception:
             logger.exception(f"Error processing YooKassa webhook: {exception}")
             return Response(status=400)
-
-    async def handle_payment_succeeded(self, payment_id: str) -> None:
-        logger.info(f"Payment succeeded {payment_id}")
-
-        async with self.session() as session:
-            transaction = await Transaction.get_by_id(session=session, payment_id=payment_id)
-            data = SubscriptionData.unpack(transaction.subscription)
-            logger.debug(f"Subscription data unpacked: {data}")
-            user = await User.get(session=session, tg_id=data.user_id)
-
-            await Transaction.update(
-                session=session,
-                payment_id=payment_id,
-                status=TransactionStatus.COMPLETED,
-            )
-
-        await self.services.notification.notify_developer(
-            text=EVENT_PAYMENT_SUCCEEDED_TAG
-            + "\n\n"
-            + _("payment:event:payment_succeeded").format(
-                payment_id=payment_id,
-                user_id=user.tg_id,
-                devices=format_device_count(data.devices),
-                duration=format_subscription_period(data.duration),
-            ),
-        )
-
-        locale = user.language_code if user else DEFAULT_LANGUAGE
-        with self.i18n.use_locale(locale):
-            await redirect_to_main_menu(bot=self.bot, user=user, storage=self.storage)
-
-            if data.is_extend:
-                await self.services.vpn.extend_subscription(
-                    user=user,
-                    devices=data.devices,
-                    duration=data.duration,
-                )
-                logger.info(f"Subscription extended for user {user.tg_id}")
-                await self.services.notification.notify_extend_success(
-                    user_id=user.tg_id,
-                    data=data,
-                )
-            elif data.is_change:
-                await self.services.vpn.change_subscription(
-                    user=user,
-                    devices=data.devices,
-                    duration=data.duration,
-                )
-                logger.info(f"Subscription changed for user {user.tg_id}")
-                await self.services.notification.notify_change_success(
-                    user_id=user.tg_id,
-                    data=data,
-                )
-            else:
-                await self.services.vpn.create_subscription(
-                    user=user,
-                    devices=data.devices,
-                    duration=data.duration,
-                )
-                logger.info(f"Subscription created for user {user.tg_id}")
-                key = await self.services.vpn.get_key(user)
-                await self.services.notification.notify_purchase_success(
-                    user_id=user.tg_id,
-                    key=key,
-                )
-
-    async def handle_payment_canceled(self, payment_id: str) -> None:
-        logger.info(f"Payment canceled {payment_id}")
-        async with self.session() as session:
-            transaction = await Transaction.get_by_id(session=session, payment_id=payment_id)
-            data = SubscriptionData.unpack(transaction.subscription)
-
-            await Transaction.update(
-                session=session,
-                payment_id=payment_id,
-                status=TransactionStatus.CANCELED,
-            )
-
-        await self.services.notification.notify_developer(
-            text=EVENT_PAYMENT_CANCELED_TAG
-            + "\n\n"
-            + _("payment:event:payment_canceled").format(
-                payment_id=payment_id,
-                user_id=data.user_id,
-                devices=format_device_count(data.devices),
-                duration=format_subscription_period(data.duration),
-            ),
-        )
