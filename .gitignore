@@ -172,3 +172,5 @@ cython_debug/
 
 # Plans
 plans.json
+
+tmp_test/
