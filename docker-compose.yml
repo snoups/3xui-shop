@@ -8,9 +8,6 @@ services:
       - "443:443"
     env_file:
       - .env
-    environment:
-      - CLOUDFLARE_API_KEY=${CF_API_KEY}
-      - CLOUDFLARE_API_EMAIL=${CF_API_EMAIL}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "letsencrypt_data:/letsencrypt"
@@ -19,9 +16,9 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--certificatesresolvers.letsencrypt.acme.email=${CF_API_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
       - "--log.level=INFO"
     labels:
       - "traefik.enable=true"

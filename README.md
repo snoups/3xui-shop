@@ -102,7 +102,7 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/snoups/3xui-shop.git
+   bash <(curl -Ls https://raw.githubusercontent.com/snoups/3xui-shop/main/scripts/install.sh) -q
    cd 3xui-shop
    ```
 
@@ -130,6 +130,8 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
 | Variable | Required | Default | Description |
 |-|-|-|-|
+| LETSENCRYPT_EMAIL | 🔴 | - | Email for generating certificates |
+| | | |
 | BOT_TOKEN | 🔴 | - | Telegram bot token |
 | BOT_ADMINS | ⭕ | - | List of admin IDs (e.g., 123456789,987654321) |
 | BOT_DEV_ID | 🔴 | - | ID of the bot developer |
@@ -167,9 +169,7 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | LOG_LEVEL | ⭕ | DEBUG | Log level (e.g., INFO, DEBUG) |
 | LOG_FORMAT | ⭕ | %(asctime)s \| %(name)s \| %(levelname)s \| %(message)s | Log format |
 | LOG_ARCHIVE_FORMAT | ⭕ | zip | Log archive format (e.g., zip, gz) |
-| | | |
-| CF_API_KEY | 🔴 | - | Cloudflare API key |
-| CF_API_EMAIL | 🔴 | - | Cloudflare API email |
+
 
 ### Subscription Plans Configuration
 
@@ -209,23 +209,6 @@ Before starting the installation, make sure you have the installed [**Docker**](
 }
 ```
 
-### Cloudflare Configuration
-
-1. **Domain and SSL/TLS Setup:**
-   
-    - Add an A record in the DNS section:
-        - Name: Your bot’s subdomain (e.g., bot)
-        - IPv4 address: Your server’s IP address
-        - Proxy status: DNS only (disable proxy)
-    - Enable Full (strict) SSL/TLS mode under the SSL/TLS section.
-
-2. **Environment Variables Setup:**
-
-    - Visit the [API Tokens](https://dash.cloudflare.com/profile/api-tokens) page.
-    - Click `View Global API Key` and set:
-        - `CF_API_KEY`: Your global API key
-        - `CF_API_EMAIL`: Your Cloudflare email
-
 ### YooKassa Configuration
 
 1. **Webhook Setup:**
@@ -259,10 +242,10 @@ Before starting the installation, make sure you have the installed [**Docker**](
 
 To ensure the bot functions correctly, you must configure the 3X-UI panel:
 
-- [Set up SSL certificates from Cloudflare.](https://github.com/MHSanaei/3x-ui?tab=readme-ov-file#ssl-certificate)
+- [Set up SSL certificate.](https://github.com/MHSanaei/3x-ui?tab=readme-ov-file#ssl-certificate)
 - Set up an Inbound **(the first one will be used)** for adding clients.
 - Enable the subscription service with port `2096` and path `/user/`.
-    > **Don’t forget to specify certificates for the subscription.**
+    > **Don’t forget to specify certificate for the subscription.**
 - Disabling configuration encryption is recommended.
 
 <a id="bugs-and-feature-requests"></a>
