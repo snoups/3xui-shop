@@ -28,7 +28,7 @@
 
 **3X-UI-SHOP** is a comprehensive solution designed to automate the sale of VPN subscriptions through Telegram.
 The bot uses the **3X-UI** panel API for client management and supports multiple payment methods, including
-**~~Cryptomus~~**, **YooKassa**, **YooMoney**, and **Telegram Stars**.
+**Cryptomus**, **YooKassa**, **YooMoney**, and **Telegram Stars**.
 
 The bot enables efficient subscription sales with advanced features:
 
@@ -74,7 +74,7 @@ The bot includes a user-friendly admin panel with tools for efficient management
 Administrators do not have access to server management.
 
 - **`Server Manager`**: Add, remove, disable, and check servers in the pool
-- **`Bot Statistics`**: View usage analytics and performance data
+- **`Statistics`**: View usage analytics and performance data
 - **`User Editor`**: Manage user accounts and subscriptions
 - **`Promocode Editor`**: Create, edit, and delete promocodes
 - **`Notification Sender`**: Send custom notifications to users
@@ -83,7 +83,6 @@ Administrators do not have access to server management.
 
 
 ### 🚧 Current Tasks
-- [ ] Cryptomus payment
 - [ ] Trial period
 - [ ] Referral system
 - [ ] Statistics
@@ -144,7 +143,7 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | ~~SHOP_TRIAL_ENABLED~~ | ⭕ | ~~True~~ | ~~Enable trial subscription~~ |
 | ~~SHOP_TRIAL_PERIOD~~ | ⭕ | ~~3~~ | ~~Period of the trial subscription in days~~ |
 | SHOP_PAYMENT_STARS_ENABLED | ⭕ | True | Enable Telegram stars payment |
-| ~~SHOP_PAYMENT_CRYPTOMUS_ENABLED~~ | ⭕ | ~~False~~ | ~~Enable Cryptomus payment~~ |
+| SHOP_PAYMENT_CRYPTOMUS_ENABLED | ⭕ | False | Enable Cryptomus payment |
 | SHOP_PAYMENT_YOOKASSA_ENABLED | ⭕ | False | Enable Yookassa payment |
 | SHOP_PAYMENT_YOOMONEY_ENABLED | ⭕ | False | Enable Yoomoney payment |
 | | | |
@@ -153,6 +152,9 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | XUI_TOKEN | ⭕ | - | Token for authentication (if configured in the panel) |
 | XUI_SUBSCRIPTION_PORT | ⭕ | 2096 | Port for subscription |
 | XUI_SUBSCRIPTION_PATH | ⭕ | /user/ | Path for subscription |
+| | | |
+| CRYPTOMUS_API_KEY | ⭕ | - | API key for Cryptomus payment |
+| CRYPTOMUS_MERCHANT_ID | ⭕ | - | Merchant ID for Cryptomus payment |
 | | | |
 | YOOKASSA_TOKEN | ⭕ | - | Token for YooKassa payment |
 | YOOKASSA_SHOP_ID | ⭕ | - | Shop ID for YooKassa payment |

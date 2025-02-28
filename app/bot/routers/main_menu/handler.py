@@ -70,12 +70,9 @@ async def redirect_to_main_menu(
     main_message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
     is_admin = await IsAdmin()(user_id=user.tg_id)
 
-    try:
-        await bot.edit_message_text(
-            text=_("main_menu:message:main").format(name=user.first_name),
-            chat_id=user.tg_id,
-            message_id=main_message_id,
-            reply_markup=main_menu_keyboard(is_admin),
-        )
-    except Exception as exception:
-        logger.error(f"Failed to edit main message: {exception}")
+    await bot.edit_message_text(
+        text=_("main_menu:message:main").format(name=user.first_name),
+        chat_id=user.tg_id,
+        message_id=main_message_id,
+        reply_markup=main_menu_keyboard(is_admin),
+    )

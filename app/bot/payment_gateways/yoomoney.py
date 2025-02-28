@@ -46,7 +46,7 @@ class Yoomoney(PaymentGateway):
         self.i18n = i18n
         self.services = services
 
-        self.app.router.add_post(YOOMONEY_WEBHOOK, lambda request: self.webhook_handler(request))
+        self.app.router.add_post(YOOMONEY_WEBHOOK, self.webhook_handler)
         logger.info("YooMoney payment gateway initialized.")
 
     async def create_payment(self, data: SubscriptionData) -> str:

@@ -72,7 +72,7 @@ async def callback_payment_method_selected(
         )
     except Exception as exception:
         logger.error(f"Error processing payment: {exception}")
-        await callback.answer(_("payment:message:error"), show_alert=True)
+        await services.notification.show_popup(callback=callback, text=_("payment:popup:error"))
     finally:
         await state.set_state(None)
 

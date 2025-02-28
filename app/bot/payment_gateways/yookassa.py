@@ -53,7 +53,7 @@ class Yookassa(PaymentGateway):
         self.services = services
 
         Configuration.configure(self.config.yookassa.SHOP_ID, self.config.yookassa.TOKEN)
-        self.app.router.add_post(YOOKASSA_WEBHOOK, lambda request: self.webhook_handler(request))
+        self.app.router.add_post(YOOKASSA_WEBHOOK, self.webhook_handler)
         logger.info("YooKassa payment gateway initialized.")
 
     async def create_payment(self, data: SubscriptionData) -> str:

@@ -81,6 +81,12 @@ class XUIConfig:
 
 
 @dataclass
+class CryptomusConfig:
+    API_KEY: str | None
+    MERCHANT_ID: str | None
+
+
+@dataclass
 class YooKassaConfig:
     TOKEN: str | None
     SHOP_ID: int | None
@@ -132,6 +138,7 @@ class Config:
     bot: BotConfig
     shop: ShopConfig
     xui: XUIConfig
+    cryptomus: CryptomusConfig
     yookassa: YooKassaConfig
     yoomoney: YooMoneyConfig
     database: DatabaseConfig
@@ -155,6 +162,19 @@ def load_config() -> Config:
         "SHOP_PAYMENT_STARS_ENABLED",
         default=DEFAULT_SHOP_PAYMENT_STARS_ENABLED,
     )
+
+    payment_cryptomus_enabled = env.bool(
+        "SHOP_PAYMENT_CRYPTOMUS_ENABLED",
+        default=DEFAULT_SHOP_PAYMENT_CRYPTOMUS_ENABLED,
+    )
+    if payment_cryptomus_enabled:
+        cryptomus_api_key = env.str("CRYPTOMUS_API_KEY", default=None)
+        cryptomus_merchant_id = env.str("CRYPTOMUS_MERCHANT_ID", default=None)
+        if not cryptomus_api_key or not cryptomus_merchant_id:
+            logger.error(
+                "CRYPTOMUS_API_KEY or CRYPTOMUS_MERCHANT_ID is not set. Payment Cryptomus is disabled."
+            )
+            payment_cryptomus_enabled = False
 
     payment_yookassa_enabled = env.bool(
         "SHOP_PAYMENT_YOOKASSA_ENABLED",
@@ -182,17 +202,10 @@ def load_config() -> Config:
             )
             payment_yoomoney_enabled = False
 
-    payment_cryptomus_enabled = env.bool(
-        "SHOP_PAYMENT_CRYPTOMUS_ENABLED",
-        default=DEFAULT_SHOP_PAYMENT_CRYPTOMUS_ENABLED,
-    )
-    if payment_cryptomus_enabled:
-        pass
-
     if (
-        not payment_yookassa_enabled
+        not payment_stars_enabled
         and not payment_cryptomus_enabled
-        and not payment_stars_enabled
+        and not payment_yookassa_enabled
         and not payment_yoomoney_enabled
     ):
         logger.warning("No payment methods are enabled. Enabling Stars payment method.")
@@ -234,6 +247,10 @@ def load_config() -> Config:
                 "XUI_SUBSCRIPTION_PATH",
                 default=DEFAULT_SUBSCRIPTION_PATH,
             ),
+        ),
+        cryptomus=CryptomusConfig(
+            API_KEY=env.str("CRYPTOMUS_API_KEY", default=None),
+            MERCHANT_ID=env.str("CRYPTOMUS_MERCHANT_ID", default=None),
         ),
         yookassa=YooKassaConfig(
             TOKEN=env.str("YOOKASSA_TOKEN", default=None),

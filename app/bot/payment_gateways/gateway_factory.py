@@ -44,9 +44,9 @@ class GatewayFactory:
 
         gateways = [
             (config.shop.PAYMENT_STARS_ENABLED, TelegramStars),
+            (config.shop.PAYMENT_CRYPTOMUS_ENABLED, Cryptomus),
             (config.shop.PAYMENT_YOOKASSA_ENABLED, Yookassa),
             (config.shop.PAYMENT_YOOMONEY_ENABLED, Yoomoney),
-            (config.shop.PAYMENT_CRYPTOMUS_ENABLED, Cryptomus),
         ]
 
         for enabled, gateway_cls in gateways:

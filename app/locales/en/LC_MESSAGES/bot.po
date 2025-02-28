@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-02-23 22:16+0500\n"
+"POT-Creation-Date: 2025-02-24 11:41+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -40,7 +40,7 @@ msgstr ""
 "User ID: {user_id}\n"
 "<code>{devices}</code> | <code>{duration}</code>"
 
-#: app/bot/payment_gateways/cryptomus.py:34
+#: app/bot/payment_gateways/cryptomus.py:41
 msgid "payment:gateway:cryptomus"
 msgstr "Cryptomus"
 
@@ -738,7 +738,7 @@ msgstr "◀️ Change duration"
 msgid "subscription:button:download_app"
 msgstr "🔌 Connect"
 
-#: app/bot/routers/subscription/payment_handler.py:46
+#: app/bot/routers/subscription/payment_handler.py:58
 msgid "payment:message:order_extend"
 msgstr ""
 "🛒 <b>Confirmation of extension:</b>\n"
@@ -750,7 +750,7 @@ msgstr ""
 "<i>The number of devices will remain the same, and the new subscription "
 "duration will be added to the remaining time!</i>"
 
-#: app/bot/routers/subscription/payment_handler.py:48
+#: app/bot/routers/subscription/payment_handler.py:60
 msgid "payment:message:order_change"
 msgstr ""
 "🛒 <b>Confirmation of change:</b>\n"
@@ -762,7 +762,7 @@ msgstr ""
 "<i>The number of devices and subscription duration will be changed "
 "without recalculating the previous data!</i>"
 
-#: app/bot/routers/subscription/payment_handler.py:50
+#: app/bot/routers/subscription/payment_handler.py:62
 msgid "payment:message:order"
 msgstr ""
 "🛒 <b>Confirmation of purchase:</b>\n"
@@ -773,6 +773,10 @@ msgstr ""
 "\n"
 "<i>After the payment, a unique key for connecting to the VPN will be "
 "generated for you. The key will be available on your profile page.</i>"
+
+#: app/bot/routers/subscription/payment_handler.py:75
+msgid "payment:popup:error"
+msgstr "❌ An error occurred during creating payment."
 
 #: app/bot/routers/subscription/promocode_handler.py:30
 msgid "promocode:message:main"
@@ -979,4 +983,3 @@ msgid "1 month"
 msgid_plural "{} months"
 msgstr[0] ""
 msgstr[1] ""
-
