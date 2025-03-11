@@ -11,8 +11,16 @@ from app.bot.utils.navigation import (
 )
 
 
-def main_menu_keyboard(is_admin: bool = False) -> InlineKeyboardMarkup:
+def main_menu_keyboard(is_admin: bool = False, is_available_try_for_free: bool = False) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
+
+    if is_available_try_for_free:
+        builder.row(
+            InlineKeyboardButton(
+                text=_("referral:button:get_bonus_days"),
+                callback_data=NavReferral.GET_BONUS_DAYS,
+            )
+        )
 
     builder.row(
         InlineKeyboardButton(

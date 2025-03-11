@@ -92,7 +92,13 @@ class PaymentGateway(ABC):
 
         locale = user.language_code if user else DEFAULT_LANGUAGE
         with self.i18n.use_locale(locale):
-            await redirect_to_main_menu(bot=self.bot, user=user, storage=self.storage)
+            await redirect_to_main_menu(
+                bot=self.bot,
+                user=user,
+                session=session,
+                config=self.config,
+                storage=self.storage
+            )
 
             if data.is_extend:
                 await self.services.vpn.extend_subscription(

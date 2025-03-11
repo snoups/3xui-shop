@@ -582,7 +582,7 @@ msgid "main_menu:message:main"
 msgstr ""
 "Welcome, {name}! 🎉\n"
 "\n"
-"3X-UI SHOP — your reliable assistant in the world of free internet. We "
+"YourVPN — your reliable assistant in the world of free internet. We "
 "offer safe and fast connections to any internet services using the XRAY "
 "protocol. Our service works even in China, Iran, and Russia.\n"
 "\n"
@@ -592,23 +592,23 @@ msgstr ""
 "♾️ UNLIMITED\n"
 "✅ GUARANTEE AND TRIAL PERIOD\n"
 
-#: app/bot/routers/main_menu/keyboard.py:19
+#: app/bot/routers/main_menu/keyboard.py:27
 msgid "main_menu:button:profile"
 msgstr "👤 Profile"
 
-#: app/bot/routers/main_menu/keyboard.py:23
+#: app/bot/routers/main_menu/keyboard.py:31
 msgid "main_menu:button:subscription"
 msgstr "💳 Subscription"
 
-#: app/bot/routers/main_menu/keyboard.py:29
+#: app/bot/routers/main_menu/keyboard.py:37
 msgid "main_menu:button:referral"
 msgstr "👥 Referral"
 
-#: app/bot/routers/main_menu/keyboard.py:33
+#: app/bot/routers/main_menu/keyboard.py:41
 msgid "main_menu:button:support"
 msgstr "🆘 Support"
 
-#: app/bot/routers/main_menu/keyboard.py:41
+#: app/bot/routers/main_menu/keyboard.py:49
 msgid "main_menu:button:admin_tools"
 msgstr "🛠 Admin tools"
 
@@ -844,6 +844,38 @@ msgstr "❌ No available servers found. Please try again later."
 #: app/bot/routers/subscription/subscription_handler.py:171
 msgid "subscription:message:payment_method"
 msgstr "💳 <b>Choose a payment method:</b>"
+
+#: app/bot/routers/referral/handler.py:45
+msgid "referral:message:user_summary"
+msgstr "By inviting a user via a personal link, you and the invited "
+"user will receive an additional period of free VPN ({duration} for each invited one)\n\n"
+"For the days to count, the invited user must activate the promo period "
+"- click on the 'Try for free' button\n\n"
+"Your personal link:\n"
+"<code>{referral_link}</code>\n\n"
+"Invited users: {referrals_count}"
+
+#: app/bot/routers/main_menu/keyboard.py:20
+msgid "referral:button:get_bonus_days"
+msgstr "TRY FOR FREE"
+
+#: app/bot/routers/referral/handler.py:96
+msgid "referral:ntf:bonus_days_activate_success"
+msgstr "✅ <b>Trial period was successfully activated!</b>\n"
+"\n"
+"<i>You have received {duration} to your subscription.</i>"
+
+#: app/bot/routers/referral/handler.py:80
+msgid "referral:popup:bonus_days_unavailable_for_user"
+msgstr "❌ You have already used the trial period."
+
+#: app/bot/routers/referral/handler.py:104
+msgid "referral:ntf:bonus_days_activate_failed"
+msgstr "❌ <i>Failed to your trial period, please try again later or contact administrator.</i>"
+
+#: app/bot/routers/referral/handler.py:70
+msgid "referral:ntf:no_available_servers"
+msgstr "❌ <i>No available servers found. Please try again later.</i>"
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"

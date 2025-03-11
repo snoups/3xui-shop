@@ -19,7 +19,7 @@ from app.bot.utils.time import (
     days_to_timestamp,
     get_current_timestamp,
 )
-from app.db.models import Promocode, User
+from app.db.models import Promocode, User, Referral
 
 logger = logging.getLogger(__name__)
 
@@ -247,7 +247,33 @@ class VPNService:
             )
         return False
 
+    async def process_bonus_days(self, user: User, duration: int) -> bool:
+        """
+        Ensures that user will receive its bonus days both if it already has subscription, or not.
+
+        Args:
+            user (User): User object.
+            duration (int): Duration of bonus days in days.
+
+        Returns:
+            bool: True, when bonus days have been successfully given, else False.
+        """
+        if await self.is_client_exists(user):
+            updated = await self.update_client(user=user, devices=0, duration=duration)
+            if updated:
+                logger.info(f"Updated client {user.tg_id} with additional {duration} days(-s).")
+                return True
+        else:
+            created = await self.create_client(user=user, devices=1, duration=duration)
+            if created:
+                logger.info(f"Created client {user.tg_id} with additional {duration} days(-s)")
+                return True
+
+        return False
+
     async def activate_promocode(self, user: User, promocode: Promocode) -> bool:
+        # todo: consider moving to some 'promocode module services' with usage of vpn-service methods.
+
         async with self.session() as session:
             activated = await Promocode.set_activated(
                 session=session,
@@ -259,19 +285,106 @@ class VPNService:
             logger.critical(f"Failed to activate promocode {promocode.code} for user {user.tg_id}.")
             return False
 
-        if await self.is_client_exists(user):
-            updated = await self.update_client(user=user, devices=0, duration=promocode.duration)
-            if updated:
-                logger.info(f"Updated client {user.tg_id} with promocode {promocode.code}.")
-                return True
-        else:
-            created = await self.create_client(user=user, devices=1, duration=promocode.duration)
-            if created:
-                logger.info(f"Created client {user.tg_id} with promocode {promocode.code}.")
-                return True
+        logger.info(f"Begun applying promocode ({promocode.code}) to a client {user.tg_id}.")
+        success = await self.process_bonus_days(user, duration=promocode.duration)
+
+        if success:
+            return True
 
         async with self.session() as session:
             await Promocode.set_deactivated(session=session, code=promocode.code)
 
         logger.warning(f"Promocode {promocode.code} not activated due to failure.")
+        return False
+
+    async def reward_referral(self, referred_tg_id: int) -> bool:
+        """
+        Rewards both user who invited (referrer) and who has been invited (referred).
+        And calls database method to log this action.
+
+        Args:
+            referred_tg_id (int): Unique Telegram ID of referred user.
+
+        Returns:
+            bool: True, when the reward has been successfully given AT LEAST to a referred user, else False.
+        """
+
+        # todo: consider moving to some 'referral module services' with usage of vpn-service methods.
+
+        async with self.session() as session:
+            referral = await Referral.get_referral_with_users(session=session, referred_tg_id=referred_tg_id)
+
+            if not referral:
+                logger.warning(f"Referral not found for user {referred_tg_id}.")
+                return False
+
+            rewarded = await referral.set_rewarded(session=session, referral=referral)
+            if not rewarded:
+                logger.warning(f"Referral reward already given for {referred_tg_id}.")
+                return False
+
+            logger.info(f"Applying reward to referred user {referral.referred_tg_id}. Referral ID: {referral.id}")
+            referred_success = await self.process_bonus_days(referral.referred,
+                                                             duration=self.config.shop.REFERRAL_PERIOD)
+
+            logger.info(f"Applying reward to referrer user {referral.referrer_tg_id}. Referral ID: {referral.id}")
+            referrer_success = await self.process_bonus_days(referral.referrer,
+                                                             duration=self.config.shop.REFERRAL_PERIOD)
+
+        if referred_success and referrer_success:
+            return True
+
+        async with self.session() as session_local:
+            await Referral.rollback_rewarded(
+                session=session_local,
+                referral=referral,
+                rollback_referrer=not referrer_success,
+                rollback_referred=not referred_success,
+            )
+
+        if not referrer_success and not referred_success:
+            return False
+        elif not referrer_success:
+            logger.critical(
+                f"Failed to reward referrer, but rewarded referred client. Referral ID: {referral.id}.")
+            return True  # continue with no error, as referred user (who started rewards assigning) received its reward.
+
+    async def gift_trial(self, user: User) -> bool:
+        """
+        Rewards both user who invited (referrer) and who has been invited (referred).
+
+        Args:
+            user (User): User object.
+
+        Returns:
+            bool: True, when the reward has been successfully given, else False.
+        """
+
+        # todo: consider moving to some 'referral module services' with usage of vpn-service methods.
+
+        if not self.config.shop.TRIAL_ENABLED:
+            logger.warning(f"Failed to activate trial for user {user.tg_id}. Trial period is disabled.")
+            return False
+
+        if user.is_trial_used is True:
+            logger.info(f"User {user.tg_id} has already used Trial period before")
+            return False
+
+        async with self.session() as session:
+            trial_used = await User.update_trial_status(session=session, tg_id=user.tg_id, used=True)
+
+        if not trial_used:
+            logger.critical(f"Failed to activate trial for user {user.tg_id}.")
+            return False
+
+        logger.info(f"Begun applying trial period for user {user.tg_id}.")
+        trial_success = await self.process_bonus_days(user, duration=self.config.shop.TRIAL_PERIOD)
+
+        if trial_success:
+            return True
+
+        async with self.session() as session:
+            await User.update_trial_status(session=session, tg_id=user.tg_id, used=False)
+
+        logger.warning(f"Failed to apply trial period for user {user.tg_id} due to failure.")
         return False

@@ -598,23 +598,23 @@ msgstr ""
 "♾️ БЕЗЛИМИТ\n"
 "✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД\n"
 
-#: app/bot/routers/main_menu/keyboard.py:19
+#: app/bot/routers/main_menu/keyboard.py:27
 msgid "main_menu:button:profile"
 msgstr "👤 Профиль"
 
-#: app/bot/routers/main_menu/keyboard.py:23
+#: app/bot/routers/main_menu/keyboard.py:31
 msgid "main_menu:button:subscription"
 msgstr "💳 Подписка"
 
-#: app/bot/routers/main_menu/keyboard.py:29
+#: app/bot/routers/main_menu/keyboard.py:37
 msgid "main_menu:button:referral"
 msgstr "👥 Пригласить"
 
-#: app/bot/routers/main_menu/keyboard.py:33
+#: app/bot/routers/main_menu/keyboard.py:41
 msgid "main_menu:button:support"
 msgstr "🆘 Помощь"
 
-#: app/bot/routers/main_menu/keyboard.py:41
+#: app/bot/routers/main_menu/keyboard.py:49
 msgid "main_menu:button:admin_tools"
 msgstr "🛠 Административные инструменты"
 
@@ -851,6 +851,38 @@ msgstr "❌ Доступных серверов не найдено. Попро�
 #: app/bot/routers/subscription/subscription_handler.py:171
 msgid "subscription:message:payment_method"
 msgstr "💳 <b>Выберите способ оплаты:</b>"
+
+#: app/bot/routers/referral/handler.py:45
+msgid "referral:message:user_summary"
+msgstr "Пригласив пользователя по персональной ссылке, вы и приглашенный "
+"пользователь получите дополнительный период бесплатного VPN ({duration} за каждого приглашенного)\n\n"
+"Чтобы дни засчитались, приглашенный пользователь должен активировать "
+"промо-период - нажать на кнопку 'Попробовать бесплатно'\n\n"
+"Ваша персональная ссылка:\n"
+"<code>{referral_link}</code>\n\n"
+"Всего приглашено пользователей: {referrals_count}"
+
+#: app/bot/routers/main_menu/keyboard.py:20
+msgid "referral:button:get_bonus_days"
+msgstr "ПОПРОБОВАТЬ БЕСПЛАТНО"
+
+#: app/bot/routers/referral/handler.py:96
+msgid "referral:ntf:bonus_days_activate_success"
+msgstr "✅ <b>Пробный период был успешно активирован!</b>\n"
+"\n"
+"<i>Вы получили {duration} к своей подписке.</i>"
+
+#: app/bot/routers/referral/handler.py:80
+msgid "referral:popup:bonus_days_unavailable_for_user"
+msgstr "❌ Пробный период уже был использован."
+
+#: app/bot/routers/referral/handler.py:104
+msgid "referral:ntf:bonus_days_activate_failed"
+msgstr "❌ <i>Не удалось активировать пробный период, пожалуйста попробуйте позже, либо обратитесь к администратору</i>"
+
+#: app/bot/routers/referral/handler.py:70
+msgid "referral:ntf:no_available_servers"
+msgstr "❌ <i>Нет доступных серверов. Попробуйте позже.</i>"
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"

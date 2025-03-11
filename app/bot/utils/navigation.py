@@ -15,6 +15,7 @@ class NavProfile(str, Enum):
 
 class NavReferral(str, Enum):
     MAIN = "referral"
+    GET_BONUS_DAYS = "get_bonus_days"
 
 
 class NavSupport(str, Enum):

@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from typing import Any, Self
 
-from sqlalchemy import ForeignKey, String, func, select, update
+from sqlalchemy import ForeignKey, String, Integer, func, select, update, Boolean
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
@@ -29,6 +29,8 @@ class User(Base):
         server (Server | None): Associated server object.
         transactions (list[Transaction]): List of transactions associated with the user.
         activated_promocodes (list[Promocode]): List of promocodes activated by the user.
+        sent_referrals (list[Referral]): List of Referrals sent by the user and applied by referred users.
+        referral (Referral | None): The Referral record if this user was invited.
     """
 
     __tablename__ = "users"
@@ -52,13 +54,28 @@ class User(Base):
     activated_promocodes: Mapped[list["Promocode"]] = relationship(  # type: ignore
         "Promocode", back_populates="activated_user"
     )
+    is_trial_used: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    sent_referrals: Mapped[list["Referral"]] = relationship(  # type: ignore
+        "Referral",
+        foreign_keys="Referral.referrer_tg_id",
+        primaryjoin="User.tg_id == Referral.referrer_tg_id",
+        back_populates="referrer",
+        cascade="all, delete-orphan"
+    )
+    referral: Mapped["Referral | None"] = relationship(
+        "Referral",
+        foreign_keys="Referral.referred_tg_id",
+        primaryjoin="User.tg_id == Referral.referred_tg_id",
+        back_populates="referred",
+        uselist=False
+    )
 
     def __repr__(self) -> str:
         return (
             f"<User(id={self.id}, tg_id={self.tg_id}, vpn_id='{self.vpn_id}', "
             f"server_id={self.server_id}, first_name='{self.first_name}', "
             f"username='{self.username}', language_code='{self.language_code}', "
-            f"created_at={self.created_at})>"
+            f"created_at={self.created_at}, is_trial_used={self.is_trial_used})>"
         )
 
     @classmethod
@@ -124,3 +141,29 @@ class User(Base):
     @classmethod
     async def exists(cls, session: AsyncSession, tg_id: int) -> bool:
         return await User.get(session=session, tg_id=tg_id) is not None
+
+    @classmethod
+    async def update_trial_status(cls, session: AsyncSession, tg_id: int, used: bool) -> bool:
+        """
+        Updates the trial status of a user.
+
+        Args:
+            session (AsyncSession): Database session.
+            tg_id (int): Telegram user ID.
+            used (bool): Whether the trial has been used.
+
+        Returns:
+            bool: True if updated, False otherwise.
+        """
+        user = await cls.get(session=session, tg_id=tg_id)
+
+        if not user:
+            logger.warning(f"User {tg_id} not found to update trial status.")
+            return False
+
+        await session.execute(
+            update(User).where(User.tg_id == tg_id).values(is_trial_used=used)
+        )
+        await session.commit()
+        logger.info(f"Trial status updated for user {tg_id}: {used}")
+        return True

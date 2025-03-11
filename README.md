@@ -47,12 +47,12 @@ The bot enables efficient subscription sales with advanced features:
     - Format text using HTML
     - Preview notifications before sending
     - System notifications for the developer and administrators
-- **~~Referral Program~~**
-    - ~~View referral statistics~~
-    - ~~Reward users for inviting new members~~
-- **~~Trial Period~~**
-    - ~~Provide free trial subscriptions~~
-    - ~~Configure and disable the trial period~~
+- **Referral Program**
+    - View referral statistics
+    - Reward users for inviting new members
+- **Trial Period**
+    - Provide free trial subscription
+    - Configure and disable the trial period
 - **Flexible Payment System**
     - Change the default currency
     - Easily extendable architecture for adding new payment gateways
@@ -140,8 +140,9 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | | | |
 | SHOP_EMAIL | ⭕ | support@3xui-shop.com | Email for receipts |
 | SHOP_CURRENCY | ⭕ | RUB | Currency for buttons (e.g., RUB, USD, XTR) |
-| ~~SHOP_TRIAL_ENABLED~~ | ⭕ | ~~True~~ | ~~Enable trial subscription~~ |
-| ~~SHOP_TRIAL_PERIOD~~ | ⭕ | ~~3~~ | ~~Period of the trial subscription in days~~ |
+| SHOP_TRIAL_ENABLED | ⭕ | True | Enable trial subscription |
+| SHOP_TRIAL_PERIOD | ⭕ | 3 | Period of the trial subscription in days |
+| SHOP_REFERRAL_PERIOD | ⭕ | 7 | Period of the referral trial reward in days |
 | SHOP_PAYMENT_STARS_ENABLED | ⭕ | True | Enable Telegram stars payment |
 | SHOP_PAYMENT_CRYPTOMUS_ENABLED | ⭕ | False | Enable Cryptomus payment |
 | SHOP_PAYMENT_YOOKASSA_ENABLED | ⭕ | False | Enable Yookassa payment |
