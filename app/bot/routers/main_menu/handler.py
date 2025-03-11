@@ -30,7 +30,7 @@ async def is_available_try_for_free(session: AsyncSession, user: User, config: C
     return not referral.referred_rewarded_at
 
 
-async def precess_creating_referral(
+async def process_creating_referral(
     session: AsyncSession,
     user: User,
     services: ServicesContainer,
@@ -82,7 +82,7 @@ async def command_main_menu(
 
     received_referrer_id = int(command.args) if command.args and command.args.isdigit() else None
     if received_referrer_id and is_new_user:
-        await precess_creating_referral(
+        await process_creating_referral(
             session=session,
             user=user,
             services=services,
