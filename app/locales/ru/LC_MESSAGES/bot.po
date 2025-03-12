@@ -871,6 +871,9 @@ msgid "referral:ntf:bonus_days_activate_success"
 msgstr "✅ <b>Пробный период был успешно активирован!</b>\n"
 "\n"
 "<i>Вы получили {duration} к своей подписке.</i>"
+"\n"
+"<b>По кнопке 'Подключиться' бот поможет вам скачать приложение и добавить вашу конфигурацию</b>\n"
+"Ваш приватный ключ VPN всегда доступен в разделе 'Профиль'"
 
 #: app/bot/routers/referral/handler.py:80
 msgid "referral:popup:bonus_days_unavailable_for_user"

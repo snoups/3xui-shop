@@ -8,13 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.models import ServicesContainer
 from app.bot.utils.constants import PREVIOUS_CALLBACK_KEY
-from app.bot.utils.navigation import NavReferral, NavSubscription
+from app.bot.utils.navigation import NavReferral
 from app.config import Config
 from app.db.models import User, Referral
 from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY
 
 from .keyboard import referral_keyboard
-from app.bot.routers.misc.keyboard import back_keyboard
 from app.bot.utils.formatting import format_subscription_period
 
 logger = logging.getLogger(__name__)
@@ -98,7 +97,7 @@ async def callback_get_bonus_days(
             ),
             chat_id=callback.message.chat.id,
             message_id=main_message_id,
-            reply_markup=back_keyboard(NavSubscription.MAIN),
+            reply_markup=referral_keyboard(),
         )
     else:
         text = _("referral:ntf:bonus_days_activate_failed")

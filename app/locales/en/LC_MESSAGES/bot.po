@@ -863,7 +863,10 @@ msgstr "TRY FOR FREE"
 msgid "referral:ntf:bonus_days_activate_success"
 msgstr "✅ <b>Trial period was successfully activated!</b>\n"
 "\n"
-"<i>You have received {duration} to your subscription.</i>"
+"<i>You have received {duration} to your subscription.</i>\n"
+"\n"
+"<b>Click 'Connect' button to download and connect to your new VPN application</b>\n"
+"Your private key for applications is always available at Profile"
 
 #: app/bot/routers/referral/handler.py:80
 msgid "referral:popup:bonus_days_unavailable_for_user"
