@@ -877,6 +877,10 @@ msgstr "❌ <i>Failed to your trial period, please try again later or contact ad
 msgid "referral:ntf:no_available_servers"
 msgstr "❌ <i>No available servers found. Please try again later.</i>"
 
+#: app/bot/routers/referral/keyboard.py:13
+msgid "referral:button:connect"
+msgstr "🔌 Connect"
+
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"
 msgstr ""

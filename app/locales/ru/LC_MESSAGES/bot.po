@@ -884,6 +884,10 @@ msgstr "❌ <i>Не удалось активировать пробный пе�
 msgid "referral:ntf:no_available_servers"
 msgstr "❌ <i>Нет доступных серверов. Попробуйте позже.</i>"
 
+#: app/bot/routers/referral/keyboard.py:13
+msgid "referral:button:connect"
+msgstr "🔌 Подключиться"
+
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"
 msgstr ""
