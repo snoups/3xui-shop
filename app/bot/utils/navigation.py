@@ -39,6 +39,7 @@ class NavSubscription(str, Enum):
     DEVICES = "devices"
     DURATION = "duration"
     PROMOCODE = "promocode"
+    TRIAL = "trial"
 
     PAY = "pay"
     PAY_YOOKASSA = f"{PAY}_yookassa"

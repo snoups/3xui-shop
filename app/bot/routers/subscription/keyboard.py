@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from app.bot.services import PlanService
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.i18n import gettext as _
+from aiogram.utils.i18n import gettext as _, ngettext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.models import SubscriptionData
@@ -21,6 +21,8 @@ from app.bot.routers.misc.keyboard import (
 )
 from app.bot.utils.formatting import format_device_count, format_subscription_period
 from app.bot.utils.navigation import NavMain, NavSubscription
+from app.config import Config
+from app.db.models.user import User
 
 
 def change_subscription_button() -> InlineKeyboardButton:
@@ -33,10 +35,23 @@ def change_subscription_button() -> InlineKeyboardButton:
 def subscription_keyboard(
     has_subscription: bool,
     callback_data: SubscriptionData,
+    config: Config,
+    user: User,
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     if not has_subscription:
+        if config.shop.TRIAL_ENABLED and not user.trial_used:
+            days = config.shop.TRIAL_PERIOD
+            trial_text = ngettext(
+                "subscription:button:trial",
+                "subscription:button:trial",
+                days
+            ).format(days)
+            builder.button(
+                text=trial_text,
+                callback_data=NavSubscription.TRIAL,
+            )
         builder.button(
             text=_("subscription:button:buy"),
             callback_data=callback_data,

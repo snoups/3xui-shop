@@ -738,6 +738,13 @@ msgstr "◀️ Change duration"
 msgid "subscription:button:download_app"
 msgstr "🔌 Connect"
 
+#: app/bot/routers/subscription/keyboard.py:171
+msgid "subscription:button:trial"
+msgid_plural "subscription:button:trial"
+msgstr "🎁 Trial Period (1 day)"
+msgstr[0] "🎁 Trial Period (1 day)"
+msgstr[1] "🎁 Trial Period ({} days)"
+
 #: app/bot/routers/subscription/payment_handler.py:58
 msgid "payment:message:order_extend"
 msgstr ""
@@ -844,6 +851,18 @@ msgstr "❌ No available servers found. Please try again later."
 #: app/bot/routers/subscription/subscription_handler.py:171
 msgid "subscription:message:payment_method"
 msgstr "💳 <b>Choose a payment method:</b>"
+
+#: app/bot/routers/subscription/subscription_handler.py:175
+msgid "subscription:popup:trial_already_used"
+msgstr "⚠️ You have already used the trial period."
+
+#: app/bot/routers/subscription/subscription_handler.py:180
+msgid "subscription:message:trial_success"
+msgstr "✅ Trial period successfully activated!\n\nYour connection key:\n<code>{key}</code>\n\nDownload the app to connect to VPN."
+
+#: app/bot/routers/subscription/subscription_handler.py:185
+msgid "subscription:popup:error_creating_subscription"
+msgstr "❌ Error creating subscription. Please try again later."
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"

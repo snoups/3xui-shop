@@ -26,6 +26,7 @@ class User(Base):
         first_name (str): First name of the user.
         username (str | None): Telegram username of the user.
         created_at (datetime): Timestamp when the user was created.
+        trial_used (bool): Indicates whether the user has used the trial.
         server (Server | None): Associated server object.
         transactions (list[Transaction]): List of transactions associated with the user.
         activated_promocodes (list[Promocode]): List of promocodes activated by the user.
@@ -47,6 +48,7 @@ class User(Base):
         default=DEFAULT_LANGUAGE,
     )
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
+    trial_used: Mapped[bool] = mapped_column(default=False, nullable=False)
     server: Mapped["Server | None"] = relationship("Server", back_populates="users", uselist=False)  # type: ignore
     transactions: Mapped[list["Transaction"]] = relationship("Transaction", back_populates="user")  # type: ignore
     activated_promocodes: Mapped[list["Promocode"]] = relationship(  # type: ignore

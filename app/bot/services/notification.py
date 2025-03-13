@@ -201,3 +201,16 @@ class NotificationService:
             ),
             message_effect_id=message_effect_id,
         )
+
+    async def notify_trial_success(
+        self,
+        user_id: int,
+        key: str,
+        message_effect_id: str = MESSAGE_EFFECT_IDS["🎉"],
+    ) -> None:
+        await self.notify_by_id(
+            chat_id=user_id,
+            text=__("subscription:message:trial_success").format(key=key),
+            message_effect_id=message_effect_id,
+            reply_markup=payment_success_keyboard(),
+        )

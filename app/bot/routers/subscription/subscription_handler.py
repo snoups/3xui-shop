@@ -17,6 +17,7 @@ from .keyboard import (
     duration_keyboard,
     payment_method_keyboard,
     subscription_keyboard,
+    payment_success_keyboard,
 )
 
 logger = logging.getLogger(__name__)
@@ -27,9 +28,10 @@ async def show_subscription(
     callback: CallbackQuery,
     client_data: ClientData | None,
     callback_data: SubscriptionData,
+    config: Config,
+    user: User,
 ) -> None:
     if client_data:
-
         if client_data.has_subscription_expired:
             text = _("subscription:message:expired")
         else:
@@ -45,6 +47,8 @@ async def show_subscription(
         reply_markup=subscription_keyboard(
             has_subscription=client_data,
             callback_data=callback_data,
+            config=config,
+            user=user,
         ),
     )
 
@@ -55,6 +59,7 @@ async def callback_subscription(
     user: User,
     state: FSMContext,
     services: ServicesContainer,
+    config: Config,
 ) -> None:
     logger.info(f"User {user.tg_id} opened subscription page.")
     await state.set_state(None)
@@ -69,7 +74,13 @@ async def callback_subscription(
             )
 
     callback_data = SubscriptionData(state=NavSubscription.PROCESS, user_id=user.tg_id)
-    await show_subscription(callback=callback, client_data=client_data, callback_data=callback_data)
+    await show_subscription(
+        callback=callback,
+        client_data=client_data,
+        callback_data=callback_data,
+        config=config,
+        user=user,
+    )
 
 
 @router.callback_query(SubscriptionData.filter(F.state == NavSubscription.EXTEND))
@@ -175,3 +186,64 @@ async def callback_duration_selected(
             gateways=gateway_factory.get_gateways(),
         ),
     )
+
+
+@router.callback_query(F.data == NavSubscription.TRIAL)
+async def callback_trial_subscription(
+    callback: CallbackQuery,
+    user: User,
+    session: AsyncSession,
+    config: Config,
+    services: ServicesContainer,
+    state: FSMContext,
+) -> None:
+    logger.info(f"User {user.tg_id} started trial subscription.")
+    
+    if user.trial_used:
+        await services.notification.show_popup(
+            callback=callback,
+            text=_("subscription:popup:trial_already_used"),
+            cache_time=120,
+        )
+        return
+
+    server = await services.server_pool.get_available_server()
+
+    if not server:
+        await services.notification.show_popup(
+            callback=callback,
+            text=_("subscription:popup:no_available_servers"),
+            cache_time=120,
+        )
+        return
+
+    success = await services.vpn.create_subscription(
+        user=user,
+        devices=1,
+        duration=config.shop.TRIAL_PERIOD,
+    )
+
+    if success:
+        await User.update(
+            session=session,
+            tg_id=user.tg_id,
+            trial_used=True,
+        )
+        key = await services.vpn.get_key(user)
+        await services.notification.notify_trial_success(
+            user_id=user.tg_id,
+            key=key,
+        )
+        # Перенаправляем на главную страницу
+        from app.bot.routers.main_menu.handler import redirect_to_main_menu
+        await redirect_to_main_menu(
+            bot=callback.bot,
+            user=user,
+            state=state,
+        )
+    else:
+        await services.notification.show_popup(
+            callback=callback,
+            text=_("subscription:popup:error_creating_subscription"),
+            cache_time=120,
+        )

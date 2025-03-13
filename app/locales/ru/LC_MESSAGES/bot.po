@@ -745,6 +745,14 @@ msgstr "◀️ Изменить длительность"
 msgid "subscription:button:download_app"
 msgstr "🔌 Подключиться"
 
+#: app/bot/routers/subscription/keyboard.py:171
+msgid "subscription:button:trial"
+msgid_plural "subscription:button:trial"
+msgstr "🎁 Пробный период (1 день)"
+msgstr[0] "🎁 Пробный период (1 день)"
+msgstr[1] "🎁 Пробный период ({} дня)"
+msgstr[2] "🎁 Пробный период ({} дней)"
+
 #: app/bot/routers/subscription/payment_handler.py:58
 msgid "payment:message:order_extend"
 msgstr ""
@@ -993,3 +1001,12 @@ msgid_plural "{} months"
 msgstr[0] "1 месяц"
 msgstr[1] "{} месяца"
 msgstr[2] "{} месяцев"
+
+msgid "subscription:popup:trial_already_used"
+msgstr "⚠️ Вы уже использовали пробный период."
+
+msgid "subscription:message:trial_success"
+msgstr "✅ Пробный период успешно активирован!\n\nВаш ключ для подключения:\n<code>{key}</code>\n\nСкачайте приложение для подключения к VPN."
+
+msgid "subscription:popup:error_creating_subscription"
+msgstr "❌ Ошибка при создании подписки. Пожалуйста, попробуйте позже."
