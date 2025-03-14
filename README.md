@@ -143,6 +143,7 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | SHOP_TRIAL_ENABLED | ⭕ | True | Enable trial subscription |
 | SHOP_TRIAL_PERIOD | ⭕ | 3 | Period of the trial subscription in days |
 | SHOP_REFERRAL_PERIOD | ⭕ | 7 | Period of the referral trial reward in days |
+| SHOP_BONUS_DEVICES_COUNT | ⭕ | 1 | Devices cound for trial and referral (mirrors plans tariff) |
 | SHOP_PAYMENT_STARS_ENABLED | ⭕ | True | Enable Telegram stars payment |
 | SHOP_PAYMENT_CRYPTOMUS_ENABLED | ⭕ | False | Enable Cryptomus payment |
 | SHOP_PAYMENT_YOOKASSA_ENABLED | ⭕ | False | Enable Yookassa payment |

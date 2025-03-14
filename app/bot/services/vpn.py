@@ -247,13 +247,14 @@ class VPNService:
             )
         return False
 
-    async def process_bonus_days(self, user: User, duration: int) -> bool:
+    async def process_bonus_days(self, user: User, duration: int, devices: int) -> bool:
         """
         Ensures that user will receive its bonus days both if it already has subscription, or not.
 
         Args:
             user (User): User object.
             duration (int): Duration of bonus days in days.
+            devices (int): Count of devices for new client.
 
         Returns:
             bool: True, when bonus days have been successfully given, else False.
@@ -264,7 +265,7 @@ class VPNService:
                 logger.info(f"Updated client {user.tg_id} with additional {duration} days(-s).")
                 return True
         else:
-            created = await self.create_client(user=user, devices=1, duration=duration)
+            created = await self.create_client(user=user, devices=devices, duration=duration)
             if created:
                 logger.info(f"Created client {user.tg_id} with additional {duration} days(-s)")
                 return True
@@ -325,11 +326,15 @@ class VPNService:
 
             logger.info(f"Applying reward to referred user {referral.referred_tg_id}. Referral ID: {referral.id}")
             referred_success = await self.process_bonus_days(referral.referred,
-                                                             duration=self.config.shop.REFERRAL_PERIOD)
+                                                             duration=self.config.shop.REFERRAL_PERIOD,
+                                                             devices=self.config.shop.BONUS_DEVICES_COUNT,
+                                                             )
 
             logger.info(f"Applying reward to referrer user {referral.referrer_tg_id}. Referral ID: {referral.id}")
             referrer_success = await self.process_bonus_days(referral.referrer,
-                                                             duration=self.config.shop.REFERRAL_PERIOD)
+                                                             duration=self.config.shop.REFERRAL_PERIOD,
+                                                             devices=self.config.shop.BONUS_DEVICES_COUNT,
+                                                             )
 
         if referred_success and referrer_success:
             return True
@@ -378,7 +383,11 @@ class VPNService:
             return False
 
         logger.info(f"Begun applying trial period for user {user.tg_id}.")
-        trial_success = await self.process_bonus_days(user, duration=self.config.shop.TRIAL_PERIOD)
+        trial_success = await self.process_bonus_days(
+            user,
+            duration=self.config.shop.TRIAL_PERIOD,
+            devices=self.config.shop.BONUS_DEVICES_COUNT,
+        )
 
         if trial_success:
             return True
