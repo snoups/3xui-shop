@@ -287,7 +287,11 @@ class VPNService:
             return False
 
         logger.info(f"Begun applying promocode ({promocode.code}) to a client {user.tg_id}.")
-        success = await self.process_bonus_days(user, duration=promocode.duration)
+        success = await self.process_bonus_days(
+            user,
+            duration=promocode.duration,
+            devices=self.config.shop.BONUS_DEVICES_COUNT,
+        )
 
         if success:
             return True
