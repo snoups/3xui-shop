@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from typing import Any, Self
 
-from sqlalchemy import ForeignKey, String, Integer, func, select, update, Boolean
+from sqlalchemy import ForeignKey, String, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
@@ -54,7 +54,7 @@ class User(Base):
     activated_promocodes: Mapped[list["Promocode"]] = relationship(  # type: ignore
         "Promocode", back_populates="activated_user"
     )
-    is_trial_used: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_trial_used: Mapped[bool] = mapped_column(default=False, nullable=False)
     referrals_sent: Mapped[list["Referral"]] = relationship(  # type: ignore
         "Referral",
         foreign_keys="Referral.referrer_tg_id",

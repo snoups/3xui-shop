@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from decimal import Decimal
-from typing import Self, Any
+from typing import Self
 
 from sqlalchemy import select, update, Enum, ForeignKey, Numeric, String, func, UniqueConstraint
 from sqlalchemy.exc import IntegrityError
@@ -62,9 +62,10 @@ class ReferrerReward(Base):
 
     @classmethod
     async def get_by_id(cls, session: AsyncSession, reward_id: int) -> Self | None:
+        filters = [ReferrerReward.id == reward_id]
+
         query = await session.execute(
-            select(cls)
-            .where(cls.id == reward_id)
+            select(ReferrerReward).where(*filters)
         )
 
         return query.scalar_one_or_none()
@@ -77,20 +78,17 @@ class ReferrerReward(Base):
             reward_type: ReferrerRewardType,
             reward_level: ReferrerRewardLevel
     ) -> Decimal:
-        filter_base = [
-            cls.user_tg_id == tg_id,
-            cls.reward_type == reward_type
+        filters = [
+            ReferrerReward.user_tg_id == tg_id,
+            ReferrerReward.reward_type == reward_type,
+            ReferrerReward.reward_level == reward_level
         ]
 
-        query_first = await session.execute(
-            select(func.coalesce(func.sum(cls.amount), 0)).where(
-                *filter_base,
-                cls.reward_level == reward_level
-            )
+        query = await session.execute(
+            select(func.coalesce(func.sum(ReferrerReward.amount), 0)).where(*filters)
         )
-        result = query_first.scalar() or Decimal(0)
 
-        return result
+        return query.scalar() or Decimal(0)
 
     @classmethod
     async def create_referrer_reward(
@@ -126,15 +124,13 @@ class ReferrerReward(Base):
             session: AsyncSession,
             user_tg_id: int | None = None,
     ) -> list[Self]:
-        filters = [
-            cls.rewarded_at.is_(None)
-        ]
+        filters = [ReferrerReward.rewarded_at.is_(None)]
 
         if user_tg_id is not None:
-            filters.append(cls.user_tg_id == user_tg_id)
+            filters.append(ReferrerReward.user_tg_id == user_tg_id)
 
         query = await session.execute(
-            select(cls).where(*filters)
+            select(ReferrerReward).where(*filters)
         )
 
         return query.scalars().all()
@@ -146,26 +142,27 @@ class ReferrerReward(Base):
             user_tg_id: int | None = None,
     ) -> int:
         filters = [
-            cls.rewarded_at.is_(None)
+            ReferrerReward.rewarded_at.is_(None)
         ]
 
         if user_tg_id is not None:
-            filters.append(cls.user_tg_id == user_tg_id)
+            filters.append(ReferrerReward.user_tg_id == user_tg_id)
 
         query = await session.execute(
-            select(func.count()).select_from(cls).where(*filters)
+            select(func.count()).select_from(ReferrerReward).where(*filters)
         )
 
         return query.scalar_one()
 
     @classmethod
     async def mark_reward_as_given(cls, session: AsyncSession, reward: Self) -> Self | None:
-        filter = [ReferrerReward.id == reward.id]
+        filters = [ReferrerReward.id == reward.id]
+
         try:
             await session.execute(
                 update(ReferrerReward)
-                .where(*filter)
-                .values(rewarded_at=datetime.utcnow())
+                .where(*filters)
+                .values(rewarded_at=func.now())
             )
             await session.commit()
             logger.info(f"Marked reward {reward.id} as given.")

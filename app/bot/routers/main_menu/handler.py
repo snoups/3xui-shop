@@ -24,14 +24,13 @@ router = Router(name=__name__)
 async def process_creating_referral(
     session: AsyncSession,
     user: User,
-    services: ServicesContainer,
-    received_referrer_id: int
+    referrer_id: int
 ) -> bool:
-    logger.info(f"Assigning user {user.tg_id} as a referred to a referrer user {received_referrer_id}")
+    logger.info(f"Assigning user {user.tg_id} as a referred to a referrer user {referrer_id}")
     try:
-        referrer = await User.get(session=session, tg_id=received_referrer_id)
+        referrer = await User.get(session=session, tg_id=referrer_id)
         if not referrer or referrer.tg_id == user.tg_id:
-            logger.info(f"Failed to assign user {user.tg_id} as a referred to a referrer user {received_referrer_id}."
+            logger.info(f"Failed to assign user {user.tg_id} as a referred to a referrer user {referrer_id}."
                         f"Invalid string received.")
             return False
 
@@ -40,11 +39,10 @@ async def process_creating_referral(
             referrer_tg_id=referrer.tg_id,
             referred_tg_id=user.tg_id
         )
-        await services.notification.notify_developer(f"Creating Referral {referrer.tg_id} =>{user.tg_id}")
         logger.info(f"User {user.tg_id} assigned as referred to a referrer with tg id {referrer.tg_id}")
         return True
     except Exception as e:
-        logger.critical(f"Error creating Referral to a referred {user.tg_id} (start arg: {received_referrer_id}): {e}")
+        logger.critical(f"Error creating Referral to a referred {user.tg_id} (start arg: {referrer_id}): {e}")
         return False
 
 
@@ -75,8 +73,7 @@ async def command_main_menu(
         await process_creating_referral(
             session=session,
             user=user,
-            services=services,
-            received_referrer_id=received_referrer_id
+            referrer_id=received_referrer_id
         )
 
     is_admin = await IsAdmin()(user_id=user.tg_id)

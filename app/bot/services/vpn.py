@@ -19,7 +19,7 @@ from app.bot.utils.time import (
     days_to_timestamp,
     get_current_timestamp,
 )
-from app.db.models import Promocode, User, Referral
+from app.db.models import Promocode, User
 
 logger = logging.getLogger(__name__)
 

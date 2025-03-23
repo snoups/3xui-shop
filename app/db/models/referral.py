@@ -57,39 +57,47 @@ class Referral(Base):
 
     @classmethod
     async def get_by_id(cls, session: AsyncSession, referral_id: int) -> Self | None:
+        filters = [Referral.id == referral_id]
+
         query = await session.execute(
             select(Referral).options(
                 selectinload(Referral.referrer),
                 selectinload(Referral.referred)
-            ).where(Referral.id == referral_id)  # type: ignore
+            ).where(*filters)
         )
         return query.scalar_one_or_none()
 
     @classmethod
     async def get_referral_count(cls, session: AsyncSession, referrer_tg_id: int) -> int:
+        filters = [Referral.referrer_tg_id == referrer_tg_id]
+
         query = await session.execute(
-            select(func.count()).where(Referral.referrer_tg_id == referrer_tg_id)  # type: ignore
+            select(func.count()).where(*filters)
         )
         return query.scalar() or 0
 
     @classmethod
     async def get_referral(cls, session: AsyncSession, referred_tg_id: int) -> Self | None:
+        filters = [Referral.referred_tg_id == referred_tg_id]
+
         query = await session.execute(
-            select(Referral).options(selectinload(Referral.referrer)).where(
-                Referral.referred_tg_id == referred_tg_id  # type: ignore
-            )
+            select(Referral)
+            .options(selectinload(Referral.referrer))
+            .where(*filters)
         )
         return query.scalar_one_or_none()
 
     @classmethod
     async def get_referral_with_users(cls, session: AsyncSession, referred_tg_id: int) -> Self | None:
+        filters = [Referral.referred_tg_id == referred_tg_id]
+
         query = await session.execute(
             select(Referral)
             .options(
                 selectinload(Referral.referrer),
                 selectinload(Referral.referred)
             )
-            .where(Referral.referred_tg_id == referred_tg_id)  # type: ignore
+            .where(*filters)
         )
         return query.scalar_one_or_none()
 
@@ -150,10 +158,11 @@ class Referral(Base):
         Returns:
             bool: True if reward successfully marked, False otherwise.
         """
+        filters = [Referral.id == referral.id]
 
         await session.execute(
             update(Referral)
-            .where(Referral.id == referral.id)  # type: ignore
+            .where(*filters)  # type: ignore
             .values(
                 referred_rewarded_at=func.now(),
                 referred_bonus_days=referred_bonus_days,
@@ -181,10 +190,11 @@ class Referral(Base):
         Returns:
             bool: True if rollback was successful, False otherwise.
         """
+        filters = [Referral.id == referral.id]
 
         await session.execute(
             update(Referral)
-            .where(Referral.id == referral.id)  # type: ignore
+            .where(*filters)  # type: ignore
             .values(
                 referred_rewarded_at=None,
                 referred_bonus_days=None,
