@@ -1,4 +1,3 @@
-### origin
 import logging
 from datetime import datetime
 from typing import Self
@@ -19,28 +18,27 @@ class Referral(Base):
 
     Attributes:
         id (int): Unique primary key for the referral record.
-        referrer_tg_id (int): Telegram user ID of the referrer.
+        referrer_tg_id (int): Unique Telegram user ID of the referrer.
         referred_tg_id (int): Unique Telegram user ID of the invited user (invitee).
         created_at (datetime): Timestamp when the referral record was created.
-        referred_rewarded_at (datetime | None): Indicates whether the invited user has received their bonus.
-        referrer_rewarded_at (datetime | None): Indicates whether the referrer has received their bonus.
-        bonus_days (int): Number of subscription days granted as a reward for the referral.
+        referred_rewarded_at (datetime | None): Indicates whether the invited user has received its 'Try for free' bonus.
+        referred_bonus_days (int | None): Number of subscription days granted as a reward to a referred user by 'Try for free'.
         referred (User): Relationship to the user who has been invited.
         referrer (User): Relationship to the user who invited.
     """
     __tablename__ = "referrals"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    referred_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id", ondelete="CASCADE"), unique=True, nullable=False)  # deprecate
-    referrer_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id", ondelete="CASCADE"), nullable=False)  # deprecate
+    referred_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id", ondelete="CASCADE"), unique=True,
+                                                nullable=False)
+    referrer_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id", ondelete="CASCADE"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     referred_rewarded_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    referrer_rewarded_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    bonus_days: Mapped[int] = mapped_column(Integer, nullable=False)
+    referred_bonus_days: Mapped[int] = mapped_column(Integer, nullable=True)
     referrer: Mapped["User"] = relationship(  # type: ignore
         "User",
         foreign_keys=[referrer_tg_id],  # type: ignore
-        back_populates="sent_referrals"
+        back_populates="referrals_sent"
     )
     referred: Mapped["User"] = relationship(  # type: ignore
         "User",
@@ -50,11 +48,11 @@ class Referral(Base):
 
     def __repr__(self) -> str:
         return (
-            f"<Referral(referrer_tg_id={self.referrer_tg_id}, "
+            f"<Referral(id={self.id}, "
             f"referred_tg_id={self.referred_tg_id}, "
+            f"referrer_tg_id={self.referrer_tg_id}, "
             f"referred_rewarded_at={self.referred_rewarded_at}, "
-            f"referrer_rewarded_at={self.referrer_rewarded_at}, "
-            f"bonus_days={self.bonus_days})>"
+            f"referred_bonus_days={self.referred_bonus_days})>"
         )
 
     @classmethod
@@ -68,7 +66,7 @@ class Referral(Base):
         return query.scalar_one_or_none()
 
     @classmethod
-    async def count_referrals(cls, session: AsyncSession, referrer_tg_id: int) -> int:
+    async def get_referral_count(cls, session: AsyncSession, referrer_tg_id: int) -> int:
         query = await session.execute(
             select(func.count()).where(Referral.referrer_tg_id == referrer_tg_id)  # type: ignore
         )
@@ -96,7 +94,23 @@ class Referral(Base):
         return query.scalar_one_or_none()
 
     @classmethod
-    async def create(cls, session: AsyncSession, referrer_tg_id: int, referred_tg_id: int, bonus_days: int = 7) -> Self | None:
+    async def create(
+            cls,
+            session: AsyncSession,
+            referrer_tg_id: int,
+            referred_tg_id: int,
+    ) -> Self | None:
+        """
+        Creates new referral relation between invited (referred) user and a user who invited him (referred).
+
+        Args:
+            session (AsyncSession): Active database session.
+            referred_tg_id(int): Unique telegram id of the referred user.
+            referrer_tg_id(int): Unique telegram id of the referrer user.
+
+        Returns:
+            bool: True if rewards successfully marked, False if duplicate rewards detected.
+        """
         existing_referral = await cls.get_referral(session, referred_tg_id)
 
         if existing_referral:
@@ -106,7 +120,6 @@ class Referral(Base):
         referral = Referral(
             referrer_tg_id=referrer_tg_id,
             referred_tg_id=referred_tg_id,
-            bonus_days=bonus_days
         )
         session.add(referral)
 
@@ -120,24 +133,36 @@ class Referral(Base):
             return False
 
     @classmethod
-    async def set_rewarded(cls, session: AsyncSession, referral: Self) -> bool:
-        """Sets up date and time of receiving rewards for the whole Referral: both referrer and referred users."""
+    async def set_rewarded(
+            cls,
+            session: AsyncSession,
+            referral: Self,
+            referred_bonus_days: int,
+    ) -> bool:
+        """
+        Marks referral and/or referrer as rewarded and assigns bonus days.
 
-        if referral.referred_rewarded_at and referral.referrer_rewarded_at:
-            logger.info(f"Referral reward already given to {referral.referrer_tg_id} & {referral.referred_tg_id}.")
-            return False
+        Args:
+            session (AsyncSession): Active database session.
+            referral (Self): Referral instance to update.
+            referred_bonus_days (int): Bonus days granted to the referred.
+
+        Returns:
+            bool: True if reward successfully marked, False otherwise.
+        """
 
         await session.execute(
             update(Referral)
             .where(Referral.id == referral.id)  # type: ignore
             .values(
-                referred_rewarded_at=func.now() if not referral.referred_rewarded_at else referral.referred_rewarded_at,
-                referrer_rewarded_at=func.now() if not referral.referrer_rewarded_at else referral.referrer_rewarded_at
+                referred_rewarded_at=func.now(),
+                referred_bonus_days=referred_bonus_days,
             )
         )
         await session.commit()
+        await session.refresh(referral)
 
-        logger.info(f"Referral reward granted for {referral.referrer_tg_id} & {referral.referred_tg_id}.")
+        logger.info(f"Referred {referral.referred_tg_id} received {referred_bonus_days} bonus days")
         return True
 
     @classmethod
@@ -145,19 +170,28 @@ class Referral(Base):
             cls,
             session: AsyncSession,
             referral: Self,
-            rollback_referrer: bool = True,
-            rollback_referred: bool = True
     ) -> bool:
+        """
+        This method allows to cancel the referred reward.
+
+        Args:
+            session (AsyncSession): The active database session.
+            referral (Self): The referral object to rollback rewards for.
+
+        Returns:
+            bool: True if rollback was successful, False otherwise.
+        """
+
         await session.execute(
             update(Referral)
             .where(Referral.id == referral.id)  # type: ignore
             .values(
-                referred_rewarded_at=None if rollback_referred else referral.referred_rewarded_at,
-                referrer_rewarded_at=None if rollback_referrer else referral.referrer_rewarded_at
+                referred_rewarded_at=None,
+                referred_bonus_days=None,
             )
         )
         await session.commit()
+        await session.refresh(referral)
 
-        logger.info(f"Referral reward rollback executed for {referral.referrer_tg_id} & {referral.referred_tg_id}.")
+        logger.info(f"Referral reward rollback successful for {referral.referred_tg_id}.")
         return True
-

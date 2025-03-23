@@ -4,13 +4,14 @@ from logging.handlers import MemoryHandler
 from pathlib import Path
 
 from environs import Env
-from marshmallow.validate import OneOf
+from marshmallow.validate import OneOf, Range
 
 from app.bot.utils.constants import (
     DB_FORMAT,
     LOG_GZ_ARCHIVE_FORMAT,
     LOG_ZIP_ARCHIVE_FORMAT,
     Currency,
+    ReferrerRewardType,
 )
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -25,9 +26,16 @@ DEFAULT_SHOP_EMAIL = "support@3xui-shop.com"
 DEFAULT_SHOP_CURRENCY = Currency.RUB.code
 DEFAULT_SHOP_TRIAL_ENABLED = True
 DEFAULT_SHOP_TRIAL_PERIOD = 3
-DEFAULT_SHOP_REFERRAL_PERIOD = 7
+DEFAULT_SHOP_REFERRED_START_ENABLED = False
+DEFAULT_SHOP_REFERRED_TRIAL_PERIOD = 7
+DEFAULT_SHOP_REFERRER_REWARD_ENABLED = False
+DEFAULT_SHOP_REFERRER_REWARD_TYPE = ReferrerRewardType.DAYS.value
+DEFAULT_SHOP_REFERRER_LEVEL_ONE_PERIOD = 10
+DEFAULT_SHOP_REFERRER_LEVEL_TWO_PERIOD = 3
+DEFAULT_SHOP_REFERRER_LEVEL_ONE_RATE = 50
+DEFAULT_SHOP_REFERRER_LEVEL_TWO_RATE = 5
+DEFAULT_SHOP_BONUS_DEVICES_COUNT = 1  # todo: add check with plans.json tariff at config
 DEFAULT_SHOP_PAYMENT_STARS_ENABLED = True
-DEFAULT_SHOP_BONUS_DEVICES_COUNT = 1
 DEFAULT_SHOP_PAYMENT_CRYPTOMUS_ENABLED = False
 DEFAULT_SHOP_PAYMENT_YOOKASSA_ENABLED = False
 DEFAULT_SHOP_PAYMENT_YOOMONEY_ENABLED = False
@@ -67,7 +75,14 @@ class ShopConfig:
     CURRENCY: str
     TRIAL_ENABLED: bool
     TRIAL_PERIOD: int
-    REFERRAL_PERIOD: int
+    REFERRED_START_ENABLED: bool
+    REFERRED_TRIAL_PERIOD: int
+    REFERRER_REWARD_ENABLED: bool
+    REFERRER_REWARD_TYPE: str
+    REFERRER_LEVEL_ONE_PERIOD: int
+    REFERRER_LEVEL_TWO_PERIOD: int
+    REFERRER_LEVEL_ONE_RATE: int
+    REFERRER_LEVEL_TWO_RATE: int
     BONUS_DEVICES_COUNT: int
     PAYMENT_STARS_ENABLED: bool
     PAYMENT_CRYPTOMUS_ENABLED: bool
@@ -215,6 +230,19 @@ def load_config() -> Config:
         logger.warning("No payment methods are enabled. Enabling Stars payment method.")
         payment_stars_enabled = True
 
+    referrer_reward_type = env.str(
+        "SHOP_REFERRED_REWARD_TYPE",
+        default=DEFAULT_SHOP_REFERRER_REWARD_TYPE,
+        validate=OneOf(
+            [reward_type.value for reward_type in ReferrerRewardType],
+            error="SHOP_REFERRER_REWARD_TYPE must be one of: {choices}",
+        ),
+    )
+    referrer_reward_enabled = env.bool("SHOP_REFERRER_REWARD_ENABLED", default=DEFAULT_SHOP_REFERRER_REWARD_ENABLED)
+    if referrer_reward_type != ReferrerRewardType.DAYS.value:
+        logger.error("Only 'days' option is now available for SHOP_REFERRER_REWARD_TYPE. Referrer reward disabled.")
+        referrer_reward_enabled = False
+
     return Config(
         bot=BotConfig(
             TOKEN=env.str("BOT_TOKEN"),
@@ -237,7 +265,42 @@ def load_config() -> Config:
             ).upper(),
             TRIAL_ENABLED=env.bool("SHOP_TRIAL_ENABLED", default=DEFAULT_SHOP_TRIAL_ENABLED),
             TRIAL_PERIOD=env.int("SHOP_TRIAL_PERIOD", default=DEFAULT_SHOP_TRIAL_PERIOD),
-            REFERRAL_PERIOD=env.int("SHOP_REFERRAL_PERIOD", default=DEFAULT_SHOP_REFERRAL_PERIOD),
+            REFERRED_START_ENABLED=env.bool("SHOP_REFERRED_START_ENABLED", default=DEFAULT_SHOP_REFERRED_START_ENABLED),
+            REFERRED_TRIAL_PERIOD=env.int(
+                "SHOP_REFERRED_TRIAL_PERIOD",
+                default=DEFAULT_SHOP_REFERRED_TRIAL_PERIOD,
+                validate=Range(min=1, error="SHOP_REFERRED_TRIAL_PERIOD must be >= 1"),
+            ),
+            REFERRER_REWARD_ENABLED=referrer_reward_enabled,
+            REFERRER_REWARD_TYPE=referrer_reward_type,
+            REFERRER_LEVEL_ONE_PERIOD=env.int(
+                "SHOP_REFERRER_LEVEL_ONE_PERIOD",
+                default=DEFAULT_SHOP_REFERRER_LEVEL_ONE_PERIOD,
+                validate=Range(min=1, error="SHOP_REFERRER_LEVEL_ONE_PERIOD must be >= 1"),
+            ),
+            REFERRER_LEVEL_TWO_PERIOD=env.int(
+                "SHOP_REFERRER_LEVEL_TWO_PERIOD",
+                default=DEFAULT_SHOP_REFERRER_LEVEL_TWO_PERIOD,
+                validate=Range(min=1, error="SHOP_REFERRER_LEVEL_TWO_PERIOD must be >= 1"),
+            ),
+            REFERRER_LEVEL_ONE_RATE=env.int(
+                "SHOP_REFERRER_LEVEL_ONE_RATE",
+                default=DEFAULT_SHOP_REFERRER_LEVEL_ONE_RATE,
+                validate=Range(
+                    min=1,
+                    max=100,
+                    error="SHOP_REFERRER_LEVEL_ONE_RATE must be between 1 and 100",
+                ),
+            ),
+            REFERRER_LEVEL_TWO_RATE=env.int(
+                "SHOP_REFERRER_LEVEL_TWO_RATE",
+                default=DEFAULT_SHOP_REFERRER_LEVEL_TWO_RATE,
+                validate=Range(
+                    min=1,
+                    max=100,
+                    error="SHOP_REFERRER_LEVEL_TWO_RATE must be between 1 and 100",
+                ),
+            ),
             BONUS_DEVICES_COUNT=env.int("SHOP_BONUS_DEVICES_COUNT", default=DEFAULT_SHOP_BONUS_DEVICES_COUNT),
             PAYMENT_STARS_ENABLED=payment_stars_enabled,
             PAYMENT_CRYPTOMUS_ENABLED=payment_cryptomus_enabled,

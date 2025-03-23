@@ -79,6 +79,13 @@ class PaymentGateway(ABC):
                 status=TransactionStatus.COMPLETED,
             )
 
+        if self.config.shop.REFERRER_REWARD_ENABLED:
+            await self.services.referral.add_referrers_rewards_on_payment(
+                referred_tg_id=data.user_id,
+                payment_amount=data.price,  # todo: (!) add currency unified processing
+                payment_id=payment_id,
+            )
+
         await self.services.notification.notify_developer(
             text=EVENT_PAYMENT_SUCCEEDED_TAG
             + "\n\n"
@@ -95,8 +102,7 @@ class PaymentGateway(ABC):
             await redirect_to_main_menu(
                 bot=self.bot,
                 user=user,
-                session=session,
-                config=self.config,
+                services=self.services,
                 storage=self.storage
             )
 

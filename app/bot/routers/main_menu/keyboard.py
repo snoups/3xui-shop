@@ -11,14 +11,25 @@ from app.bot.utils.navigation import (
 )
 
 
-def main_menu_keyboard(is_admin: bool = False, is_available_try_for_free: bool = False) -> InlineKeyboardMarkup:
+def main_menu_keyboard(
+        is_admin: bool = False,
+        is_trial_available: bool = False,
+        is_referred_trial_available: bool = False,
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
-    if is_available_try_for_free:
+    if is_referred_trial_available:
         builder.row(
             InlineKeyboardButton(
-                text=_("referral:button:get_bonus_days"),
-                callback_data=NavReferral.GET_BONUS_DAYS,
+                text=_("referral:button:get_referred_trial"),
+                callback_data=NavReferral.GET_REFERRED_TRIAL,
+            )
+        )
+    elif is_trial_available:
+        builder.row(
+            InlineKeyboardButton(
+                text=_("subscription:button:get_trial"),
+                callback_data=NavSubscription.GET_TRIAL
             )
         )
 

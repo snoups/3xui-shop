@@ -66,6 +66,7 @@ MESSAGE_EFFECT_IDS = {
 
 # region: Enums
 from enum import Enum
+from typing import Optional, Any
 
 
 class TransactionStatus(Enum):
@@ -96,5 +97,31 @@ class Currency(Enum):
                 return currency
         raise ValueError(f"Invalid currency code: {code}")
 
+
+class ReferrerRewardType(Enum):
+    DAYS = 'days'
+    MONEY = 'money'  # todo: consider using currencies instead? depends on balance implementation
+
+    @classmethod
+    def from_str(cls, value: str) -> Optional["ReferrerRewardType"]:
+        try:
+            return cls[value.upper()]
+        except KeyError:
+            try:
+                return cls(value.lower())
+            except ValueError:
+                return None
+
+
+class ReferrerRewardLevel(Enum):
+    FIRST_LEVEL = 1
+    SECOND_LEVEL = 2
+
+    @classmethod
+    def from_value(cls, value: Any) -> Optional["ReferrerRewardLevel"]:
+        try:
+            return cls(int(value))
+        except (ValueError, KeyError):
+            return None
 
 # endregion

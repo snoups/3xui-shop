@@ -29,7 +29,7 @@ class User(Base):
         server (Server | None): Associated server object.
         transactions (list[Transaction]): List of transactions associated with the user.
         activated_promocodes (list[Promocode]): List of promocodes activated by the user.
-        sent_referrals (list[Referral]): List of Referrals sent by the user and applied by referred users.
+        referrals_sent (list[Referral]): List of Referrals sent by the user and applied by referred users.
         referral (Referral | None): The Referral record if this user was invited.
     """
 
@@ -55,7 +55,7 @@ class User(Base):
         "Promocode", back_populates="activated_user"
     )
     is_trial_used: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    sent_referrals: Mapped[list["Referral"]] = relationship(  # type: ignore
+    referrals_sent: Mapped[list["Referral"]] = relationship(  # type: ignore
         "Referral",
         foreign_keys="Referral.referrer_tg_id",
         primaryjoin="User.tg_id == Referral.referrer_tg_id",

@@ -65,7 +65,6 @@ async def command_main_menu(
     services: ServicesContainer,
     session: AsyncSession,
     command: CommandObject,
-    config: Config,
     is_new_user: bool
 ) -> None:
     logger.info(f"User {user.tg_id} opened main menu page.")
@@ -94,14 +93,15 @@ async def command_main_menu(
         text=_("main_menu:message:main").format(name=user.first_name),
         reply_markup=main_menu_keyboard(
             is_admin,
-            is_available_try_for_free=await is_available_try_for_free(session, user, config)
+            is_trial_available=await services.subscription.is_trial_available(user),
+            is_referred_trial_available=await services.referral.is_referred_trial_available(user),
         ),
     )
     await state.update_data({MAIN_MESSAGE_ID_KEY: main_menu.message_id})
 
 
 @router.callback_query(F.data == NavMain.MAIN_MENU)
-async def callback_main_menu(callback: CallbackQuery, user: User, session: AsyncSession, state: FSMContext, config: Config) -> None:
+async def callback_main_menu(callback: CallbackQuery, user: User, services: ServicesContainer, state: FSMContext) -> None:
     logger.info(f"User {user.tg_id} returned to main menu page.")
     await state.clear()
     await state.update_data({MAIN_MESSAGE_ID_KEY: callback.message.message_id})
@@ -110,7 +110,8 @@ async def callback_main_menu(callback: CallbackQuery, user: User, session: Async
         text=_("main_menu:message:main").format(name=user.first_name),
         reply_markup=main_menu_keyboard(
             is_admin,
-            is_available_try_for_free=await is_available_try_for_free(session, user, config)
+            is_trial_available=await services.subscription.is_trial_available(user),
+            is_referred_trial_available=await services.referral.is_referred_trial_available(user),
         ),
     )
 
@@ -118,8 +119,7 @@ async def callback_main_menu(callback: CallbackQuery, user: User, session: Async
 async def redirect_to_main_menu(
     bot: Bot,
     user: User,
-    session: AsyncSession,
-    config: Config,
+    services: ServicesContainer,
     storage: RedisStorage | None = None,
     state: FSMContext | None = None,
 ) -> None:
@@ -134,12 +134,16 @@ async def redirect_to_main_menu(
     main_message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
     is_admin = await IsAdmin()(user_id=user.tg_id)
 
-    await bot.edit_message_text(
-        text=_("main_menu:message:main").format(name=user.first_name),
-        chat_id=user.tg_id,
-        message_id=main_message_id,
-        reply_markup=main_menu_keyboard(
-            is_admin,
-            is_available_try_for_free=await is_available_try_for_free(session, user, config),
-        ),
-    )
+    try:
+        await bot.edit_message_text(
+            text=_("main_menu:message:main").format(name=user.first_name),
+            chat_id=user.tg_id,
+            message_id=main_message_id,
+            reply_markup=main_menu_keyboard(
+                is_admin,
+                is_trial_available=await services.subscription.is_trial_available(user),
+                is_referred_trial_available=await services.referral.is_referred_trial_available(user),
+            ),
+        )
+    except Exception as e:
+        logger.critical(f"Error redirecting to main menu page: {e}")

@@ -50,6 +50,8 @@ async def on_startup(config: Config, bot: Bot, services: ServicesContainer, db: 
     logging.info("Bot started.")
 
     tasks.transactions.start_scheduler(db.session)
+    if config.shop.REFERRER_REWARD_ENABLED:
+        tasks.referral.start_referral_scheduler(session_factory=db.session, referral_service=services.referral)
 
 
 async def main() -> None:

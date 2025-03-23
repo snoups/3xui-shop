@@ -8,12 +8,6 @@ from app.bot.utils.navigation import NavDownload
 
 def referral_keyboard() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    builder.row(
-        InlineKeyboardButton(
-            text=_("referral:button:connect"),
-            callback_data=NavDownload.MAIN,
-        )
-    )
     builder.row(back_to_main_menu_button())
 
     return builder.as_markup()

@@ -845,22 +845,68 @@ msgstr "❌ No available servers found. Please try again later."
 msgid "subscription:message:payment_method"
 msgstr "💳 <b>Choose a payment method:</b>"
 
-#: app/bot/routers/referral/handler.py:45
+#:
+msgid "subscription:button:get_trial"
+msgstr "🎁 TRY FOR FREE"
+
+#:
 msgid "referral:message:user_summary"
-msgstr "By inviting a user via a personal link, you and the invited "
-"user will receive an additional period of free VPN ({duration} for each invited one)\n\n"
-"For the days to count, the invited user must activate the promo period "
-"- click on the 'Try for free' button\n\n"
-"Your personal link:\n"
-"<code>{referral_link}</code>\n\n"
-"Invited users: {referrals_count}"
+msgstr "Invite friends and get rewarded!\n"
 
-#: app/bot/routers/main_menu/keyboard.py:20
-msgid "referral:button:get_bonus_days"
-msgstr "TRY FOR FREE"
+#:
+msgid "referral:message:user_summary_referred_trial_enabled"
+msgstr "\n"
+"🔗 When a new user follows your invitation link and clicks the «🎁 Claim Gift» button, "
+"they get an extended promo period of {referred_duration}.\n"
 
-#: app/bot/routers/referral/handler.py:96
-msgid "referral:ntf:bonus_days_activate_success"
+#:
+msgid "referral:message:user_summary_referred_trial_disabled"
+msgstr "\n"
+"✨ When a new user follows your invitation link you can earn rewards for their future payments\n"
+
+#:
+msgid "referral:message:user_summary_invite_link"
+msgstr "\n"
+"📎 Your personal link:\n"
+"<code>{referral_link}</code>\n"
+"(click on the link to copy)\n"
+"👀 Clicks on your link: {referrals_count}\n"
+
+#:
+msgid "referral:message:user_summary_explain_referrer_days"
+msgstr "\n"
+"💸 <b>Two-level referral system</b>\n"
+"👥 <b>For each successful payment</b> for a subscription using your link:\n"
+"1️⃣ You get <b>+{first_referrer_duration}</b> to your subscription\n"
+"2️⃣ You also get <b>+{second_referrer_duration}</b> from users invited by your referrals!\n"
+
+#:
+msgid "referral:message:user_summary_explain_referrer_money"
+msgstr "\n"
+"💸 <b>Two-level referral system</b>\n"
+"👥 <b>For each successful payment</b> for a subscription using your link:\n"
+"1️⃣ You get on your balance <b>{first_referrer_rate}%</b> of payments made by your referral!\n"
+"2️⃣ You also get <b>{second_referrer_rate}%</b> of payments from users invited by your referrals!\n"
+
+#:
+msgid "referral:message:user_summary_link_stats"
+msgstr "\n"
+"👀 Clicks on your link: {referrals_count}\n"
+
+#:
+msgid "referral:message:user_summary_referrer_rewards"
+msgstr "\n"
+"📊 <b>Your reward for payments by referrals</b>\n"
+"First level: {first_level_rewards_sum}\n"
+"Second level: {second_level_rewards_sum}\n"
+"<i>*(Rewards are credited within 15 minutes. Pending rewards: {pending_rewards_count})</i>"
+
+#:
+msgid "referral:button:get_referred_trial"
+msgstr "🎁 Claim gift"
+
+#:
+msgid "referral:ntf:trial_activate_success"
 msgstr "✅ <b>Trial period was successfully activated!</b>\n"
 "\n"
 "<i>You have received {duration} to your subscription.</i>\n"
@@ -868,19 +914,19 @@ msgstr "✅ <b>Trial period was successfully activated!</b>\n"
 "<b>Click 'Connect' button to download and connect to your new VPN application</b>\n"
 "Your private key for applications is always available at Profile"
 
-#: app/bot/routers/referral/handler.py:80
-msgid "referral:popup:bonus_days_unavailable_for_user"
+#:
+msgid "referral:popup:trial_unavailable_for_user"
 msgstr "❌ You have already used the trial period."
 
-#: app/bot/routers/referral/handler.py:104
+#:
 msgid "referral:ntf:bonus_days_activate_failed"
 msgstr "❌ <i>Failed to your trial period, please try again later or contact administrator.</i>"
 
-#: app/bot/routers/referral/handler.py:70
-msgid "referral:ntf:no_available_servers"
-msgstr "❌ <i>No available servers found. Please try again later.</i>"
+#:
+msgid "referral:popup:no_available_servers"
+msgstr "❌ No available servers found. Please try again later."
 
-#: app/bot/routers/referral/keyboard.py:13
+#:
 msgid "referral:button:connect"
 msgstr "🔌 Connect"
 
