@@ -60,5 +60,5 @@ async def callback_get_trial(
             reply_markup=referral_keyboard(),
         )
     else:
-        text = _("subscription:ntf:bonus_days_activate_failed")
+        text = _("subscription:ntf:trial_activate_failed")
         await services.notification.notify_by_message(message=callback.message, text=text, duration=15)

@@ -845,26 +845,38 @@ msgstr "❌ No available servers found. Please try again later."
 msgid "subscription:message:payment_method"
 msgstr "💳 <b>Choose a payment method:</b>"
 
-#:
+#: app/bot/routers/subscription/trial_handler.py:63
+msgid "subscription:ntf:trial_activate_failed"
+msgstr "❌ Failed to activate trial period. Please, try later."
+
+#: app/bot/routers/subscription/trial_handler.py:45
+msgid "subscription:popup:trial_unavailable_for_user"
+msgstr "❌ Trial is not available for you now."
+
+#: app/bot/routers/subscription/trial_handler.py:55
+msgid "subscription:ntf:trial_activate_success"
+msgstr "✅ Trial period {duration} was successfully activated!"
+
+#: app/bot/routers/main_menu/keyboard.py:31
 msgid "subscription:button:get_trial"
 msgstr "🎁 TRY FOR FREE"
 
-#:
+#: app/bot/routers/referral/handler.py:32
 msgid "referral:message:user_summary"
-msgstr "Invite friends and get rewarded!\n"
+msgstr "🎉 Invite friends and get rewarded!\n"
 
-#:
+#: app/bot/routers/referral/handler.py:37
 msgid "referral:message:user_summary_referred_trial_enabled"
 msgstr "\n"
 "🔗 When a new user follows your invitation link and clicks the «🎁 Claim Gift» button, "
 "they get an extended promo period of {referred_duration}.\n"
 
-#:
+#: app/bot/routers/referral/handler.py:41
 msgid "referral:message:user_summary_referred_trial_disabled"
 msgstr "\n"
 "✨ When a new user follows your invitation link you can earn rewards for their future payments\n"
 
-#:
+#: app/bot/routers/referral/handler.py:44
 msgid "referral:message:user_summary_invite_link"
 msgstr "\n"
 "📎 Your personal link:\n"
@@ -872,7 +884,7 @@ msgstr "\n"
 "(click on the link to copy)\n"
 "👀 Clicks on your link: {referrals_count}\n"
 
-#:
+#: app/bot/routers/referral/handler.py:69
 msgid "referral:message:user_summary_explain_referrer_days"
 msgstr "\n"
 "💸 <b>Two-level referral system</b>\n"
@@ -880,7 +892,7 @@ msgstr "\n"
 "1️⃣ You get <b>+{first_referrer_duration}</b> to your subscription\n"
 "2️⃣ You also get <b>+{second_referrer_duration}</b> from users invited by your referrals!\n"
 
-#:
+#: app/bot/routers/referral/handler.py:78
 msgid "referral:message:user_summary_explain_referrer_money"
 msgstr "\n"
 "💸 <b>Two-level referral system</b>\n"
@@ -893,7 +905,7 @@ msgid "referral:message:user_summary_link_stats"
 msgstr "\n"
 "👀 Clicks on your link: {referrals_count}\n"
 
-#:
+#: app/bot/routers/referral/handler.py:86
 msgid "referral:message:user_summary_referrer_rewards"
 msgstr "\n"
 "📊 <b>Your reward for payments by referrals</b>\n"
@@ -901,11 +913,11 @@ msgstr "\n"
 "Second level: {second_level_rewards_sum}\n"
 "<i>*(Rewards are credited within 15 minutes. Pending rewards: {pending_rewards_count})</i>"
 
-#:
+#: app/bot/routers/main_menu/keyboard.py:24
 msgid "referral:button:get_referred_trial"
 msgstr "🎁 Claim gift"
 
-#:
+#: app/bot/routers/referral/handler.py:156
 msgid "referral:ntf:trial_activate_success"
 msgstr "✅ <b>Trial period was successfully activated!</b>\n"
 "\n"
@@ -918,17 +930,13 @@ msgstr "✅ <b>Trial period was successfully activated!</b>\n"
 msgid "referral:popup:trial_unavailable_for_user"
 msgstr "❌ You have already used the trial period."
 
-#:
-msgid "referral:ntf:bonus_days_activate_failed"
+#: app/bot/routers/referral/handler.py:164
+msgid "referral:ntf:referred_trial_activate_failed"
 msgstr "❌ <i>Failed to your trial period, please try again later or contact administrator.</i>"
 
-#:
+#: app/bot/routers/referral/handler.py:136
 msgid "referral:popup:no_available_servers"
 msgstr "❌ No available servers found. Please try again later."
-
-#:
-msgid "referral:button:connect"
-msgstr "🔌 Connect"
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"

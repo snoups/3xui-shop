@@ -852,38 +852,38 @@ msgstr "❌ Доступных серверов не найдено. Попро�
 msgid "subscription:message:payment_method"
 msgstr "💳 <b>Выберите способ оплаты:</b>"
 
-#:
-msgid "subscription:ntf:bonus_days_activate_failed"
+#: app/bot/routers/subscription/trial_handler.py:63
+msgid "subscription:ntf:trial_activate_failed"
 msgstr "❌ Не удалось активировать пробный период. Попробуйте позже."
 
-#:
+#: app/bot/routers/subscription/trial_handler.py:45
 msgid "subscription:popup:trial_unavailable_for_user"
 msgstr "❌ Сейчас вам не доступен пробный период."
 
-#:
+#: app/bot/routers/subscription/trial_handler.py:55
 msgid "subscription:ntf:trial_activate_success"
 msgstr "✅ Пробный период {duration} был успешно активирован!"
 
-#:
+#: app/bot/routers/main_menu/keyboard.py:31
 msgid "subscription:button:get_trial"
 msgstr "🎁 ПОПРОБОВАТЬ БЕСПЛАТНО"
 
-#:
+#: app/bot/routers/referral/handler.py:32
 msgid "referral:message:user_summary"
 msgstr "🎉 Приглашайте друзей и получайте вознаграждение!\n"
 
-#:
+#: app/bot/routers/referral/handler.py:37
 msgid "referral:message:user_summary_referred_trial_enabled"
 msgstr "\n"
 "🔗 Когда новый пользователь переходит по вашей пригласительной ссылке и нажимает кнопку «🎁 Получить подарок», "
 "он получает расширенный промо-период {referred_duration}.\n"
 
-#:
+#: app/bot/routers/referral/handler.py:41
 msgid "referral:message:user_summary_referred_trial_disabled"
 msgstr "\n"
 "✨ Когда новый пользователь переходит по вашей пригласительной ссылке, вы можете получать вознаграждения за его будущие платежи\n"
 
-#:
+#: app/bot/routers/referral/handler.py:44
 msgid "referral:message:user_summary_invite_link"
 msgstr "\n"
 "📎 Ваша персональная ссылка:\n"
@@ -891,7 +891,7 @@ msgstr "\n"
 "(нажмите на ссылку, чтобы скопировать)\n"
 "👀 Переходов по вашей ссылке: {referrals_count}\n"
 
-#:
+#: app/bot/routers/referral/handler.py:69
 msgid "referral:message:user_summary_explain_referrer_days"
 msgstr "\n"
 "💸 <b>Двухуровневая реферальная система</b>\n"
@@ -899,7 +899,7 @@ msgstr "\n"
 "1️⃣ Вы получаете <b>+{first_referrer_duration}</b> к своей подписке\n"
 "2️⃣ Вы также получаете <b>+{second_referrer_duration}</b> от пользователей, приглашенных вашими рефералами!\n"
 
-#:
+#: app/bot/routers/referral/handler.py:78
 msgid "referral:message:user_summary_explain_referrer_money"
 msgstr "\n"
 "💸 <b>Двухуровневая реферальная система</b>\n"
@@ -907,7 +907,7 @@ msgstr "\n"
 "1️⃣ Вы получаете на свой баланс <b>{first_referrer_rate}%</b> платежей, совершенных вашим рефералом!\n"
 "2️⃣ Также вы получаете <b>{second_referrer_rate}%</b> платежей от пользователей, приглашенных вашими рефералами!\n"
 
-#:
+#: app/bot/routers/referral/handler.py:86
 msgid "referral:message:user_summary_referrer_rewards"
 msgstr "\n"
 "📊 <b>Ваше вознаграждение за платежи рефералов</b>\n"
@@ -915,11 +915,11 @@ msgstr "\n"
 "Второй уровень рефералов: {second_level_rewards_sum}\n"
 "<i>*(Награды начисляются в течении 15 минут. Ожидают: {pending_rewards_count})</i>"
 
-#:
+#: app/bot/routers/main_menu/keyboard.py:24
 msgid "referral:button:get_referred_trial"
 msgstr "🎁 ПОЛУЧИТЬ ПОДАРОК"
 
-#:
+#: app/bot/routers/referral/handler.py:156
 msgid "referral:ntf:trial_activate_success"
 msgstr "✅ <b>Пробный период был успешно активирован!</b>\n"
 "\n"
@@ -928,21 +928,17 @@ msgstr "✅ <b>Пробный период был успешно активир�
 "<b>По кнопке 'Подключиться' бот поможет вам скачать приложение и добавить вашу конфигурацию</b>\n"
 "Ваш приватный ключ VPN всегда доступен в разделе 'Профиль'"
 
-#:
+#: app/bot/routers/referral/handler.py:145
 msgid "referral:popup:trial_unavailable_for_user"
 msgstr "❌ Пробный период уже был использован."
 
-#:
-msgid "referral:ntf:bonus_days_activate_failed"
+#: app/bot/routers/referral/handler.py:164
+msgid "referral:ntf:referred_trial_activate_failed"
 msgstr "❌ <i>Не удалось активировать пробный период, пожалуйста попробуйте позже, либо обратитесь к администратору</i>"
 
-#:
+#: app/bot/routers/referral/handler.py:136
 msgid "referral:popup:no_available_servers"
 msgstr "❌ Нет доступных серверов. Попробуйте позже."
-
-#:
-msgid "referral:button:connect"
-msgstr "🔌 Подключиться"
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"
