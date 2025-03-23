@@ -145,7 +145,8 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | SHOP_REFERRED_TRIAL_ENABLED | ⭕ | False | Enable specific trial subscription for referral users. |
 | SHOP_REFERRED_TRIAL_PERIOD | ⭕ | 7 | Trial duration in days for the referred (invited) user |
 | SHOP_REFERRER_REWARD_ENABLED | ⭕ | False | Enable the two-level referral reward system |
-| ~~SHOP_REFERRER_REWARD_TYPE~~ | ⭕ | DAYS | DAYS only now. Awaits user balance implementation. (e.g. DAYS, MONEY) |
+
+| ~~SHOP_REFERRER_REWARD_TYPE~~ | ⭕ | DAYS | Type of referrer reward. 'days' only now. Awaits user balance implementation. (e.g. days, money) |
 | SHOP_REFERRER_LEVEL_ONE_PERIOD | ⭕ | 10 | Days reward for the first-level referrer (user who invited) |
 | SHOP_REFERRER_LEVEL_TWO_PERIOD | ⭕ | 3 | Days reward for the second-level referrer (user invited by the invited) |
 | ~~SHOP_REFERRER_LEVEL_ONE_RATE~~ | ⭕ | 50 | Percentage reward for the first-level referrer (user who invited) |
