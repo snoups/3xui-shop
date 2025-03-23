@@ -142,7 +142,7 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | SHOP_CURRENCY | ⭕ | RUB | Currency for buttons (e.g., RUB, USD, XTR) |
 | SHOP_TRIAL_ENABLED | ⭕ | False | Enable trial subscription for new users. |
 | SHOP_TRIAL_PERIOD | ⭕ | 3 | Duration of the trial subscription in days. |
-| SHOP_REFERRED_START_ENABLED | ⭕ | False | Enable specific trial subscription for referral users. |
+| SHOP_REFERRED_TRIAL_ENABLED | ⭕ | False | Enable specific trial subscription for referral users. |
 | SHOP_REFERRED_TRIAL_PERIOD | ⭕ | 7 | Trial duration in days for the referred (invited) user |
 | SHOP_REFERRER_REWARD_ENABLED | ⭕ | False | Enable the two-level referral reward system |
 | ~~SHOP_REFERRER_REWARD_TYPE~~ | ⭕ | DAYS | DAYS only now. Awaits user balance implementation. (e.g. DAYS, MONEY) |

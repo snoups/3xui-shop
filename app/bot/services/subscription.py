@@ -35,7 +35,7 @@ class SubscriptionService:
         async with self.session_factory() as session:
             referral = await Referral.get_referral(session, user.tg_id)
 
-        return not referral or (referral and not self.config.shop.REFERRED_START_ENABLED)
+        return not referral or (referral and not self.config.shop.REFERRED_TRIAL_ENABLED)
 
     async def gift_trial(self, user: User) -> bool:
         """

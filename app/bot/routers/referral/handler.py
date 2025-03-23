@@ -31,7 +31,7 @@ async def generate_referral_summary_text(
 
     text = _("referral:message:user_summary")
 
-    referred_trial_enabled = config.shop.REFERRED_START_ENABLED
+    referred_trial_enabled = config.shop.REFERRED_TRIAL_ENABLED
     if referred_trial_enabled:
         referred_duration = format_subscription_period(config.shop.REFERRED_TRIAL_PERIOD)
         text += _("referral:message:user_summary_referred_trial_enabled").format(

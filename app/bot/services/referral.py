@@ -20,7 +20,7 @@ class ReferralService:
         logger.info("ReferralService initialized")
 
     async def is_referred_trial_available(self, user: User) -> bool:
-        is_first_check_ok = (self.config.shop.REFERRED_START_ENABLED
+        is_first_check_ok = (self.config.shop.REFERRED_TRIAL_ENABLED
                              and not user.server_id
                              and not user.is_trial_used)
         if not is_first_check_ok:
