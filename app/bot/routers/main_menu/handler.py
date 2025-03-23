@@ -13,21 +13,12 @@ from app.bot.filters import IsAdmin
 from app.bot.models import ServicesContainer
 from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY
 from app.bot.utils.navigation import NavMain
-from app.config import Config
 from app.db.models import User, Referral
 
 from .keyboard import main_menu_keyboard
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
-
-
-async def is_available_try_for_free(session: AsyncSession, user: User, config: Config) -> bool:
-    referral = await Referral.get_referral(session, user.tg_id)
-    if not referral:
-        return config.shop.TRIAL_ENABLED and not user.is_trial_used
-
-    return not referral.referred_rewarded_at
 
 
 async def process_creating_referral(
