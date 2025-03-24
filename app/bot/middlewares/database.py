@@ -29,8 +29,10 @@ class DBSessionMiddleware(BaseMiddleware):
 
             if tg_user is not None and not tg_user.is_bot:
                 user = await User.get(session=session, tg_id=tg_user.id)
+                is_new_user = False
 
                 if not user:
+                    is_new_user = True
                     user = await User.create(
                         session=session,
                         tg_id=tg_user.id,
@@ -43,6 +45,7 @@ class DBSessionMiddleware(BaseMiddleware):
 
                 data["user"] = user
                 data["session"] = session
+                data["is_new_user"] = is_new_user
             else:
                 logger.debug("No user found in event data.")
 

@@ -20,7 +20,7 @@ from app.bot.routers.misc.keyboard import (
     close_notification_button,
 )
 from app.bot.utils.formatting import format_device_count, format_subscription_period
-from app.bot.utils.navigation import NavMain, NavSubscription
+from app.bot.utils.navigation import NavMain, NavSubscription, NavDownload
 
 
 def change_subscription_button() -> InlineKeyboardButton:
@@ -171,4 +171,17 @@ def payment_success_keyboard() -> InlineKeyboardMarkup:
     )
 
     builder.row(close_notification_button())
+    return builder.as_markup()
+
+
+def trial_success_keyboard() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(
+            text=_("subscription:button:connect"),
+            callback_data=NavDownload.MAIN,
+        )
+    )
+    builder.row(back_to_main_menu_button())
+
     return builder.as_markup()

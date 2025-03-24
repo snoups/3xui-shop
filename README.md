@@ -47,12 +47,12 @@ The bot enables efficient subscription sales with advanced features:
     - Format text using HTML
     - Preview notifications before sending
     - System notifications for the developer and administrators
-- **~~Referral Program~~**
-    - ~~View referral statistics~~
-    - ~~Reward users for inviting new members~~
-- **~~Trial Period~~**
-    - ~~Provide free trial subscriptions~~
-    - ~~Configure and disable the trial period~~
+- **Referral Program**
+    - View referral statistics
+    - Reward users for inviting new members
+- **Trial Period**
+    - Provide free trial subscription
+    - Configure and disable the trial period
 - **Flexible Payment System**
     - Change the default currency
     - Easily extendable architecture for adding new payment gateways
@@ -140,8 +140,17 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | | | |
 | SHOP_EMAIL | ⭕ | support@3xui-shop.com | Email for receipts |
 | SHOP_CURRENCY | ⭕ | RUB | Currency for buttons (e.g., RUB, USD, XTR) |
-| ~~SHOP_TRIAL_ENABLED~~ | ⭕ | ~~True~~ | ~~Enable trial subscription~~ |
-| ~~SHOP_TRIAL_PERIOD~~ | ⭕ | ~~3~~ | ~~Period of the trial subscription in days~~ |
+| SHOP_TRIAL_ENABLED | ⭕ | True | Enable trial subscription for new users. |
+| SHOP_TRIAL_PERIOD | ⭕ | 3 | Duration of the trial subscription in days. |
+| SHOP_REFERRED_TRIAL_ENABLED | ⭕ | False | Enable specific trial subscription for referral users. |
+| SHOP_REFERRED_TRIAL_PERIOD | ⭕ | 7 | Trial duration in days for the referred (invited) user |
+| SHOP_REFERRER_REWARD_ENABLED | ⭕ | True | Enable the two-level referral reward system |
+| ~~SHOP_REFERRER_REWARD_TYPE~~ | ⭕ | DAYS | Type of referrer reward. 'days' only now. Awaits user balance implementation. (e.g. days, money) |
+| SHOP_REFERRER_LEVEL_ONE_PERIOD | ⭕ | 10 | Days reward for the first-level referrer (user who invited) |
+| SHOP_REFERRER_LEVEL_TWO_PERIOD | ⭕ | 3 | Days reward for the second-level referrer (user invited by the invited) |
+| ~~SHOP_REFERRER_LEVEL_ONE_RATE~~ | ⭕ | 50 | Percentage reward for the first-level referrer (user who invited) |
+| ~~SHOP_REFERRER_LEVEL_TWO_RATE~~ | ⭕ | 5 | Percentage reward for the second-level referrer (user invited by the invited) |
+| SHOP_BONUS_DEVICES_COUNT | ⭕ | 1 | Number of devices by default for trial and referral users (mirrors tariff plans settings) |
 | SHOP_PAYMENT_STARS_ENABLED | ⭕ | True | Enable Telegram stars payment |
 | SHOP_PAYMENT_CRYPTOMUS_ENABLED | ⭕ | False | Enable Cryptomus payment |
 | SHOP_PAYMENT_YOOKASSA_ENABLED | ⭕ | False | Enable Yookassa payment |
@@ -251,6 +260,16 @@ To ensure the bot functions correctly, you must configure the 3X-UI panel:
 - Disabling configuration encryption is recommended.
 
 <a id="bugs-and-feature-requests"></a>
+
+### Referral and Trial Rewards Configuration
+Shop now supports **trial subscriptions** and a **two-level referral reward system**. Here’s how it works:
+All configuration is available via .env (see it above).
+
+| Type of reward                   | How it works                                                                                                                                                                                                                        |
+|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Trial period                     | A trial subscription is available by 'TRY FOR FREE' button at start menu to any user who opens the bot and does not have an active subscription.                                                                                    |
+| Referred user  Trial period      | This option is just like previous 'trial period', but allows bot admin to configure **extended trial period** for an invited user.                                                                                                  |
+| Referral 2-level payment rewards | When a referred user pays for a subscription, the referrer and the second-level referrer (the user who invited the referrer) receive ~~a percentage of the payment as a reward~~ fixed count of days at the moment fore each level. |
 
 ## 🐛 Bugs and Feature Requests
 

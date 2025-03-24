@@ -247,7 +247,34 @@ class VPNService:
             )
         return False
 
+    async def process_bonus_days(self, user: User, duration: int, devices: int) -> bool:
+        """
+        Ensures that user will receive its bonus days both if it already has subscription, or not.
+
+        Args:
+            user (User): User object.
+            duration (int): Duration of bonus days in days.
+            devices (int): Count of devices for new client.
+
+        Returns:
+            bool: True, when bonus days have been successfully given, else False.
+        """
+        if await self.is_client_exists(user):
+            updated = await self.update_client(user=user, devices=0, duration=duration)
+            if updated:
+                logger.info(f"Updated client {user.tg_id} with additional {duration} days(-s).")
+                return True
+        else:
+            created = await self.create_client(user=user, devices=devices, duration=duration)
+            if created:
+                logger.info(f"Created client {user.tg_id} with additional {duration} days(-s)")
+                return True
+
+        return False
+
     async def activate_promocode(self, user: User, promocode: Promocode) -> bool:
+        # todo: consider moving to some 'promocode module services' with usage of vpn-service methods.
+
         async with self.session() as session:
             activated = await Promocode.set_activated(
                 session=session,
@@ -259,16 +286,15 @@ class VPNService:
             logger.critical(f"Failed to activate promocode {promocode.code} for user {user.tg_id}.")
             return False
 
-        if await self.is_client_exists(user):
-            updated = await self.update_client(user=user, devices=0, duration=promocode.duration)
-            if updated:
-                logger.info(f"Updated client {user.tg_id} with promocode {promocode.code}.")
-                return True
-        else:
-            created = await self.create_client(user=user, devices=1, duration=promocode.duration)
-            if created:
-                logger.info(f"Created client {user.tg_id} with promocode {promocode.code}.")
-                return True
+        logger.info(f"Begun applying promocode ({promocode.code}) to a client {user.tg_id}.")
+        success = await self.process_bonus_days(
+            user,
+            duration=promocode.duration,
+            devices=self.config.shop.BONUS_DEVICES_COUNT,
+        )
+
+        if success:
+            return True
 
         async with self.session() as session:
             await Promocode.set_deactivated(session=session, code=promocode.code)

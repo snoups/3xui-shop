@@ -1,6 +1,7 @@
 import logging
 import math
 from datetime import datetime, timezone
+from decimal import Decimal, ROUND_DOWN
 
 from aiogram.utils.i18n import gettext as _
 
@@ -70,3 +71,18 @@ def format_subscription_period(days: int) -> str:
     if days % 30 == 0:
         return _("1 month", "{} months", days // 30).format(days // 30)
     return _("1 day", "{} days", days).format(days)
+
+
+def to_decimal(amount: float | str | Decimal | int) -> Decimal:
+    """
+    Converts a value to Decimal with a precision of 38.18
+    """
+    DECIMAL_SCALE = 18
+    DECIMAL_FORMAT = f"1.{'0' * DECIMAL_SCALE}"
+
+    if isinstance(amount, Decimal):
+        result = amount
+    else:
+        result = Decimal(str(amount))
+
+    return result.quantize(Decimal(DECIMAL_FORMAT), rounding=ROUND_DOWN)
