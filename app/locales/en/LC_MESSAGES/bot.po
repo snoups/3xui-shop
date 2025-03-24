@@ -920,15 +920,6 @@ msgstr "\n"
 msgid "referral:button:get_referred_trial"
 msgstr "🎁 Claim gift"
 
-#: app/bot/routers/referral/handler.py:156
-msgid "referral:ntf:trial_activate_success"
-msgstr "✅ <b>Trial period was successfully activated!</b>\n"
-"\n"
-"<i>You have received <b>{duration}<b> to your subscription.</i>\n"
-"\n"
-"<b>Click 'Connect' button to download and connect to your new VPN application</b>\n"
-"Your private key for applications is always available at <b>Profile</b>"
-
 #:
 msgid "referral:popup:trial_unavailable_for_user"
 msgstr "❌ You have already used the trial period."
@@ -940,9 +931,6 @@ msgstr "❌ <i>Failed to your trial period, please try again later or contact ad
 #: app/bot/routers/referral/handler.py:136
 msgid "referral:popup:no_available_servers"
 msgstr "❌ No available servers found. Please try again later."
-
-msgid "referral:button:connect"
-msgstr "🔌 Connect"
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"

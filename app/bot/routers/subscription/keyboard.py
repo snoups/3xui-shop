@@ -178,7 +178,7 @@ def trial_success_keyboard() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
         InlineKeyboardButton(
-            text=_("referral:button:connect"),
+            text=_("subscription:button:connect"),
             callback_data=NavDownload.MAIN,
         )
     )

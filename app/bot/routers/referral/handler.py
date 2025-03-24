@@ -151,7 +151,7 @@ async def callback_get_referred_trial(
     main_message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
     if success:
         await callback.bot.edit_message_text(
-            text=_("referral:ntf:trial_activate_success").format(
+            text=_("subscription:ntf:trial_activate_success").format(
                 duration=format_subscription_period(referred_trial_period),
             ),
             chat_id=callback.message.chat.id,

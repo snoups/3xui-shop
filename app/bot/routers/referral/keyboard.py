@@ -11,7 +11,7 @@ def referral_keyboard(connect: bool = False) -> InlineKeyboardMarkup:
     if connect:
         builder.row(
             InlineKeyboardButton(
-                text=_("referral:button:connect"),
+                text=_("subscription:button:connect"),
                 callback_data=NavDownload.MAIN,
             )
         )

@@ -922,15 +922,6 @@ msgstr "\n"
 msgid "referral:button:get_referred_trial"
 msgstr "🎁 ПОЛУЧИТЬ ПОДАРОК"
 
-#: app/bot/routers/referral/handler.py:156
-msgid "referral:ntf:trial_activate_success"
-msgstr "✅ <b>Пробный период был успешно активирован!</b>\n"
-"\n"
-"<i>Вы получили <b>{duration}</b> к своей подписке.</i>\n"
-"\n"
-"<b>По кнопке 'Подключиться' бот поможет вам скачать приложение и добавить вашу конфигурацию</b>\n"
-"Ваш приватный ключ VPN всегда доступен в разделе <b>'Профиль'</b>"
-
 #: app/bot/routers/referral/handler.py:145
 msgid "referral:popup:trial_unavailable_for_user"
 msgstr "❌ Пробный период уже был использован."
@@ -942,9 +933,6 @@ msgstr "❌ <i>Не удалось активировать пробный пе�
 #: app/bot/routers/referral/handler.py:136
 msgid "referral:popup:no_available_servers"
 msgstr "❌ Нет доступных серверов. Попробуйте позже."
-
-msgid "referral:button:connect"
-msgstr "🔌 Подключиться"
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"
