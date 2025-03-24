@@ -846,7 +846,7 @@ msgid "subscription:message:payment_method"
 msgstr "💳 <b>Choose a payment method:</b>"
 
 #: app/bot/routers/subscription/trial_handler.py:63
-msgid "subscription:ntf:trial_activate_failed"
+msgid "subscription:popup:trial_activate_failed"
 msgstr "❌ Failed to activate trial period. Please, try later."
 
 #: app/bot/routers/subscription/trial_handler.py:45
@@ -855,7 +855,15 @@ msgstr "❌ Trial is not available for you now."
 
 #: app/bot/routers/subscription/trial_handler.py:55
 msgid "subscription:ntf:trial_activate_success"
-msgstr "✅ Trial period {duration} was successfully activated!"
+msgstr "✅ Trial period was successfully activated!\n"
+"\n"
+"<i>You have received <b>{duration}</b> to your subscription.</i>\n"
+"\n"
+"<b>Click 'Connect' button to download and connect to your new VPN application</b>\n"
+"Your private key for applications is always available at <b>Profile</b>"
+
+msgid "subscription:button:connect"
+msgstr "🔌 Connect"
 
 #: app/bot/routers/main_menu/keyboard.py:31
 msgid "subscription:button:get_trial"
@@ -870,11 +878,6 @@ msgid "referral:message:user_summary_referred_trial_enabled"
 msgstr "\n"
 "🔗 When a new user follows your invitation link and clicks the «🎁 Claim Gift» button, "
 "they get an extended promo period of {referred_duration}.\n"
-
-#: app/bot/routers/referral/handler.py:41
-msgid "referral:message:user_summary_referred_trial_disabled"
-msgstr "\n"
-"✨ When a new user follows your invitation link you can earn rewards for their future payments\n"
 
 #: app/bot/routers/referral/handler.py:44
 msgid "referral:message:user_summary_invite_link"
@@ -921,10 +924,10 @@ msgstr "🎁 Claim gift"
 msgid "referral:ntf:trial_activate_success"
 msgstr "✅ <b>Trial period was successfully activated!</b>\n"
 "\n"
-"<i>You have received {duration} to your subscription.</i>\n"
+"<i>You have received <b>{duration}<b> to your subscription.</i>\n"
 "\n"
 "<b>Click 'Connect' button to download and connect to your new VPN application</b>\n"
-"Your private key for applications is always available at Profile"
+"Your private key for applications is always available at <b>Profile</b>"
 
 #:
 msgid "referral:popup:trial_unavailable_for_user"
@@ -937,6 +940,9 @@ msgstr "❌ <i>Failed to your trial period, please try again later or contact ad
 #: app/bot/routers/referral/handler.py:136
 msgid "referral:popup:no_available_servers"
 msgstr "❌ No available servers found. Please try again later."
+
+msgid "referral:button:connect"
+msgstr "🔌 Connect"
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"

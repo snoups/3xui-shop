@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import gettext as _
 
 from app.bot.models import ServicesContainer
-from app.bot.routers.referral.keyboard import referral_keyboard
+from app.bot.routers.subscription.keyboard import trial_success_keyboard
 from app.bot.utils.navigation import NavSubscription
 from app.config import Config
 from app.db.models import User
@@ -57,8 +57,8 @@ async def callback_get_trial(
             ),
             chat_id=callback.message.chat.id,
             message_id=main_message_id,
-            reply_markup=referral_keyboard(),
+            reply_markup=trial_success_keyboard(),
         )
     else:
-        text = _("subscription:ntf:trial_activate_failed")
-        await services.notification.notify_by_message(message=callback.message, text=text, duration=15)
+        text = _("subscription:popup:trial_activate_failed")
+        await services.notification.show_popup(callback=callback, text=text)

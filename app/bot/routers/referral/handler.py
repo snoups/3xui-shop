@@ -37,8 +37,6 @@ async def generate_referral_summary_text(
         text += _("referral:message:user_summary_referred_trial_enabled").format(
             referred_duration=referred_duration,
         )
-    else:
-        text += _("referral:message:user_summary_referred_trial_disabled")
 
     referrals_count = await Referral.get_referral_count(session=session, referrer_tg_id=user.tg_id)
     text += _("referral:message:user_summary_invite_link").format(
@@ -158,7 +156,7 @@ async def callback_get_referred_trial(
             ),
             chat_id=callback.message.chat.id,
             message_id=main_message_id,
-            reply_markup=referral_keyboard(),
+            reply_markup=referral_keyboard(connect=True),
         )
     else:
         text = _("referral:ntf:referred_trial_activate_failed")

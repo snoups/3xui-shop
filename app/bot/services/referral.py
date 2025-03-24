@@ -173,7 +173,11 @@ class ReferralService:
                 if not user:
                     return False
 
-                success = await self.vpn_service.process_bonus_days(user, days, devices=3)
+                success = await self.vpn_service.process_bonus_days(
+                    user=user,
+                    duration=days,
+                    devices=self.config.shop.BONUS_DEVICES_COUNT
+                )
                 if not success:
                     logger.error(f"Failed to give {days} days reward to a referrer user {reward.user_tg_id}")
                     return False

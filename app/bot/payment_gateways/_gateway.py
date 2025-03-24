@@ -103,7 +103,8 @@ class PaymentGateway(ABC):
                 bot=self.bot,
                 user=user,
                 services=self.services,
-                storage=self.storage
+                config=self.config,
+                storage=self.storage,
             )
 
             if data.is_extend:

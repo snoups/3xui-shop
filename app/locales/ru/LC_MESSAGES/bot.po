@@ -853,7 +853,7 @@ msgid "subscription:message:payment_method"
 msgstr "💳 <b>Выберите способ оплаты:</b>"
 
 #: app/bot/routers/subscription/trial_handler.py:63
-msgid "subscription:ntf:trial_activate_failed"
+msgid "subscription:popup:trial_activate_failed"
 msgstr "❌ Не удалось активировать пробный период. Попробуйте позже."
 
 #: app/bot/routers/subscription/trial_handler.py:45
@@ -862,7 +862,15 @@ msgstr "❌ Сейчас вам не доступен пробный перио�
 
 #: app/bot/routers/subscription/trial_handler.py:55
 msgid "subscription:ntf:trial_activate_success"
-msgstr "✅ Пробный период {duration} был успешно активирован!"
+msgstr "✅ Пробный период был успешно активирован!\n"
+"\n"
+"<i>Вы получили <b>{duration}</b> к своей подписке.</i>\n"
+"\n"
+"<b>По кнопке 'Подключиться' бот поможет вам скачать приложение и добавить вашу конфигурацию</b>\n"
+"Ваш приватный ключ VPN всегда доступен в разделе <b>'Профиль'</b>"
+
+msgid "subscription:button:connect"
+msgstr "🔌 Подключиться"
 
 #: app/bot/routers/main_menu/keyboard.py:31
 msgid "subscription:button:get_trial"
@@ -877,11 +885,6 @@ msgid "referral:message:user_summary_referred_trial_enabled"
 msgstr "\n"
 "🔗 Когда новый пользователь переходит по вашей пригласительной ссылке и нажимает кнопку «🎁 Получить подарок», "
 "он получает расширенный промо-период {referred_duration}.\n"
-
-#: app/bot/routers/referral/handler.py:41
-msgid "referral:message:user_summary_referred_trial_disabled"
-msgstr "\n"
-"✨ Когда новый пользователь переходит по вашей пригласительной ссылке, вы можете получать вознаграждения за его будущие платежи\n"
 
 #: app/bot/routers/referral/handler.py:44
 msgid "referral:message:user_summary_invite_link"
@@ -923,10 +926,10 @@ msgstr "🎁 ПОЛУЧИТЬ ПОДАРОК"
 msgid "referral:ntf:trial_activate_success"
 msgstr "✅ <b>Пробный период был успешно активирован!</b>\n"
 "\n"
-"<i>Вы получили {duration} к своей подписке.</i>"
+"<i>Вы получили <b>{duration}</b> к своей подписке.</i>\n"
 "\n"
 "<b>По кнопке 'Подключиться' бот поможет вам скачать приложение и добавить вашу конфигурацию</b>\n"
-"Ваш приватный ключ VPN всегда доступен в разделе 'Профиль'"
+"Ваш приватный ключ VPN всегда доступен в разделе <b>'Профиль'</b>"
 
 #: app/bot/routers/referral/handler.py:145
 msgid "referral:popup:trial_unavailable_for_user"
@@ -939,6 +942,9 @@ msgstr "❌ <i>Не удалось активировать пробный пе�
 #: app/bot/routers/referral/handler.py:136
 msgid "referral:popup:no_available_servers"
 msgstr "❌ Нет доступных серверов. Попробуйте позже."
+
+msgid "referral:button:connect"
+msgstr "🔌 Подключиться"
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"

@@ -140,11 +140,11 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | | | |
 | SHOP_EMAIL | ⭕ | support@3xui-shop.com | Email for receipts |
 | SHOP_CURRENCY | ⭕ | RUB | Currency for buttons (e.g., RUB, USD, XTR) |
-| SHOP_TRIAL_ENABLED | ⭕ | False | Enable trial subscription for new users. |
+| SHOP_TRIAL_ENABLED | ⭕ | True | Enable trial subscription for new users. |
 | SHOP_TRIAL_PERIOD | ⭕ | 3 | Duration of the trial subscription in days. |
 | SHOP_REFERRED_TRIAL_ENABLED | ⭕ | False | Enable specific trial subscription for referral users. |
 | SHOP_REFERRED_TRIAL_PERIOD | ⭕ | 7 | Trial duration in days for the referred (invited) user |
-| SHOP_REFERRER_REWARD_ENABLED | ⭕ | False | Enable the two-level referral reward system |
+| SHOP_REFERRER_REWARD_ENABLED | ⭕ | True | Enable the two-level referral reward system |
 | ~~SHOP_REFERRER_REWARD_TYPE~~ | ⭕ | DAYS | Type of referrer reward. 'days' only now. Awaits user balance implementation. (e.g. days, money) |
 | SHOP_REFERRER_LEVEL_ONE_PERIOD | ⭕ | 10 | Days reward for the first-level referrer (user who invited) |
 | SHOP_REFERRER_LEVEL_TWO_PERIOD | ⭕ | 3 | Days reward for the second-level referrer (user invited by the invited) |

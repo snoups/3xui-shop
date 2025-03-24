@@ -13,6 +13,7 @@ from app.bot.filters import IsAdmin
 from app.bot.models import ServicesContainer
 from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY
 from app.bot.utils.navigation import NavMain
+from app.config import Config
 from app.db.models import User, Referral
 
 from .keyboard import main_menu_keyboard
@@ -52,6 +53,7 @@ async def command_main_menu(
     user: User,
     state: FSMContext,
     services: ServicesContainer,
+    config: Config,
     session: AsyncSession,
     command: CommandObject,
     is_new_user: bool
@@ -81,6 +83,7 @@ async def command_main_menu(
         text=_("main_menu:message:main").format(name=user.first_name),
         reply_markup=main_menu_keyboard(
             is_admin,
+            is_referral_available=config.shop.REFERRER_REWARD_ENABLED,
             is_trial_available=await services.subscription.is_trial_available(user),
             is_referred_trial_available=await services.referral.is_referred_trial_available(user),
         ),
@@ -89,7 +92,13 @@ async def command_main_menu(
 
 
 @router.callback_query(F.data == NavMain.MAIN_MENU)
-async def callback_main_menu(callback: CallbackQuery, user: User, services: ServicesContainer, state: FSMContext) -> None:
+async def callback_main_menu(
+        callback: CallbackQuery,
+        user: User,
+        services: ServicesContainer,
+        state: FSMContext,
+        config: Config,
+) -> None:
     logger.info(f"User {user.tg_id} returned to main menu page.")
     await state.clear()
     await state.update_data({MAIN_MESSAGE_ID_KEY: callback.message.message_id})
@@ -98,6 +107,7 @@ async def callback_main_menu(callback: CallbackQuery, user: User, services: Serv
         text=_("main_menu:message:main").format(name=user.first_name),
         reply_markup=main_menu_keyboard(
             is_admin,
+            is_referral_available=config.shop.REFERRER_REWARD_ENABLED,
             is_trial_available=await services.subscription.is_trial_available(user),
             is_referred_trial_available=await services.referral.is_referred_trial_available(user),
         ),
@@ -108,6 +118,7 @@ async def redirect_to_main_menu(
     bot: Bot,
     user: User,
     services: ServicesContainer,
+    config: Config,
     storage: RedisStorage | None = None,
     state: FSMContext | None = None,
 ) -> None:
@@ -129,6 +140,7 @@ async def redirect_to_main_menu(
             message_id=main_message_id,
             reply_markup=main_menu_keyboard(
                 is_admin,
+                is_referral_available=config.shop.REFERRER_REWARD_ENABLED,
                 is_trial_available=await services.subscription.is_trial_available(user),
                 is_referred_trial_available=await services.referral.is_referred_trial_available(user),
             ),
