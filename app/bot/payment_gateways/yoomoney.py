@@ -36,7 +36,7 @@ class Yoomoney(PaymentGateway):
         bot: Bot,
         i18n: I18n,
         services: ServicesContainer,
-    ):
+    ) -> None:
         self.name = __("payment:gateway:yoomoney")
         self.app = app
         self.config = config

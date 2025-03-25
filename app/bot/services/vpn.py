@@ -2,9 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.bot.utils.network import extract_base_url
-from app.config import Config
-
 if TYPE_CHECKING:
     from .server_pool import ServerPoolService
 
@@ -14,11 +11,13 @@ from py3xui import Client, Inbound
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.bot.models import ClientData
+from app.bot.utils.network import extract_base_url
 from app.bot.utils.time import (
     add_days_to_timestamp,
     days_to_timestamp,
     get_current_timestamp,
 )
+from app.config import Config
 from app.db.models import Promocode, User
 
 logger = logging.getLogger(__name__)
@@ -248,17 +247,6 @@ class VPNService:
         return False
 
     async def process_bonus_days(self, user: User, duration: int, devices: int) -> bool:
-        """
-        Ensures that user will receive its bonus days both if it already has subscription, or not.
-
-        Args:
-            user (User): User object.
-            duration (int): Duration of bonus days in days.
-            devices (int): Count of devices for new client.
-
-        Returns:
-            bool: True, when bonus days have been successfully given, else False.
-        """
         if await self.is_client_exists(user):
             updated = await self.update_client(user=user, devices=0, duration=duration)
             if updated:
@@ -273,7 +261,7 @@ class VPNService:
         return False
 
     async def activate_promocode(self, user: User, promocode: Promocode) -> bool:
-        # todo: consider moving to some 'promocode module services' with usage of vpn-service methods.
+        # TODO: consider moving to some 'promocode module services' with usage of vpn-service methods.
 
         async with self.session() as session:
             activated = await Promocode.set_activated(

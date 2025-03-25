@@ -1,11 +1,9 @@
 import logging
 from dataclasses import dataclass
 
-from py3xui import AsyncApi, Inbound
-from py3xui.inbound import Settings, Sniffing, StreamSettings
+from py3xui import AsyncApi
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.bot.utils.network import ping_url
 from app.config import Config
 from app.db.models import Server, User
 

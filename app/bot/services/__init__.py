@@ -6,7 +6,9 @@ from app.config import Config
 
 from .notification import NotificationService
 from .plan import PlanService
+from .referral import ReferralService
 from .server_pool import ServerPoolService
+from .subscription import SubscriptionService
 from .vpn import VPNService
 from .referral import ReferralService
 from .subscription import SubscriptionService

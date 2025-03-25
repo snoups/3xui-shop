@@ -10,7 +10,7 @@ from app.bot.models import ClientData, ServicesContainer, SubscriptionData
 from app.bot.payment_gateways import GatewayFactory
 from app.bot.utils.navigation import NavSubscription
 from app.config import Config
-from app.db.models import Server, User
+from app.db.models import User
 
 from .keyboard import (
     devices_keyboard,
@@ -82,7 +82,16 @@ async def callback_subscription_extend(
 ) -> None:
     logger.info(f"User {user.tg_id} started extend subscription.")
     client = await services.vpn.is_client_exists(user)
-    callback_data.devices = await services.vpn.get_limit_ip(user=user, client=client)
+
+    current_devices = await services.vpn.get_limit_ip(user=user, client=client)
+    if not services.plan.get_plan(current_devices):
+        await services.notification.show_popup(
+            callback=callback,
+            text=_("subscription:popup:error_fetching_plan"),
+        )
+        return
+
+    callback_data.devices = current_devices
     callback_data.state = NavSubscription.DURATION
     callback_data.is_extend = True
     await callback.message.edit_text(

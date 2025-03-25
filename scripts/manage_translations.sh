@@ -14,11 +14,12 @@
 
 set -e
 
+DOMAIN="bot"
 MAIN_TRANSLATIONS_DIR="app/locales"
 BACKUP_TRANSLATIONS_DIR="app/locales/backup"
 LOCALES_DIR="app/locales"
-MESSAGES_POT="$LOCALES_DIR/bot.pot"
-PROJECT_NAME="bot"
+MESSAGES_POT="$LOCALES_DIR/$DOMAIN.pot"
+PROJECT_NAME="$DOMAIN"
 VERSION="0.1"
 COPYRIGHT_HOLDER="snoups"
 INPUT_DIR="."
@@ -102,6 +103,15 @@ extract_messages() {
     echo "✅ Messages extracted to $MESSAGES_POT."
 }
 
+update_translations() {
+    echo "🔄 Updating translations..."
+    pybabel update \
+        -D "$DOMAIN" \
+        -i "$MESSAGES_POT" \
+        -d "$LOCALES_DIR"
+    echo "✅ Translations updated in $LOCALE_DIR."
+}
+
 compile_translations() {
     echo "⚙️ Compiling..."
     pybabel compile -d "$LOCALES_DIR" -D "$PROJECT_NAME"
@@ -147,6 +157,7 @@ case "$1" in
         ;;
     --update)
         extract_messages
+        update_translations
         compile_translations
         ;;
     --help)

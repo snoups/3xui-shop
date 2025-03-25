@@ -1,7 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
 
-import requests
 from aiogram import Bot
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.utils.i18n import I18n
@@ -43,7 +42,7 @@ class PaymentGateway(ABC):
         bot: Bot,
         i18n: I18n,
         services: ServicesContainer,
-    ):
+    ) -> None:
         self.app = app
         self.config = config
         self.session = session
@@ -82,7 +81,7 @@ class PaymentGateway(ABC):
         if self.config.shop.REFERRER_REWARD_ENABLED:
             await self.services.referral.add_referrers_rewards_on_payment(
                 referred_tg_id=data.user_id,
-                payment_amount=data.price,  # todo: (!) add currency unified processing
+                payment_amount=data.price,  # TODO: (!) add currency unified processing
                 payment_id=payment_id,
             )
 

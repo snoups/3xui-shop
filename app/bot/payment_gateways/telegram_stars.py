@@ -34,7 +34,7 @@ class TelegramStars(PaymentGateway):
         bot: Bot,
         i18n: I18n,
         services: ServicesContainer,
-    ):
+    ) -> None:
         self.name = __("payment:gateway:telegram_stars")
         self.app = app
         self.config = config

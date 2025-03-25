@@ -133,3 +133,6 @@ def setup_logging(config: LoggingConfig) -> None:
 
     urllib_logger = logging.getLogger("urllib3")
     urllib_logger.setLevel(logging.WARNING)
+
+    apscheduler_logger = logging.getLogger("apscheduler")
+    apscheduler_logger.setLevel(logging.WARNING)

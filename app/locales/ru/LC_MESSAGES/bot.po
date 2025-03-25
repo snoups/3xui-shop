@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-02-24 11:41+0500\n"
+"POT-Creation-Date: 2025-03-25 19:51+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -17,15 +17,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: app/bot/middlewares/maintenance.py:41
+#: app/bot/middlewares/maintenance.py:45
 msgid "maintenance:ntf:try_later"
 msgstr ""
 "🚧 <i>Бот находится в режиме обслуживания. Пожалуйста, попробуйте "
 "позже.</i>"
 
-#: app/bot/payment_gateways/_gateway.py:85
+#: app/bot/payment_gateways/_gateway.py:91
 msgid "payment:event:payment_succeeded"
 msgstr ""
 "💳 <b>Событие: Покупка завершена!</b>\n"
@@ -34,7 +34,7 @@ msgstr ""
 "ID пользователя: <code>{user_id}</code>\n"
 "<code>{devices}</code> | <code>{duration}</code>"
 
-#: app/bot/payment_gateways/_gateway.py:147
+#: app/bot/payment_gateways/_gateway.py:159
 msgid "payment:event:payment_canceled"
 msgstr ""
 "💳 <b>Событие: Покупка отменена!</b>\n"
@@ -43,7 +43,7 @@ msgstr ""
 "ID пользователя: <code>{user_id}</code>\n"
 "<code>{devices}</code> | <code>{duration}</code>"
 
-#: app/bot/payment_gateways/cryptomus.py:41
+#: app/bot/payment_gateways/cryptomus.py:42
 msgid "payment:gateway:cryptomus"
 msgstr "Cryptomus"
 
@@ -137,7 +137,8 @@ msgstr "🗑 Удалить"
 msgid "promocode_editor:button:edit"
 msgstr "✏️ Изменить"
 
-#: app/bot/routers/admin_tools/keyboard.py:110 app/bot/utils/formatting.py:72
+#: app/bot/routers/admin_tools/keyboard.py:110 app/bot/utils/formatting.py:73
+#, python-brace-format
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] "1 день"
@@ -529,7 +530,6 @@ msgstr "❌ Не удалось удалить сервер."
 
 #: app/bot/routers/admin_tools/statistics_handler.py:18
 #: app/bot/routers/admin_tools/user_handler.py:18
-#: app/bot/routers/referral/handler.py:17
 msgid "global:popup:development"
 msgstr "В разработке!"
 
@@ -580,9 +580,9 @@ msgstr "📥 Скачать"
 msgid "download:button:connect"
 msgstr "🔌 Подключиться"
 
-#: app/bot/routers/main_menu/handler.py:38
-#: app/bot/routers/main_menu/handler.py:51
-#: app/bot/routers/main_menu/handler.py:75
+#: app/bot/routers/main_menu/handler.py:81
+#: app/bot/routers/main_menu/handler.py:105
+#: app/bot/routers/main_menu/handler.py:136
 msgid "main_menu:message:main"
 msgstr ""
 "Добро пожаловать, {name}! 🎉\n"
@@ -597,24 +597,33 @@ msgstr ""
 "📱 ПОДДЕРЖКА ВСЕХ ПЛАТФОРМ\n"
 "♾️ БЕЗЛИМИТ\n"
 "✅ ГАРАНТИЯ И ПРОБНЫЙ ПЕРИОД\n"
+"👥 РЕФЕРАЛЬНАЯ СИСТЕМА\n"
 
-#: app/bot/routers/main_menu/keyboard.py:27
+#: app/bot/routers/main_menu/keyboard.py:25
+msgid "referral:button:get_referred_trial"
+msgstr "🎁 ПОЛУЧИТЬ ПОДАРОК"
+
+#: app/bot/routers/main_menu/keyboard.py:32
+msgid "subscription:button:get_trial"
+msgstr "🎁 ПОПРОБОВАТЬ БЕСПЛАТНО"
+
+#: app/bot/routers/main_menu/keyboard.py:38
 msgid "main_menu:button:profile"
 msgstr "👤 Профиль"
 
-#: app/bot/routers/main_menu/keyboard.py:31
+#: app/bot/routers/main_menu/keyboard.py:42
 msgid "main_menu:button:subscription"
 msgstr "💳 Подписка"
 
-#: app/bot/routers/main_menu/keyboard.py:37
+#: app/bot/routers/main_menu/keyboard.py:50
 msgid "main_menu:button:referral"
 msgstr "👥 Пригласить"
 
-#: app/bot/routers/main_menu/keyboard.py:41
+#: app/bot/routers/main_menu/keyboard.py:58
 msgid "main_menu:button:support"
 msgstr "🆘 Помощь"
 
-#: app/bot/routers/main_menu/keyboard.py:49
+#: app/bot/routers/main_menu/keyboard.py:66
 msgid "main_menu:button:admin_tools"
 msgstr "🛠 Административные инструменты"
 
@@ -690,6 +699,7 @@ msgid "10 seconds"
 msgstr "10 секунд"
 
 #: app/bot/routers/profile/handler.py:87
+#, python-brace-format
 msgid "1 second"
 msgid_plural "{} seconds"
 msgstr[0] "1 секунду"
@@ -708,40 +718,123 @@ msgstr "🔑 Показать ключ"
 msgid "profile:button:connect"
 msgstr "🔌 Подключиться"
 
-#: app/bot/routers/subscription/keyboard.py:28
-#: app/bot/routers/subscription/keyboard.py:52
+#: app/bot/routers/referral/handler.py:35
+msgid "referral:message:user_summary"
+msgstr "🎉 Приглашайте друзей и получайте вознаграждение!\n"
+
+#: app/bot/routers/referral/handler.py:40
+msgid "referral:message:user_summary_referred_trial_enabled"
+msgstr ""
+"\n"
+"🔗 Когда новый пользователь переходит по вашей пригласительной ссылке и "
+"нажимает кнопку «🎁 Получить подарок», он получает расширенный "
+"промо-период {referred_duration}.\n"
+
+#: app/bot/routers/referral/handler.py:45
+msgid "referral:message:user_summary_invite_link"
+msgstr ""
+"\n"
+"📎 Ваша персональная ссылка:\n"
+"<code>{referral_link}</code>\n"
+"(нажмите на ссылку, чтобы скопировать)\n"
+"👀 Переходов по вашей ссылке: {referrals_count}\n"
+
+#: app/bot/routers/referral/handler.py:74
+msgid "referral:message:user_summary_explain_referrer_days"
+msgstr ""
+"\n"
+"💸 <b>Двухуровневая реферальная система</b>\n"
+"👥 <b>За каждую успешную оплату</b> подписки, по вашей ссылке:\n"
+"1️⃣ Вы получаете <b>+{first_referrer_duration}</b> к своей подписке\n"
+"2️⃣ Вы также получаете <b>+{second_referrer_duration}</b> от "
+"пользователей, приглашенных вашими рефералами!\n"
+
+#: app/bot/routers/referral/handler.py:83
+msgid "referral:message:user_summary_explain_referrer_money"
+msgstr ""
+"\n"
+"💸 <b>Двухуровневая реферальная система</b>\n"
+"👥 <b>За каждую успешную оплату</b> подписки по вашей ссылке:\n"
+"1️⃣ Вы получаете на свой баланс <b>{first_referrer_rate}%</b> платежей, "
+"совершенных вашим рефералом!\n"
+"2️⃣ Также вы получаете <b>{second_referrer_rate}%</b> платежей от "
+"пользователей, приглашенных вашими рефералами!\n"
+
+#: app/bot/routers/referral/handler.py:93
+msgid "referral:message:user_summary_referrer_rewards"
+msgstr ""
+"\n"
+"📊 <b>Ваше вознаграждение за платежи рефералов</b>\n"
+"Первый уровень рефералов: {first_level_rewards_sum}\n"
+"Второй уровень рефералов: {second_level_rewards_sum}\n"
+"<i>*(Награды начисляются в течении 15 минут. Ожидают: "
+"{pending_rewards_count})</i>"
+
+#: app/bot/routers/referral/handler.py:143
+msgid "referral:popup:no_available_servers"
+msgstr "❌ Нет доступных серверов. Попробуйте позже."
+
+#: app/bot/routers/referral/handler.py:152
+msgid "referral:popup:trial_unavailable_for_user"
+msgstr "❌ Пробный период уже был использован."
+
+#: app/bot/routers/referral/handler.py:165
+#: app/bot/routers/subscription/trial_handler.py:52
+msgid "subscription:ntf:trial_activate_success"
+msgstr ""
+"✅ Пробный период был успешно активирован!\n"
+"\n"
+"<i>Вы получили <b>{duration}</b> к своей подписке.</i>\n"
+"\n"
+"<b>По кнопке 'Подключиться' бот поможет вам скачать приложение и добавить"
+" вашу конфигурацию</b>\n"
+"Ваш приватный ключ VPN всегда доступен в разделе <b>'Профиль'</b>"
+
+#: app/bot/routers/referral/handler.py:173
+msgid "referral:ntf:referred_trial_activate_failed"
+msgstr ""
+"❌ <i>Не удалось активировать пробный период, пожалуйста попробуйте позже,"
+" либо обратитесь к администратору</i>"
+
+#: app/bot/routers/referral/keyboard.py:14
+#: app/bot/routers/subscription/keyboard.py:180
+msgid "subscription:button:connect"
+msgstr "🔌 Подключиться"
+
+#: app/bot/routers/subscription/keyboard.py:27
+#: app/bot/routers/subscription/keyboard.py:51
 msgid "subscription:button:change"
 msgstr "💳 Изменить подписку"
 
-#: app/bot/routers/subscription/keyboard.py:41
+#: app/bot/routers/subscription/keyboard.py:40
 msgid "subscription:button:buy"
 msgstr "💳 Купить подписку"
 
-#: app/bot/routers/subscription/keyboard.py:47
+#: app/bot/routers/subscription/keyboard.py:46
 msgid "subscription:button:extend"
 msgstr "💳 Продлить подписку"
 
-#: app/bot/routers/subscription/keyboard.py:57
+#: app/bot/routers/subscription/keyboard.py:56
 msgid "subscription:button:activate_promocode"
 msgstr "🎟️ Активировать промокод"
 
-#: app/bot/routers/subscription/keyboard.py:111
+#: app/bot/routers/subscription/keyboard.py:110
 msgid "subscription:button:change_devices"
 msgstr "◀️ Изменить количество устройств"
 
-#: app/bot/routers/subscription/keyboard.py:121
+#: app/bot/routers/subscription/keyboard.py:120
 msgid "subscription:button:pay"
 msgstr "💳 Оплатить"
 
-#: app/bot/routers/subscription/keyboard.py:127
+#: app/bot/routers/subscription/keyboard.py:126
 msgid "subscription:button:change_payment_method"
 msgstr "◀️ Изменить способ оплаты"
 
-#: app/bot/routers/subscription/keyboard.py:157
+#: app/bot/routers/subscription/keyboard.py:156
 msgid "subscription:button:change_duration"
 msgstr "◀️ Изменить длительность"
 
-#: app/bot/routers/subscription/keyboard.py:168
+#: app/bot/routers/subscription/keyboard.py:167
 msgid "subscription:button:download_app"
 msgstr "🔌 Подключиться"
 
@@ -834,105 +927,38 @@ msgstr ""
 "<i>Похоже, вы еще не приобрели подписку. Купите подписку, чтобы начать "
 "пользоваться нашим сервисом.</i>"
 
-#: app/bot/routers/subscription/subscription_handler.py:89
-#: app/bot/routers/subscription/subscription_handler.py:151
+#: app/bot/routers/subscription/subscription_handler.py:90
+msgid "subscription:popup:error_fetching_plan"
+msgstr ""
+"❌ Ваш тарифный план больше не поддерживается. Вам необходимо изменить "
+"подписку."
+
+#: app/bot/routers/subscription/subscription_handler.py:98
+#: app/bot/routers/subscription/subscription_handler.py:160
 msgid "subscription:message:duration"
 msgstr "⏳ <b>Выберите длительность:</b>"
 
-#: app/bot/routers/subscription/subscription_handler.py:109
-#: app/bot/routers/subscription/subscription_handler.py:135
+#: app/bot/routers/subscription/subscription_handler.py:118
+#: app/bot/routers/subscription/subscription_handler.py:144
 msgid "subscription:message:devices"
 msgstr "📱 <b>Выберите количество устройств:</b>"
 
-#: app/bot/routers/subscription/subscription_handler.py:128
+#: app/bot/routers/subscription/subscription_handler.py:137
+#: app/bot/routers/subscription/trial_handler.py:34
 msgid "subscription:popup:no_available_servers"
 msgstr "❌ Доступных серверов не найдено. Попробуйте позже."
 
-#: app/bot/routers/subscription/subscription_handler.py:171
+#: app/bot/routers/subscription/subscription_handler.py:180
 msgid "subscription:message:payment_method"
 msgstr "💳 <b>Выберите способ оплаты:</b>"
 
-#: app/bot/routers/subscription/trial_handler.py:63
-msgid "subscription:popup:trial_activate_failed"
-msgstr "❌ Не удалось активировать пробный период. Попробуйте позже."
-
-#: app/bot/routers/subscription/trial_handler.py:45
+#: app/bot/routers/subscription/trial_handler.py:42
 msgid "subscription:popup:trial_unavailable_for_user"
 msgstr "❌ Сейчас вам не доступен пробный период."
 
-#: app/bot/routers/subscription/trial_handler.py:55
-msgid "subscription:ntf:trial_activate_success"
-msgstr "✅ Пробный период был успешно активирован!\n"
-"\n"
-"<i>Вы получили <b>{duration}</b> к своей подписке.</i>\n"
-"\n"
-"<b>По кнопке 'Подключиться' бот поможет вам скачать приложение и добавить вашу конфигурацию</b>\n"
-"Ваш приватный ключ VPN всегда доступен в разделе <b>'Профиль'</b>"
-
-msgid "subscription:button:connect"
-msgstr "🔌 Подключиться"
-
-#: app/bot/routers/main_menu/keyboard.py:31
-msgid "subscription:button:get_trial"
-msgstr "🎁 ПОПРОБОВАТЬ БЕСПЛАТНО"
-
-#: app/bot/routers/referral/handler.py:32
-msgid "referral:message:user_summary"
-msgstr "🎉 Приглашайте друзей и получайте вознаграждение!\n"
-
-#: app/bot/routers/referral/handler.py:37
-msgid "referral:message:user_summary_referred_trial_enabled"
-msgstr "\n"
-"🔗 Когда новый пользователь переходит по вашей пригласительной ссылке и нажимает кнопку «🎁 Получить подарок», "
-"он получает расширенный промо-период {referred_duration}.\n"
-
-#: app/bot/routers/referral/handler.py:44
-msgid "referral:message:user_summary_invite_link"
-msgstr "\n"
-"📎 Ваша персональная ссылка:\n"
-"<code>{referral_link}</code>\n"
-"(нажмите на ссылку, чтобы скопировать)\n"
-"👀 Переходов по вашей ссылке: {referrals_count}\n"
-
-#: app/bot/routers/referral/handler.py:69
-msgid "referral:message:user_summary_explain_referrer_days"
-msgstr "\n"
-"💸 <b>Двухуровневая реферальная система</b>\n"
-"👥 <b>За каждую успешную оплату</b> подписки, по вашей ссылке:\n"
-"1️⃣ Вы получаете <b>+{first_referrer_duration}</b> к своей подписке\n"
-"2️⃣ Вы также получаете <b>+{second_referrer_duration}</b> от пользователей, приглашенных вашими рефералами!\n"
-
-#: app/bot/routers/referral/handler.py:78
-msgid "referral:message:user_summary_explain_referrer_money"
-msgstr "\n"
-"💸 <b>Двухуровневая реферальная система</b>\n"
-"👥 <b>За каждую успешную оплату</b> подписки по вашей ссылке:\n"
-"1️⃣ Вы получаете на свой баланс <b>{first_referrer_rate}%</b> платежей, совершенных вашим рефералом!\n"
-"2️⃣ Также вы получаете <b>{second_referrer_rate}%</b> платежей от пользователей, приглашенных вашими рефералами!\n"
-
-#: app/bot/routers/referral/handler.py:86
-msgid "referral:message:user_summary_referrer_rewards"
-msgstr "\n"
-"📊 <b>Ваше вознаграждение за платежи рефералов</b>\n"
-"Первый уровень рефералов: {first_level_rewards_sum}\n"
-"Второй уровень рефералов: {second_level_rewards_sum}\n"
-"<i>*(Награды начисляются в течении 15 минут. Ожидают: {pending_rewards_count})</i>"
-
-#: app/bot/routers/main_menu/keyboard.py:24
-msgid "referral:button:get_referred_trial"
-msgstr "🎁 ПОЛУЧИТЬ ПОДАРОК"
-
-#: app/bot/routers/referral/handler.py:145
-msgid "referral:popup:trial_unavailable_for_user"
-msgstr "❌ Пробный период уже был использован."
-
-#: app/bot/routers/referral/handler.py:164
-msgid "referral:ntf:referred_trial_activate_failed"
-msgstr "❌ <i>Не удалось активировать пробный период, пожалуйста попробуйте позже, либо обратитесь к администратору</i>"
-
-#: app/bot/routers/referral/handler.py:136
-msgid "referral:popup:no_available_servers"
-msgstr "❌ Нет доступных серверов. Попробуйте позже."
+#: app/bot/routers/subscription/trial_handler.py:60
+msgid "subscription:popup:trial_activate_failed"
+msgstr "❌ Не удалось активировать пробный период. Попробуйте позже."
 
 #: app/bot/routers/support/handler.py:21
 msgid "support:message:main"
@@ -1010,68 +1036,72 @@ msgstr ""
 "\n"
 "Ваша подписка была обновлена ​​на {device} и {duration}."
 
-#: app/bot/utils/formatting.py:17 app/bot/utils/formatting.py:19
-#: app/bot/utils/formatting.py:27
+#: app/bot/utils/formatting.py:18 app/bot/utils/formatting.py:20
+#: app/bot/utils/formatting.py:28
 msgid "MB"
 msgstr "МБ"
 
-#: app/bot/utils/formatting.py:19
+#: app/bot/utils/formatting.py:20
 msgid "GB"
 msgstr "ГБ"
 
-#: app/bot/utils/formatting.py:19
+#: app/bot/utils/formatting.py:20
 msgid "TB"
 msgstr "ТБ"
 
-#: app/bot/utils/formatting.py:19
+#: app/bot/utils/formatting.py:20
 msgid "PB"
 msgstr "ПБ"
 
-#: app/bot/utils/formatting.py:19
+#: app/bot/utils/formatting.py:20
 msgid "EB"
 msgstr "ЭБ"
 
-#: app/bot/utils/formatting.py:19
+#: app/bot/utils/formatting.py:20
 msgid "ZB"
 msgstr "ЗБ"
 
-#: app/bot/utils/formatting.py:19
+#: app/bot/utils/formatting.py:20
 msgid "YB"
 msgstr "ЙБ"
 
-#: app/bot/utils/formatting.py:45
+#: app/bot/utils/formatting.py:46
 msgid "d"
 msgstr "д"
 
-#: app/bot/utils/formatting.py:47
+#: app/bot/utils/formatting.py:48
 msgid "h"
 msgstr "ч"
 
-#: app/bot/utils/formatting.py:49 app/bot/utils/formatting.py:54
+#: app/bot/utils/formatting.py:50 app/bot/utils/formatting.py:55
 msgid "m"
 msgstr "м"
 
-#: app/bot/utils/formatting.py:59
+#: app/bot/utils/formatting.py:60
 msgid "devices"
 msgstr "устройств"
 
-#: app/bot/utils/formatting.py:61
+#: app/bot/utils/formatting.py:62
+#, python-brace-format
 msgid "1 device"
 msgid_plural "{} devices"
 msgstr[0] "1 устройство"
 msgstr[1] "{} устройства"
 msgstr[2] "{} устройств"
 
-#: app/bot/utils/formatting.py:69
+#: app/bot/utils/formatting.py:70
+#, python-brace-format
 msgid "1 year"
 msgid_plural "{} years"
 msgstr[0] "1 год"
 msgstr[1] "{} года"
 msgstr[2] "{} лет"
 
-#: app/bot/utils/formatting.py:71
+#: app/bot/utils/formatting.py:72
+#, python-brace-format
 msgid "1 month"
 msgid_plural "{} months"
 msgstr[0] "1 месяц"
 msgstr[1] "{} месяца"
 msgstr[2] "{} месяцев"
+

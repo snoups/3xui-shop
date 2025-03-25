@@ -47,17 +47,18 @@ The bot enables efficient subscription sales with advanced features:
     - Format text using HTML
     - Preview notifications before sending
     - System notifications for the developer and administrators
-- **Referral Program**
+- **Two-Level Referral Program** (by [@Heimlet](https://github.com/Heimlet))
     - View referral statistics
     - Reward users for inviting new members
-- **Trial Period**
+    - Support for two-tier referral rewards
+- **Trial Period** (by [@Heimlet](https://github.com/Heimlet))
     - Provide free trial subscription
+    - Extend trial period for referred users
     - Configure and disable the trial period
 - **Flexible Payment System**
     - Change the default currency
     - Easily extendable architecture for adding new payment gateways
     - ~~Add, edit, and delete subscription plans at any time~~
-    - ~~Enable or disable payment methods~~
     - ~~Change the display order of payment options~~
 - **~~User Editor~~**
     - ~~View user information~~
@@ -83,11 +84,13 @@ Administrators do not have access to server management.
 
 
 ### 🚧 Current Tasks
-- [ ] Trial period
-- [ ] Referral system
+- [x] Trial period
+- [x] Referral system
 - [ ] Statistics
 - [ ] User editor
 - [ ] Plans editor
+- [ ] Flexible server pool
+- [ ] Custom promocodes
 
 <a id="installation-guide"></a>
 
@@ -140,17 +143,14 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | | | |
 | SHOP_EMAIL | ⭕ | support@3xui-shop.com | Email for receipts |
 | SHOP_CURRENCY | ⭕ | RUB | Currency for buttons (e.g., RUB, USD, XTR) |
-| SHOP_TRIAL_ENABLED | ⭕ | True | Enable trial subscription for new users. |
-| SHOP_TRIAL_PERIOD | ⭕ | 3 | Duration of the trial subscription in days. |
-| SHOP_REFERRED_TRIAL_ENABLED | ⭕ | False | Enable specific trial subscription for referral users. |
-| SHOP_REFERRED_TRIAL_PERIOD | ⭕ | 7 | Trial duration in days for the referred (invited) user |
+| SHOP_TRIAL_ENABLED | ⭕ | True | Enable trial subscription for new users |
+| SHOP_TRIAL_PERIOD | ⭕ | 3 | Duration of the trial subscription in days |
+| SHOP_REFERRED_TRIAL_ENABLED | ⭕ | False | Enable extended trial period for referred users |
+| SHOP_REFERRED_TRIAL_PERIOD | ⭕ | 7 | Duration of the extended trial for referred users (in days) |
 | SHOP_REFERRER_REWARD_ENABLED | ⭕ | True | Enable the two-level referral reward system |
-| ~~SHOP_REFERRER_REWARD_TYPE~~ | ⭕ | DAYS | Type of referrer reward. 'days' only now. Awaits user balance implementation. (e.g. days, money) |
-| SHOP_REFERRER_LEVEL_ONE_PERIOD | ⭕ | 10 | Days reward for the first-level referrer (user who invited) |
-| SHOP_REFERRER_LEVEL_TWO_PERIOD | ⭕ | 3 | Days reward for the second-level referrer (user invited by the invited) |
-| ~~SHOP_REFERRER_LEVEL_ONE_RATE~~ | ⭕ | 50 | Percentage reward for the first-level referrer (user who invited) |
-| ~~SHOP_REFERRER_LEVEL_TWO_RATE~~ | ⭕ | 5 | Percentage reward for the second-level referrer (user invited by the invited) |
-| SHOP_BONUS_DEVICES_COUNT | ⭕ | 1 | Number of devices by default for trial and referral users (mirrors tariff plans settings) |
+| SHOP_REFERRER_LEVEL_ONE_PERIOD | ⭕ | 10 | Reward in days for the first-level referrer (inviter) |
+| SHOP_REFERRER_LEVEL_TWO_PERIOD | ⭕ | 3 | Reward in days for the second-level referrer (inviter of the inviter). |
+| SHOP_BONUS_DEVICES_COUNT | ⭕ | 1 | Default Device Limit for Promocode, Trial, and Referral Users (Based on Plan Settings) |
 | SHOP_PAYMENT_STARS_ENABLED | ⭕ | True | Enable Telegram stars payment |
 | SHOP_PAYMENT_CRYPTOMUS_ENABLED | ⭕ | False | Enable Cryptomus payment |
 | SHOP_PAYMENT_YOOKASSA_ENABLED | ⭕ | False | Enable Yookassa payment |
@@ -170,12 +170,6 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | | | |
 | YOOMONEY_WALLET_ID | ⭕ | - | Wallet ID for Yoomoney payment |
 | YOOMONEY_NOTIFICATION_SECRET | ⭕ | - | Notification secret key for Yoomoney payment |
-| | | |
-| REDIS_HOST | ⭕ | 3xui-shop-redis | Host of the Redis server |
-| REDIS_PORT | ⭕ | 6379 | Port of the Redis server |
-| REDIS_DB_NAME | ⭕ | 0 | Name of the Redis database |
-| REDIS_USERNAME | ⭕ | - | Username for authentication in the Redis server |
-| REDIS_PASSWORD | ⭕ | - | Password for authentication in the Redis server |
 | | | |
 | LOG_LEVEL | ⭕ | DEBUG | Log level (e.g., INFO, DEBUG) |
 | LOG_FORMAT | ⭕ | %(asctime)s \| %(name)s \| %(levelname)s \| %(message)s | Log format |
@@ -262,14 +256,15 @@ To ensure the bot functions correctly, you must configure the 3X-UI panel:
 <a id="bugs-and-feature-requests"></a>
 
 ### Referral and Trial Rewards Configuration
-Shop now supports **trial subscriptions** and a **two-level referral reward system**. Here’s how it works:
-All configuration is available via .env (see it above).
 
-| Type of reward                   | How it works                                                                                                                                                                                                                        |
-|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Trial period                     | A trial subscription is available by 'TRY FOR FREE' button at start menu to any user who opens the bot and does not have an active subscription.                                                                                    |
-| Referred user  Trial period      | This option is just like previous 'trial period', but allows bot admin to configure **extended trial period** for an invited user.                                                                                                  |
-| Referral 2-level payment rewards | When a referred user pays for a subscription, the referrer and the second-level referrer (the user who invited the referrer) receive ~~a percentage of the payment as a reward~~ fixed count of days at the moment fore each level. |
+Bot now supports **trial subscriptions** and a **two-level referral reward system**. Here’s how it works:
+All configuration is available via `.env` [(see it above)](#environment-variables-configuration).
+
+| Type of reward | How it works |
+| - | - |
+| Trial period | A trial subscription is available by 'TRY FOR FREE' button at start menu to any user who opens the bot and does not have an active subscription. |
+| Extended Trial period | This option is just like previous 'trial period', but allows to configure **extended trial period** for an invited user. |
+| Two-Level Referral Payment Rewards | When a referred user pays for a subscription, the referrer and the second-level referrer (the user who invited the referrer) receive fixed count of days at the moment fore each level. |
 
 ## 🐛 Bugs and Feature Requests
 

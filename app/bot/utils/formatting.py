@@ -1,7 +1,7 @@
 import logging
 import math
 from datetime import datetime, timezone
-from decimal import Decimal, ROUND_DOWN
+from decimal import ROUND_DOWN, Decimal
 
 from aiogram.utils.i18n import gettext as _
 
@@ -66,17 +66,14 @@ def format_device_count(devices: int) -> str:
 def format_subscription_period(days: int) -> str:
     if days == -1:
         return UNLIMITED
-    if days % 365 == 0:
+    if days % 365 == 0 and days != 0:
         return _("1 year", "{} years", days // 365).format(days // 365)
-    if days % 30 == 0:
+    if days % 30 == 0 and days != 0:
         return _("1 month", "{} months", days // 30).format(days // 30)
     return _("1 day", "{} days", days).format(days)
 
 
 def to_decimal(amount: float | str | Decimal | int) -> Decimal:
-    """
-    Converts a value to Decimal with a precision of 38.18
-    """
     DECIMAL_SCALE = 18
     DECIMAL_FORMAT = f"1.{'0' * DECIMAL_SCALE}"
 

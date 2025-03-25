@@ -42,7 +42,7 @@ class Yookassa(PaymentGateway):
         bot: Bot,
         i18n: I18n,
         services: ServicesContainer,
-    ):
+    ) -> None:
         self.name = __("payment:gateway:yookassa")
         self.app = app
         self.config = config
