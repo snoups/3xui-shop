@@ -62,7 +62,7 @@ class User(Base):
         back_populates="referrer",
         cascade="all, delete-orphan"
     )
-    referral: Mapped["Referral | None"] = relationship(
+    referral: Mapped["Referral | None"] = relationship( # type: ignore
         "Referral",
         foreign_keys="Referral.referred_tg_id",
         primaryjoin="User.tg_id == Referral.referred_tg_id",

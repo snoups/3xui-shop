@@ -1,6 +1,6 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.i18n import gettext as _
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.routers.misc.keyboard import back_to_main_menu_button
 from app.bot.utils.navigation import NavDownload

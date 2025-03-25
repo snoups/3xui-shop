@@ -51,7 +51,9 @@ async def on_startup(config: Config, bot: Bot, services: ServicesContainer, db: 
 
     tasks.transactions.start_scheduler(db.session)
     if config.shop.REFERRER_REWARD_ENABLED:
-        tasks.referral.start_referral_scheduler(session_factory=db.session, referral_service=services.referral)
+        tasks.referral.start_scheduler(
+            session_factory=db.session, referral_service=services.referral
+        )
 
 
 async def main() -> None:
@@ -66,6 +68,7 @@ async def main() -> None:
 
     # Initialize database
     db = Database(config.database)
+    await db.initialize()
 
     # Set up storage for FSM (Finite State Machine)
     storage = RedisStorage.from_url(url=config.redis.url())
@@ -114,7 +117,7 @@ async def main() -> None:
     dispatcher.shutdown.register(on_shutdown)
 
     # Enable Maintenance mode for developing # WARNING: remove before production
-    MaintenanceMiddleware.set_mode(True)
+    MaintenanceMiddleware.set_mode(False)
 
     # Register middlewares
     middlewares.register(dispatcher=dispatcher, i18n=i18n, session=db.session)
@@ -128,9 +131,6 @@ async def main() -> None:
 
     # Include bot routers
     routers.include(app=app, dispatcher=dispatcher)
-
-    # Initialize database
-    await db.initialize()
 
     # Set up bot commands
     await commands.setup(bot)

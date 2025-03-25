@@ -66,7 +66,7 @@ MESSAGE_EFFECT_IDS = {
 
 # region: Enums
 from enum import Enum
-from typing import Optional, Any
+from typing import Any, Optional
 
 
 class TransactionStatus(Enum):
@@ -82,11 +82,11 @@ class Currency(Enum):
     XTR = ("XTR", "★")
 
     @property
-    def symbol(self):
+    def symbol(self) -> str:
         return self.value[1]
 
     @property
-    def code(self):
+    def code(self) -> str:
         return self.value[0]
 
     @classmethod
@@ -99,8 +99,8 @@ class Currency(Enum):
 
 
 class ReferrerRewardType(Enum):
-    DAYS = 'days'
-    MONEY = 'money'  # todo: consider using currencies instead? depends on balance implementation
+    DAYS = "days"
+    MONEY = "money"  # TODO: consider using currencies instead? depends on balance implementation
 
     @classmethod
     def from_str(cls, value: str) -> Optional["ReferrerRewardType"]:
@@ -123,5 +123,6 @@ class ReferrerRewardLevel(Enum):
             return cls(int(value))
         except (ValueError, KeyError):
             return None
+
 
 # endregion

@@ -33,7 +33,11 @@ class MaintenanceMiddleware(BaseMiddleware):
 
                 if self.active and not is_admin and user.id != event.bot.id:
                     logger.info(f"User {user.id} tried to use bot in maintenance")
-                    message = event.message or event.callback_query.message
+                    
+                    if event.message:
+                        message = event.message
+                    elif event.callback_query and event.callback_query.message:
+                        message = event.callback_query.message
 
                     if message:
                         await NotificationService.notify_by_message(

@@ -7,25 +7,28 @@ from aiogram.utils.i18n import gettext as _
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.models import ServicesContainer
-from app.bot.utils.constants import PREVIOUS_CALLBACK_KEY, ReferrerRewardType, ReferrerRewardLevel
+from app.bot.utils.constants import (
+    MAIN_MESSAGE_ID_KEY,
+    PREVIOUS_CALLBACK_KEY,
+    ReferrerRewardLevel,
+    ReferrerRewardType,
+)
+from app.bot.utils.formatting import format_subscription_period
 from app.bot.utils.navigation import NavReferral
 from app.config import Config
-from app.db.models import User, Referral, ReferrerReward
-from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY
+from app.db.models import Referral, ReferrerReward, User
 
 from .keyboard import referral_keyboard
-from app.bot.utils.formatting import format_subscription_period
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
 
 
 async def generate_referral_summary_text(
-        session: AsyncSession,
-        user: User,
-        config: Config,
-        bot_username: str,
-
+    session: AsyncSession,
+    user: User,
+    config: Config,
+    bot_username: str,
 ) -> str:
     referral_link = f"https://t.me/{bot_username}?start={user.tg_id}"
 
@@ -62,8 +65,12 @@ async def generate_referral_summary_text(
         )
 
         if reward_type == ReferrerRewardType.DAYS:
-            first_referrer_duration = format_subscription_period(config.shop.REFERRER_LEVEL_ONE_PERIOD)
-            second_referrer_duration = format_subscription_period(config.shop.REFERRER_LEVEL_TWO_PERIOD)
+            first_referrer_duration = format_subscription_period(
+                config.shop.REFERRER_LEVEL_ONE_PERIOD
+            )
+            second_referrer_duration = format_subscription_period(
+                config.shop.REFERRER_LEVEL_TWO_PERIOD
+            )
             text += _("referral:message:user_summary_explain_referrer_days").format(
                 first_referrer_duration=first_referrer_duration,
                 second_referrer_duration=second_referrer_duration,
@@ -78,9 +85,11 @@ async def generate_referral_summary_text(
                 second_referrer_rate=second_referrer_rate,
             )
 
-            # todo: handle and format money currencies
+            # TODO: handle and format money currencies
 
-        pending_rewards_count = await ReferrerReward.get_pending_rewards_count(session=session, user_tg_id=user.tg_id)
+        pending_rewards_count = await ReferrerReward.get_pending_rewards_count(
+            session=session, user_tg_id=user.tg_id
+        )
         text += _("referral:message:user_summary_referrer_rewards").format(
             first_level_rewards_sum=first_level_rewards_sum,
             second_level_rewards_sum=second_level_rewards_sum,
@@ -92,11 +101,11 @@ async def generate_referral_summary_text(
 
 @router.callback_query(F.data == NavReferral.MAIN)
 async def callback_referral(
-        callback: CallbackQuery,
-        user: User,
-        state: FSMContext,
-        session: AsyncSession,
-        config: Config,
+    callback: CallbackQuery,
+    user: User,
+    state: FSMContext,
+    session: AsyncSession,
+    config: Config,
 ) -> None:
     logger.info(f"User {user.tg_id} opened referral page.")
 
@@ -118,11 +127,11 @@ async def callback_referral(
 
 @router.callback_query(F.data == NavReferral.GET_REFERRED_TRIAL)
 async def callback_get_referred_trial(
-        callback: CallbackQuery,
-        user: User,
-        state: FSMContext,
-        services: ServicesContainer,
-        config: Config
+    callback: CallbackQuery,
+    user: User,
+    state: FSMContext,
+    services: ServicesContainer,
+    config: Config,
 ) -> None:
     logger.info(f"User {user.tg_id} triggered getting bonus days.")
 
@@ -146,7 +155,9 @@ async def callback_get_referred_trial(
 
     referred_trial_period = config.shop.REFERRED_TRIAL_PERIOD
 
-    success = await services.referral.reward_referred_user(user=user, days_count=referred_trial_period)
+    success = await services.referral.reward_referred_user(
+        user=user, days_count=referred_trial_period
+    )
 
     main_message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
     if success:
@@ -160,4 +171,6 @@ async def callback_get_referred_trial(
         )
     else:
         text = _("referral:ntf:referred_trial_activate_failed")
-        await services.notification.notify_by_message(message=callback.message, text=text, duration=15)
+        await services.notification.notify_by_message(
+            message=callback.message, text=text, duration=15
+        )

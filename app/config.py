@@ -34,7 +34,7 @@ DEFAULT_SHOP_REFERRER_LEVEL_ONE_PERIOD = 10
 DEFAULT_SHOP_REFERRER_LEVEL_TWO_PERIOD = 3
 DEFAULT_SHOP_REFERRER_LEVEL_ONE_RATE = 50
 DEFAULT_SHOP_REFERRER_LEVEL_TWO_RATE = 5
-DEFAULT_SHOP_BONUS_DEVICES_COUNT = 1  # todo: add check with plans.json tariff at config
+DEFAULT_SHOP_BONUS_DEVICES_COUNT = 1
 DEFAULT_SHOP_PAYMENT_STARS_ENABLED = True
 DEFAULT_SHOP_PAYMENT_CRYPTOMUS_ENABLED = False
 DEFAULT_SHOP_PAYMENT_YOOKASSA_ENABLED = False
@@ -238,9 +238,13 @@ def load_config() -> Config:
             error="SHOP_REFERRER_REWARD_TYPE must be one of: {choices}",
         ),
     )
-    referrer_reward_enabled = env.bool("SHOP_REFERRER_REWARD_ENABLED", default=DEFAULT_SHOP_REFERRER_REWARD_ENABLED)
+    referrer_reward_enabled = env.bool(
+        "SHOP_REFERRER_REWARD_ENABLED", default=DEFAULT_SHOP_REFERRER_REWARD_ENABLED
+    )
     if referrer_reward_type != ReferrerRewardType.DAYS.value:
-        logger.error("Only 'days' option is now available for SHOP_REFERRER_REWARD_TYPE. Referrer reward disabled.")
+        logger.error(
+            "Only 'days' option is now available for SHOP_REFERRER_REWARD_TYPE. Referrer reward disabled."
+        )
         referrer_reward_enabled = False
 
     return Config(
@@ -265,7 +269,9 @@ def load_config() -> Config:
             ).upper(),
             TRIAL_ENABLED=env.bool("SHOP_TRIAL_ENABLED", default=DEFAULT_SHOP_TRIAL_ENABLED),
             TRIAL_PERIOD=env.int("SHOP_TRIAL_PERIOD", default=DEFAULT_SHOP_TRIAL_PERIOD),
-            REFERRED_TRIAL_ENABLED=env.bool("SHOP_REFERRED_TRIAL_ENABLED", default=DEFAULT_SHOP_REFERRED_TRIAL_ENABLED),
+            REFERRED_TRIAL_ENABLED=env.bool(
+                "SHOP_REFERRED_TRIAL_ENABLED", default=DEFAULT_SHOP_REFERRED_TRIAL_ENABLED
+            ),
             REFERRED_TRIAL_PERIOD=env.int(
                 "SHOP_REFERRED_TRIAL_PERIOD",
                 default=DEFAULT_SHOP_REFERRED_TRIAL_PERIOD,
@@ -301,7 +307,9 @@ def load_config() -> Config:
                     error="SHOP_REFERRER_LEVEL_TWO_RATE must be between 1 and 100",
                 ),
             ),
-            BONUS_DEVICES_COUNT=env.int("SHOP_BONUS_DEVICES_COUNT", default=DEFAULT_SHOP_BONUS_DEVICES_COUNT),
+            BONUS_DEVICES_COUNT=env.int(
+                "SHOP_BONUS_DEVICES_COUNT", default=DEFAULT_SHOP_BONUS_DEVICES_COUNT
+            ),
             PAYMENT_STARS_ENABLED=payment_stars_enabled,
             PAYMENT_CRYPTOMUS_ENABLED=payment_cryptomus_enabled,
             PAYMENT_YOOKASSA_ENABLED=payment_yookassa_enabled,
