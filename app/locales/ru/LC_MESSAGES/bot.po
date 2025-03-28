@@ -47,6 +47,10 @@ msgstr ""
 msgid "payment:gateway:cryptomus"
 msgstr "Cryptomus"
 
+#: app/bot/payment_gateways/heleket.py:42
+msgid "payment:gateway:heleket"
+msgstr "Heleket"
+
 #: app/bot/payment_gateways/telegram_stars.py:38
 msgid "payment:gateway:telegram_stars"
 msgstr "Звёзды Telegram"
