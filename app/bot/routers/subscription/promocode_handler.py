@@ -8,11 +8,12 @@ from aiogram.utils.i18n import gettext as _
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.models import ServicesContainer
-from app.bot.routers.misc.keyboard import back_keyboard
 from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY
 from app.bot.utils.formatting import format_subscription_period
 from app.bot.utils.navigation import NavSubscription
 from app.db.models import Promocode, User
+
+from .keyboard import promocode_keyboard
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -28,7 +29,7 @@ async def callback_promocode(callback: CallbackQuery, user: User, state: FSMCont
     await state.set_state(ActivatePromocodeStates.promocode_input)
     await callback.message.edit_text(
         text=_("promocode:message:main"),
-        reply_markup=back_keyboard(NavSubscription.MAIN),
+        reply_markup=promocode_keyboard(),
     )
 
 
@@ -65,7 +66,7 @@ async def handle_promocode_input(
                 ),
                 chat_id=message.chat.id,
                 message_id=main_message_id,
-                reply_markup=back_keyboard(NavSubscription.MAIN),
+                reply_markup=promocode_keyboard(),
             )
         else:
             text = _("promocode:ntf:activate_failed")

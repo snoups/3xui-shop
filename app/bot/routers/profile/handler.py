@@ -60,6 +60,7 @@ async def callback_profile(
                 callback=callback,
                 text=_("subscription:popup:error_fetching_data"),
             )
+            return
 
     reply_markup = (
         profile_keyboard()

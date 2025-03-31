@@ -76,6 +76,7 @@ def devices_keyboard(
 
     builder.adjust(2)
     builder.row(back_button(NavSubscription.MAIN))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
@@ -111,6 +112,7 @@ def duration_keyboard(
             )
         )
 
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
@@ -156,6 +158,8 @@ def payment_method_keyboard(
             text=_("subscription:button:change_duration"),
         )
     )
+
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
@@ -175,12 +179,20 @@ def payment_success_keyboard() -> InlineKeyboardMarkup:
 
 def trial_success_keyboard() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
+
     builder.row(
         InlineKeyboardButton(
             text=_("subscription:button:connect"),
             callback_data=NavDownload.MAIN,
         )
     )
-    builder.row(back_to_main_menu_button())
 
+    builder.row(back_to_main_menu_button())
+    return builder.as_markup()
+
+
+def promocode_keyboard() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.row(back_button(NavSubscription.MAIN))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()

@@ -67,6 +67,7 @@ async def callback_subscription(
                 callback=callback,
                 text=_("subscription:popup:error_fetching_data"),
             )
+            return
 
     callback_data = SubscriptionData(state=NavSubscription.PROCESS, user_id=user.tg_id)
     await show_subscription(callback=callback, client_data=client_data, callback_data=callback_data)

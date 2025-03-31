@@ -1,5 +1,10 @@
 <div align="center" markdown>
 
+<p align="center">
+    <a href="https://github.com/snoups/3xui-shop/blob/main/README.md"><u><b>ENGLISH</b></u></a> •
+    <a href="https://github.com/snoups/3xui-shop/blob/main/README.ru_RU.md"><u><b>РУССКИЙ</b></u></a>
+</p>
+
 ![3xui-shop](https://github.com/user-attachments/assets/282d10db-a355-4c65-a2cf-eb0e8ec8eed1)
 
 **This project is a Telegram bot for selling VPN subscriptions. It works with 3X-UI.**
@@ -28,7 +33,7 @@
 
 **3X-UI-SHOP** is a comprehensive solution designed to automate the sale of VPN subscriptions through Telegram.
 The bot uses the **3X-UI** panel API for client management and supports multiple payment methods, including
-**Cryptomus**, **YooKassa**, **YooMoney**, and **Telegram Stars**.
+**Cryptomus**, **Heleket**, **YooKassa**, **YooMoney**, and **Telegram Stars**.
 
 The bot enables efficient subscription sales with advanced features:
 
@@ -109,21 +114,21 @@ Before starting the installation, make sure you have the installed [**Docker**](
    ```
 
 2. **Set up environment variables and plans:**
-- Copy plans.example.json to plans.json and .env.example to .env:
+- Copy `plans.example.json` to `plans.json` and `.env.example` to `.env`:
     ```bash
     cp plans.example.json plans.json
     cp .env.example .env
     ```
-    > Update plans.json file with your subscription plans. [(Subscription Plans Configuration)](#subscription-plans-configuration) 
+    > Update `plans.json` file with your subscription plans. [(Subscription Plans Configuration)](#subscription-plans-configuration) 
 
-    > Update .env file with your configuration. [(Environment Variables Configuration)](#environment-variables-configuration)
+    > Update `.env` file with your configuration. [(Environment Variables Configuration)](#environment-variables-configuration)
 
 3. **Build the Docker image:**
    ```bash
    docker compose build
    ```
 
-4. **Run the Docker container::**
+4. **Run the Docker container:**
    ```bash
    docker compose up -d
    ```
@@ -153,6 +158,7 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | SHOP_BONUS_DEVICES_COUNT | ⭕ | 1 | Default Device Limit for Promocode, Trial, and Referral Users (Based on Plan Settings) |
 | SHOP_PAYMENT_STARS_ENABLED | ⭕ | True | Enable Telegram stars payment |
 | SHOP_PAYMENT_CRYPTOMUS_ENABLED | ⭕ | False | Enable Cryptomus payment |
+| SHOP_PAYMENT_HELEKET_ENABLED | ⭕ | False | Enable Heleket payment |
 | SHOP_PAYMENT_YOOKASSA_ENABLED | ⭕ | False | Enable Yookassa payment |
 | SHOP_PAYMENT_YOOMONEY_ENABLED | ⭕ | False | Enable Yoomoney payment |
 | | | |
@@ -164,6 +170,9 @@ Before starting the installation, make sure you have the installed [**Docker**](
 | | | |
 | CRYPTOMUS_API_KEY | ⭕ | - | API key for Cryptomus payment |
 | CRYPTOMUS_MERCHANT_ID | ⭕ | - | Merchant ID for Cryptomus payment |
+| | | |
+| HELEKET_API_KEY | ⭕ | - | API key for Heleket payment |
+| HELEKET_MERCHANT_ID | ⭕ | - | Merchant ID for Heleket payment |
 | | | |
 | YOOKASSA_TOKEN | ⭕ | - | Token for YooKassa payment |
 | YOOKASSA_SHOP_ID | ⭕ | - | Shop ID for YooKassa payment |
@@ -282,7 +291,7 @@ A special thanks to the following individuals for their generous support:
 - **Aleksey**
 - [**@DmitryKryloff**](https://t.me/DmitryKryloff)
 
-You can support me via the following methods:
+You can support me via the following methods ([or RUB](https://t.me/shop_3xui/2/1580)):
 
 - **Bitcoin:** `bc1ql53lcaukdv3thxcheh3cmgucwlwkr929gar0cy`
 - **Ethereum:** `0xe604a10258d26c085ada79cdea9a84a5b0894b91`
