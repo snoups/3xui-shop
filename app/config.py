@@ -274,7 +274,7 @@ def load_config() -> Config:
             ADMINS=bot_admins,
             DEV_ID=env.int("BOT_DEV_ID"),
             SUPPORT_ID=env.int("BOT_SUPPORT_ID"),
-            DOMAIN=f"https://{env.str('BOT_DOMAIN')}",
+            DOMAIN=f"https://{env.str('BOT_DOMAIN')}:{env.int('BOT_PORT', default=DEFAULT_BOT_PORT)}",
             PORT=env.int("BOT_PORT", default=DEFAULT_BOT_PORT),
         ),
         shop=ShopConfig(
