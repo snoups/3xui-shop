@@ -7,9 +7,9 @@ from aiogram.utils.i18n import gettext as _
 
 from app.bot.models import ServicesContainer
 from app.bot.routers.subscription.keyboard import trial_success_keyboard
-from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY
+from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY, PREVIOUS_CALLBACK_KEY
 from app.bot.utils.formatting import format_subscription_period
-from app.bot.utils.navigation import NavSubscription
+from app.bot.utils.navigation import NavMain, NavSubscription
 from app.config import Config
 from app.db.models import User
 
@@ -26,6 +26,7 @@ async def callback_get_trial(
     config: Config,
 ) -> None:
     logger.info(f"User {user.tg_id} triggered getting non-referral trial period.")
+    await state.update_data({PREVIOUS_CALLBACK_KEY: NavMain.MAIN_MENU})
 
     server = await services.server_pool.get_available_server()
 

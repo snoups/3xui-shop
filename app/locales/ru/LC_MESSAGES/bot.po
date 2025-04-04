@@ -47,6 +47,10 @@ msgstr ""
 msgid "payment:gateway:cryptomus"
 msgstr "Cryptomus"
 
+#: app/bot/payment_gateways/heleket.py:42
+msgid "payment:gateway:heleket"
+msgstr "Heleket"
+
 #: app/bot/payment_gateways/telegram_stars.py:38
 msgid "payment:gateway:telegram_stars"
 msgstr "Звёзды Telegram"
@@ -820,17 +824,17 @@ msgstr ""
 msgid "subscription:popup:error_fetching_data"
 msgstr "❌ Ошибка получения данных. Пожалуйста, попробуйте ещё раз позже."
 
-#: app/bot/routers/profile/handler.py:83
+#: app/bot/routers/profile/handler.py:84
 msgid "profile:message:key"
 msgstr ""
 "🔑 <b>Ваш ключ:</b> <i>(Закроется через {seconds_text})</i>\n"
 "<pre>{key}</pre>"
 
-#: app/bot/routers/profile/handler.py:84
+#: app/bot/routers/profile/handler.py:85
 msgid "10 seconds"
 msgstr "10 секунд"
 
-#: app/bot/routers/profile/handler.py:87
+#: app/bot/routers/profile/handler.py:88
 #, python-brace-format
 msgid "1 second"
 msgid_plural "{} seconds"
@@ -899,19 +903,19 @@ msgstr ""
 "📊 <b>Ваше вознаграждение за платежи рефералов</b>\n"
 "Первый уровень рефералов: {first_level_rewards_sum}\n"
 "Второй уровень рефералов: {second_level_rewards_sum}\n"
-"<i>*(Награды начисляются в течении 15 минут. Ожидают: "
+"<i>*(Награды начисляются в течение 15 минут. Ожидают: "
 "{pending_rewards_count})</i>"
 
-#: app/bot/routers/referral/handler.py:143
+#: app/bot/routers/referral/handler.py:142
 msgid "referral:popup:no_available_servers"
 msgstr "❌ Нет доступных серверов. Попробуйте позже."
 
-#: app/bot/routers/referral/handler.py:152
+#: app/bot/routers/referral/handler.py:151
 msgid "referral:popup:trial_unavailable_for_user"
 msgstr "❌ Пробный период уже был использован."
 
 #: app/bot/routers/referral/handler.py:165
-#: app/bot/routers/subscription/trial_handler.py:52
+#: app/bot/routers/subscription/trial_handler.py:53
 msgid "subscription:ntf:trial_activate_success"
 msgstr ""
 "✅ Пробный период был успешно активирован!\n"
@@ -929,7 +933,7 @@ msgstr ""
 " либо обратитесь к администратору</i>"
 
 #: app/bot/routers/referral/keyboard.py:14
-#: app/bot/routers/subscription/keyboard.py:180
+#: app/bot/routers/subscription/keyboard.py:185
 msgid "subscription:button:connect"
 msgstr "🔌 Подключиться"
 
@@ -950,23 +954,23 @@ msgstr "💳 Продлить подписку"
 msgid "subscription:button:activate_promocode"
 msgstr "🎟️ Активировать промокод"
 
-#: app/bot/routers/subscription/keyboard.py:110
+#: app/bot/routers/subscription/keyboard.py:111
 msgid "subscription:button:change_devices"
 msgstr "◀️ Изменить количество устройств"
 
-#: app/bot/routers/subscription/keyboard.py:120
+#: app/bot/routers/subscription/keyboard.py:122
 msgid "subscription:button:pay"
 msgstr "💳 Оплатить"
 
-#: app/bot/routers/subscription/keyboard.py:126
+#: app/bot/routers/subscription/keyboard.py:128
 msgid "subscription:button:change_payment_method"
 msgstr "◀️ Изменить способ оплаты"
 
-#: app/bot/routers/subscription/keyboard.py:156
+#: app/bot/routers/subscription/keyboard.py:158
 msgid "subscription:button:change_duration"
 msgstr "◀️ Изменить длительность"
 
-#: app/bot/routers/subscription/keyboard.py:167
+#: app/bot/routers/subscription/keyboard.py:171
 msgid "subscription:button:download_app"
 msgstr "🔌 Подключиться"
 
@@ -1010,29 +1014,29 @@ msgstr ""
 msgid "payment:popup:error"
 msgstr "❌ Возникла ошибка при создании платежа."
 
-#: app/bot/routers/subscription/promocode_handler.py:30
+#: app/bot/routers/subscription/promocode_handler.py:31
 msgid "promocode:message:main"
 msgstr ""
 "🎟️ <b>Активировать промокод:</b>\n"
 "\n"
 "<i>Отправьте промокод для активации</i>"
 
-#: app/bot/routers/subscription/promocode_handler.py:51
+#: app/bot/routers/subscription/promocode_handler.py:52
 msgid "promocode:ntf:no_available_servers"
 msgstr "❌ <i>Нет доступных серверов. Попробуйте позже.</i>"
 
-#: app/bot/routers/subscription/promocode_handler.py:62
+#: app/bot/routers/subscription/promocode_handler.py:63
 msgid "promocode:message:activated_success"
 msgstr ""
 "✅ <b>Промокод {promocode} был успешно активирован!</b>\n"
 "\n"
 "<i>Вы получили {duration} к своей подписке.</i>"
 
-#: app/bot/routers/subscription/promocode_handler.py:71
+#: app/bot/routers/subscription/promocode_handler.py:72
 msgid "promocode:ntf:activate_failed"
 msgstr "❌ <i>Не удалось активировать промокод, попробуйте позже.</i>"
 
-#: app/bot/routers/subscription/promocode_handler.py:74
+#: app/bot/routers/subscription/promocode_handler.py:75
 msgid "promocode:ntf:activate_invalid"
 msgstr "❌ <i>Промокод недействителен или уже активирован.</i>"
 
@@ -1059,36 +1063,36 @@ msgstr ""
 "<i>Похоже, вы еще не приобрели подписку. Купите подписку, чтобы начать "
 "пользоваться нашим сервисом.</i>"
 
-#: app/bot/routers/subscription/subscription_handler.py:90
+#: app/bot/routers/subscription/subscription_handler.py:91
 msgid "subscription:popup:error_fetching_plan"
 msgstr ""
 "❌ Ваш тарифный план больше не поддерживается. Вам необходимо изменить "
 "подписку."
 
-#: app/bot/routers/subscription/subscription_handler.py:98
-#: app/bot/routers/subscription/subscription_handler.py:160
+#: app/bot/routers/subscription/subscription_handler.py:99
+#: app/bot/routers/subscription/subscription_handler.py:161
 msgid "subscription:message:duration"
 msgstr "⏳ <b>Выберите длительность:</b>"
 
-#: app/bot/routers/subscription/subscription_handler.py:118
-#: app/bot/routers/subscription/subscription_handler.py:144
+#: app/bot/routers/subscription/subscription_handler.py:119
+#: app/bot/routers/subscription/subscription_handler.py:145
 msgid "subscription:message:devices"
 msgstr "📱 <b>Выберите количество устройств:</b>"
 
-#: app/bot/routers/subscription/subscription_handler.py:137
-#: app/bot/routers/subscription/trial_handler.py:34
+#: app/bot/routers/subscription/subscription_handler.py:138
+#: app/bot/routers/subscription/trial_handler.py:35
 msgid "subscription:popup:no_available_servers"
 msgstr "❌ Доступных серверов не найдено. Попробуйте позже."
 
-#: app/bot/routers/subscription/subscription_handler.py:180
+#: app/bot/routers/subscription/subscription_handler.py:181
 msgid "subscription:message:payment_method"
 msgstr "💳 <b>Выберите способ оплаты:</b>"
 
-#: app/bot/routers/subscription/trial_handler.py:42
+#: app/bot/routers/subscription/trial_handler.py:43
 msgid "subscription:popup:trial_unavailable_for_user"
 msgstr "❌ Сейчас вам не доступен пробный период."
 
-#: app/bot/routers/subscription/trial_handler.py:60
+#: app/bot/routers/subscription/trial_handler.py:61
 msgid "subscription:popup:trial_activate_failed"
 msgstr "❌ Не удалось активировать пробный период. Попробуйте позже."
 

@@ -14,7 +14,7 @@ from app.bot.utils.constants import (
     ReferrerRewardType,
 )
 from app.bot.utils.formatting import format_subscription_period
-from app.bot.utils.navigation import NavReferral
+from app.bot.utils.navigation import NavMain, NavReferral
 from app.config import Config
 from app.db.models import Referral, ReferrerReward, User
 
@@ -113,7 +113,6 @@ async def callback_referral(
 
     await state.update_data({PREVIOUS_CALLBACK_KEY: NavReferral.MAIN})
 
-    reply_markup = referral_keyboard()
     await callback.message.edit_text(
         text=await generate_referral_summary_text(
             session=session,
@@ -121,7 +120,7 @@ async def callback_referral(
             config=config,
             bot_username=bot_username,
         ),
-        reply_markup=reply_markup,
+        reply_markup=referral_keyboard(),
     )
 
 
@@ -161,6 +160,7 @@ async def callback_get_referred_trial(
 
     main_message_id = await state.get_value(MAIN_MESSAGE_ID_KEY)
     if success:
+        await state.update_data({PREVIOUS_CALLBACK_KEY: NavMain.MAIN_MENU})
         await callback.bot.edit_message_text(
             text=_("subscription:ntf:trial_activate_success").format(
                 duration=format_subscription_period(referred_trial_period),

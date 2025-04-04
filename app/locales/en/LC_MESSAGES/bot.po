@@ -44,6 +44,10 @@ msgstr ""
 msgid "payment:gateway:cryptomus"
 msgstr "Cryptomus"
 
+#: app/bot/payment_gateways/heleket.py:42
+msgid "payment:gateway:heleket"
+msgstr "Heleket"
+
 #: app/bot/payment_gateways/telegram_stars.py:38
 msgid "payment:gateway:telegram_stars"
 msgstr "Telegram Stars"
@@ -812,17 +816,17 @@ msgstr ""
 msgid "subscription:popup:error_fetching_data"
 msgstr "❌ Error fetching data. Please try again later."
 
-#: app/bot/routers/profile/handler.py:83
+#: app/bot/routers/profile/handler.py:84
 msgid "profile:message:key"
 msgstr ""
 "🔑 <b>Your key:</b> <i>(Closes after {seconds_text})</i>\n"
 "<pre>{key}</pre>"
 
-#: app/bot/routers/profile/handler.py:84
+#: app/bot/routers/profile/handler.py:85
 msgid "10 seconds"
 msgstr ""
 
-#: app/bot/routers/profile/handler.py:87
+#: app/bot/routers/profile/handler.py:88
 #, python-brace-format
 msgid "1 second"
 msgid_plural "{} seconds"
@@ -892,16 +896,16 @@ msgstr ""
 "<i>*(Rewards are credited within 15 minutes. Pending rewards: "
 "{pending_rewards_count})</i>"
 
-#: app/bot/routers/referral/handler.py:143
+#: app/bot/routers/referral/handler.py:142
 msgid "referral:popup:no_available_servers"
 msgstr "❌ No available servers found. Please try again later."
 
-#: app/bot/routers/referral/handler.py:152
+#: app/bot/routers/referral/handler.py:151
 msgid "referral:popup:trial_unavailable_for_user"
 msgstr "❌ Trial is not available for you now."
 
 #: app/bot/routers/referral/handler.py:165
-#: app/bot/routers/subscription/trial_handler.py:52
+#: app/bot/routers/subscription/trial_handler.py:53
 msgid "subscription:ntf:trial_activate_success"
 msgstr ""
 "✅ Trial period was successfully activated!\n"
@@ -919,7 +923,7 @@ msgstr ""
 "administrator.</i>"
 
 #: app/bot/routers/referral/keyboard.py:14
-#: app/bot/routers/subscription/keyboard.py:180
+#: app/bot/routers/subscription/keyboard.py:185
 msgid "subscription:button:connect"
 msgstr "🔌 Connect"
 
@@ -940,23 +944,23 @@ msgstr "💳 Extend subscription"
 msgid "subscription:button:activate_promocode"
 msgstr "🎟️ Activate promocode"
 
-#: app/bot/routers/subscription/keyboard.py:110
+#: app/bot/routers/subscription/keyboard.py:111
 msgid "subscription:button:change_devices"
 msgstr "◀️ Change number of devices"
 
-#: app/bot/routers/subscription/keyboard.py:120
+#: app/bot/routers/subscription/keyboard.py:122
 msgid "subscription:button:pay"
 msgstr "💳 Pay"
 
-#: app/bot/routers/subscription/keyboard.py:126
+#: app/bot/routers/subscription/keyboard.py:128
 msgid "subscription:button:change_payment_method"
 msgstr "◀️ Change payment method"
 
-#: app/bot/routers/subscription/keyboard.py:156
+#: app/bot/routers/subscription/keyboard.py:158
 msgid "subscription:button:change_duration"
 msgstr "◀️ Change duration"
 
-#: app/bot/routers/subscription/keyboard.py:167
+#: app/bot/routers/subscription/keyboard.py:171
 msgid "subscription:button:download_app"
 msgstr "🔌 Connect"
 
@@ -1000,29 +1004,29 @@ msgstr ""
 msgid "payment:popup:error"
 msgstr "❌ An error occurred during creating payment."
 
-#: app/bot/routers/subscription/promocode_handler.py:30
+#: app/bot/routers/subscription/promocode_handler.py:31
 msgid "promocode:message:main"
 msgstr ""
 "🎟️ <b>Activate promocode:</b>\n"
 "\n"
 "<i>Send promocode to activation</i>"
 
-#: app/bot/routers/subscription/promocode_handler.py:51
+#: app/bot/routers/subscription/promocode_handler.py:52
 msgid "promocode:ntf:no_available_servers"
 msgstr "❌ <i>No available servers found. Please try again later.</i>"
 
-#: app/bot/routers/subscription/promocode_handler.py:62
+#: app/bot/routers/subscription/promocode_handler.py:63
 msgid "promocode:message:activated_success"
 msgstr ""
 "✅ <b>Promocode {promocode} was successfully activated!</b>\n"
 "\n"
 "<i>You have received {duration} to your subscription.</i>"
 
-#: app/bot/routers/subscription/promocode_handler.py:71
+#: app/bot/routers/subscription/promocode_handler.py:72
 msgid "promocode:ntf:activate_failed"
 msgstr "❌ <i>Failed to activate promocode, please try again later.</i>"
 
-#: app/bot/routers/subscription/promocode_handler.py:74
+#: app/bot/routers/subscription/promocode_handler.py:75
 msgid "promocode:ntf:activate_invalid"
 msgstr "❌ <i>Promocode is invalid or has already been activated.</i>"
 
@@ -1049,34 +1053,34 @@ msgstr ""
 "<i>It seems that you haven't purchased a subscription yet. Buy a "
 "subscription to start using our service.</i>"
 
-#: app/bot/routers/subscription/subscription_handler.py:90
+#: app/bot/routers/subscription/subscription_handler.py:91
 msgid "subscription:popup:error_fetching_plan"
 msgstr "❌ Your plan is no longer supported. You need to change your subscription."
 
-#: app/bot/routers/subscription/subscription_handler.py:98
-#: app/bot/routers/subscription/subscription_handler.py:160
+#: app/bot/routers/subscription/subscription_handler.py:99
+#: app/bot/routers/subscription/subscription_handler.py:161
 msgid "subscription:message:duration"
 msgstr "⏳ <b>Specify the duration:</b>"
 
-#: app/bot/routers/subscription/subscription_handler.py:118
-#: app/bot/routers/subscription/subscription_handler.py:144
+#: app/bot/routers/subscription/subscription_handler.py:119
+#: app/bot/routers/subscription/subscription_handler.py:145
 msgid "subscription:message:devices"
 msgstr "📱 <b>Select the number of devices:</b>"
 
-#: app/bot/routers/subscription/subscription_handler.py:137
-#: app/bot/routers/subscription/trial_handler.py:34
+#: app/bot/routers/subscription/subscription_handler.py:138
+#: app/bot/routers/subscription/trial_handler.py:35
 msgid "subscription:popup:no_available_servers"
 msgstr "❌ No available servers found. Please try again later."
 
-#: app/bot/routers/subscription/subscription_handler.py:180
+#: app/bot/routers/subscription/subscription_handler.py:181
 msgid "subscription:message:payment_method"
 msgstr "💳 <b>Choose a payment method:</b>"
 
-#: app/bot/routers/subscription/trial_handler.py:42
+#: app/bot/routers/subscription/trial_handler.py:43
 msgid "subscription:popup:trial_unavailable_for_user"
 msgstr "❌ Trial is not available for you now."
 
-#: app/bot/routers/subscription/trial_handler.py:60
+#: app/bot/routers/subscription/trial_handler.py:61
 msgid "subscription:popup:trial_activate_failed"
 msgstr "❌ Failed to activate trial period. Please, try later."
 

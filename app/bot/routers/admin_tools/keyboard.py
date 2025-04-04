@@ -106,6 +106,7 @@ def promocode_editor_keyboard() -> InlineKeyboardMarkup:
 
     builder.adjust(3)
     builder.row(back_button(NavAdminTools.MAIN))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
@@ -147,6 +148,7 @@ def maintenance_mode_keyboard() -> InlineKeyboardMarkup:
 
     builder.adjust(2)
     builder.row(back_button(NavAdminTools.MAIN))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
@@ -178,6 +180,7 @@ def servers_keyboard(servers: list) -> InlineKeyboardMarkup:
         )
 
     builder.row(back_button(NavAdminTools.MAIN))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
@@ -239,6 +242,7 @@ def notification_keyboard() -> InlineKeyboardMarkup:
     )
 
     builder.row(back_button(NavAdminTools.MAIN))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
