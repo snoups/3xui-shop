@@ -129,6 +129,7 @@ class PaymentStatsService:
             'pay_yookassa': 'RUB',
             'pay_yoomoney': 'RUB',
             'pay_cryptomus': 'USD',
+            'pay_heleket': 'USD',
             'pay_telegram_stars': 'XTR'
         }
 
