@@ -188,6 +188,7 @@ async def callback_toggle_invite(
     callback: CallbackQuery,
     user: User,
     session: AsyncSession,
+    services: ServicesContainer,
 ) -> None:
     invite_id = int(callback.data.split(":")[1])
     invite = await session.get(Invite, invite_id)
@@ -216,6 +217,7 @@ async def callback_toggle_invite(
         callback=callback,
         user=user,
         session=session,
+        services=services,
     )
 
 
