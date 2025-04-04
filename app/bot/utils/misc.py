@@ -1,6 +1,8 @@
+import hashlib
 import secrets
 import string
 import uuid
+from datetime import datetime
 
 CHARSET = string.ascii_uppercase + string.digits
 
@@ -13,3 +15,13 @@ def split_text(text: str, chunk_size: int = 4096) -> list[str]:
 def generate_code(length: int = 8) -> str:
     """Generate an 8-character alphanumeric promocode."""
     return "".join(secrets.choice(CHARSET) for _ in range(length))
+
+
+def generate_hash(text: str, length: int = 8) -> str:
+    """
+    Generate a hash from text, using timestamp for uniqueness.
+    """
+    timestamp = datetime.utcnow().timestamp()
+    combined = f"{text}_{timestamp}"
+    full_hash = hashlib.md5(combined.encode()).hexdigest()
+    return full_hash[:length]
