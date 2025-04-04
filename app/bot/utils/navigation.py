@@ -66,6 +66,12 @@ class NavAdminTools(str, Enum):
     STATISTICS = "statistics"
     USER_EDITOR = "user_editor"
 
+    INVITE_EDITOR = "invite_editor"
+    CREATE_INVITE = "create_invite"
+    LIST_INVITES = "list_invites"
+    TOGGLE_INVITE = "toggle_invite"
+    DELETE_INVITE = "delete_invite"
+
     PROMOCODE_EDITOR = "promocode_editor"
     CREATE_PROMOCODE = "create_promocode"
     DELETE_PROMOCODE = "delete_promocode"
