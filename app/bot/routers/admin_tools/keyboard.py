@@ -2,11 +2,9 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from app.bot.routers.misc.keyboard import (
-    back_button,
-    back_to_main_menu_button,
-    cancel_button,
-)
+from app.bot.routers.misc.keyboard import (back_button,
+                                           back_to_main_menu_button,
+                                           cancel_button)
 from app.bot.utils.navigation import NavAdminTools
 from app.db.models import Server
 from app.db.models.invite import Invite
@@ -305,7 +303,6 @@ def invite_list_keyboard(
     invites: list[Invite], page: int = 0, limit: int = 5
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-
     total_invites = len(invites)
     start_idx = page * limit
     end_idx = min(start_idx + limit, total_invites)
@@ -315,7 +312,7 @@ def invite_list_keyboard(
         builder.row(
             InlineKeyboardButton(
                 text=f"{invite.name} ({invite.clicks} clicks)",
-                callback_data=f"invite:{invite.id}",
+                callback_data=f"{NavAdminTools.SHOW_INVITE_DETAILS}:{invite.id}",
             )
         )
 
@@ -324,7 +321,7 @@ def invite_list_keyboard(
         row.append(
             InlineKeyboardButton(
                 text=_("invite_editor:button:previous_page"),
-                callback_data=f"invite_page:{page-1}",
+                callback_data=f"{NavAdminTools.SHOW_INVITE_PAGE}:{page-1}",
             )
         )
 
@@ -332,7 +329,7 @@ def invite_list_keyboard(
         row.append(
             InlineKeyboardButton(
                 text=_("invite_editor:button:next_page"),
-                callback_data=f"invite_page:{page+1}",
+                callback_data=f"{NavAdminTools.SHOW_INVITE_PAGE}:{page+1}",
             )
         )
 
@@ -340,6 +337,7 @@ def invite_list_keyboard(
         builder.row(*row)
 
     builder.row(back_button(NavAdminTools.INVITE_EDITOR))
+
     return builder.as_markup()
 
 
@@ -350,21 +348,21 @@ def invite_details_keyboard(invite: Invite) -> InlineKeyboardMarkup:
         builder.row(
             InlineKeyboardButton(
                 text=_("invite_editor:button:disable"),
-                callback_data=f"toggle_invite:{invite.id}",
+                callback_data=f"{NavAdminTools.TOGGLE_INVITE_STATUS}:{invite.id}",
             )
         )
     else:
         builder.row(
             InlineKeyboardButton(
                 text=_("invite_editor:button:enable"),
-                callback_data=f"toggle_invite:{invite.id}",
+                callback_data=f"{NavAdminTools.TOGGLE_INVITE_STATUS}:{invite.id}",
             )
         )
 
     builder.row(
         InlineKeyboardButton(
             text=_("invite_editor:button:delete"),
-            callback_data=f"delete_invite:{invite.id}",
+            callback_data=f"{NavAdminTools.DELETE_INVITE_CONFIRM}:{invite.id}",
         )
     )
 
