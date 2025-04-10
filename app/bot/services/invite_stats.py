@@ -13,15 +13,15 @@ logger = logging.getLogger(__name__)
 class InviteStatsService:
     """Service for collecting and analyzing invite link statistics."""
 
-    def __init__(self, session_maker: async_sessionmaker, payment_stats_service) -> None:
+    def __init__(self, session_factory: async_sessionmaker, payment_stats_service) -> None:
         """
         Initialize InviteStatsService.
 
         Args:
-            session_maker: SQLAlchemy async session maker
+            session_factory: SQLAlchemy async session maker
             payment_stats_service: Instance of PaymentStatsService for payment data retrieval
         """
-        self.session_maker = session_maker
+        self.session_factory = session_factory
         self.payment_stats = payment_stats_service
         logger.debug("InviteStatsService initialized")
 
@@ -95,5 +95,5 @@ class InviteStatsService:
         if session:
             return await _get_stats(session)
         else:
-            async with self.session_maker() as session:
+            async with self.session_factory() as session:
                 return await _get_stats(session)

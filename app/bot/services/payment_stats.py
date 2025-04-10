@@ -14,14 +14,14 @@ logger = logging.getLogger(__name__)
 class PaymentStatsService:
     """Service for tracking payment statistics and revenue from transaction records."""
 
-    def __init__(self, session_maker: async_sessionmaker) -> None:
+    def __init__(self, session_factory: async_sessionmaker) -> None:
         """
         Initialize PaymentStatsService.
 
         Args:
-            session_maker: SQLAlchemy async session maker
+            session_factory: SQLAlchemy async session maker
         """
-        self.session_maker = session_maker
+        self.session_factory = session_factory
         logger.debug("PaymentStatsService initialized")
 
     async def get_user_payment_stats(
@@ -68,7 +68,7 @@ class PaymentStatsService:
         if session:
             return await _get_stats(session)
         else:
-            async with self.session_maker() as session:
+            async with self.session_factory() as session:
                 return await _get_stats(session)
 
     async def get_total_revenue_stats(
@@ -112,7 +112,7 @@ class PaymentStatsService:
         if session:
             return await _get_stats(session)
         else:
-            async with self.session_maker() as session:
+            async with self.session_factory() as session:
                 return await _get_stats(session)
 
     def _get_currency_from_payment_method(self, payment_method: str) -> Optional[str]:
