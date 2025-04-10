@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-01 02:07+0300\n"
+"POT-Creation-Date: 2025-04-10 23:27+0300\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -90,168 +90,157 @@ msgstr "❌ Failed to send backup."
 msgid "backup:popup:error"
 msgstr "❌ An error occurred during backup."
 
-#: app/bot/routers/admin_tools/invites_handler.py:35
+#: app/bot/routers/admin_tools/invites_handler.py:36
 msgid "invite_editor:message:main"
 msgstr ""
-"📊 Invite Link Management\n"
+"📊 <b>Invite Link Management</b>\n"
 "\n"
 "Here you can create and manage invite links to track user sources."
 
-#: app/bot/routers/admin_tools/invites_handler.py:49
+#: app/bot/routers/admin_tools/invites_handler.py:50
 msgid "invite_editor:message:enter_name"
 msgstr ""
-"Enter a name for the invite link.\n"
-"This name will be used to generate a unique tracking code."
+"<b>Enter a name for the invite link.</b>\n"
+"<i>This name will be used to generate a unique tracking code.</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:76
+#: app/bot/routers/admin_tools/invites_handler.py:77
 msgid "invite_editor:message:created_success"
 msgstr ""
-"✅ Invite link created successfully!\n"
+"✅ <b>Invite link created successfully!</b>\n"
 "\n"
-"Name: {name}\n"
+"<b>Name:</b> {name}\n"
 "\n"
-"Link: {link}\n"
+"<b>Link:</b> <code>{link}</code>\n"
 "\n"
-"Share this link to track users coming from this source."
+"<i>Share this link to track users coming from this source.</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:87
+#: app/bot/routers/admin_tools/invites_handler.py:88
 msgid "invite_editor:ntf:create_failed"
 msgstr "❌ Failed to create invite link. Please try a different name."
 
-#: app/bot/routers/admin_tools/invites_handler.py:102
-#: app/bot/routers/admin_tools/invites_handler.py:122
+#: app/bot/routers/admin_tools/invites_handler.py:103
+#: app/bot/routers/admin_tools/invites_handler.py:123
 msgid "invite_editor:message:list"
 msgstr ""
-"📊 Invite Links\n"
+"📊 <b>Invite Links</b>\n"
 "\n"
-"Select a link to see details:"
+"<i>Select a link to see details:</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:107
+#: app/bot/routers/admin_tools/invites_handler.py:108
 msgid "invite_editor:message:no_invites"
-msgstr "There are no invite links yet. Create your first invite link!"
+msgstr "<i>There are no invite links yet. Create your first invite link!</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:144
-#: app/bot/routers/admin_tools/invites_handler.py:207
+#: app/bot/routers/admin_tools/invites_handler.py:145
+#: app/bot/routers/admin_tools/invites_handler.py:203
 msgid "invite_editor:status:active"
 msgstr "🟢"
 
-#: app/bot/routers/admin_tools/invites_handler.py:146
-#: app/bot/routers/admin_tools/invites_handler.py:209
+#: app/bot/routers/admin_tools/invites_handler.py:147
+#: app/bot/routers/admin_tools/invites_handler.py:205
 msgid "invite_editor:status:inactive"
 msgstr "🔴"
 
-#: app/bot/routers/admin_tools/invites_handler.py:151
-msgid "invite_editor:revenue:title"
-msgstr "💵 Revenue:"
-
-#: app/bot/routers/admin_tools/invites_handler.py:157
+#: app/bot/routers/admin_tools/invites_handler.py:159
 msgid "invite_editor:revenue:none"
 msgstr "no data"
 
-#: app/bot/routers/admin_tools/invites_handler.py:160
-msgid "invite_editor:statistics:users_count"
-msgstr "Total users: {count}"
-
-#: app/bot/routers/admin_tools/invites_handler.py:163
-msgid "invite_editor:statistics:trial_users_count"
-msgstr "Used trial: {count}"
-
-#: app/bot/routers/admin_tools/invites_handler.py:166
-msgid "invite_editor:statistics:paid_users_count"
-msgstr "Made payment: {count}"
-
-#: app/bot/routers/admin_tools/invites_handler.py:169
-msgid "invite_editor:statistics:repeat_customers_count"
-msgstr "Repeat customers: {count}"
-
-#: app/bot/routers/admin_tools/invites_handler.py:173
+#: app/bot/routers/admin_tools/invites_handler.py:162
 msgid "invite_editor:message:details"
 msgstr ""
-"📊 Invite Link Details\n"
+"📊 <b>Invite Link Details</b>\n"
 "\n"
-"Name: {name}\n"
-"Link: {link}\n"
-"Clicks: {clicks}\n"
-"Created: {created_at}\n"
-"Status: {status}"
+"<b>Name:</b> {name}\n"
+"<b>Link:</b> <code>{link}</code>\n"
+"<b>Clicks:</b> {clicks}\n"
+"<b>Created:</b> {created_at}\n"
+"<b>Status:</b> {status}\n"
+"\n"
+"<b>💵 Revenue:</b>\n"
+"{revenue_text}\n"
+"\n"
+"<b>👥 User Statistics:</b>\n"
+"• <b>Total users:</b> {users_count}\n"
+"• <b>Used trial:</b> {trial_users_count}\n"
+"• <b>Made payment:</b> {paid_users_count}\n"
+"• <b>Repeat customers:</b> {repeat_customers_count}"
 
-#: app/bot/routers/admin_tools/invites_handler.py:196
-#: app/bot/routers/admin_tools/invites_handler.py:232
+#: app/bot/routers/admin_tools/invites_handler.py:191
+#: app/bot/routers/admin_tools/invites_handler.py:234
 msgid "invite_editor:ntf:not_found"
 msgstr "❌ Invite link not found"
 
-#: app/bot/routers/admin_tools/invites_handler.py:212
+#: app/bot/routers/admin_tools/invites_handler.py:210
 msgid "invite_editor:ntf:status_changed"
 msgstr "Invite link status changed: {status}"
 
-#: app/bot/routers/admin_tools/invites_handler.py:243
+#: app/bot/routers/admin_tools/invites_handler.py:247
 msgid "invite_editor:ntf:deleted"
 msgstr "Invite link \"{name}\" deleted"
 
-#: app/bot/routers/admin_tools/keyboard.py:21
+#: app/bot/routers/admin_tools/keyboard.py:19
 msgid "admin_tools:button:server_management"
 msgstr "🌐 Server management"
 
-#: app/bot/routers/admin_tools/keyboard.py:28
+#: app/bot/routers/admin_tools/keyboard.py:26
 msgid "admin_tools:button:statistics"
 msgstr "📈 Statistics"
 
-#: app/bot/routers/admin_tools/keyboard.py:34
+#: app/bot/routers/admin_tools/keyboard.py:32
 msgid "admin_tools:button:user_editor"
 msgstr "👤 User editor"
 
-#: app/bot/routers/admin_tools/keyboard.py:40
+#: app/bot/routers/admin_tools/keyboard.py:38
 msgid "admin_tools:button:invite_editor"
 msgstr "🔗 Invite Links"
 
-#: app/bot/routers/admin_tools/keyboard.py:46
+#: app/bot/routers/admin_tools/keyboard.py:44
 msgid "admin_tools:button:promocode_editor"
 msgstr "🎟 Promocode editor"
 
-#: app/bot/routers/admin_tools/keyboard.py:52
+#: app/bot/routers/admin_tools/keyboard.py:50
 msgid "admin_tools:button:notification"
 msgstr "📣 Send notification"
 
-#: app/bot/routers/admin_tools/keyboard.py:58
+#: app/bot/routers/admin_tools/keyboard.py:56
 msgid "admin_tools:button:create_backup"
 msgstr "💾 Create backup"
 
-#: app/bot/routers/admin_tools/keyboard.py:64
+#: app/bot/routers/admin_tools/keyboard.py:62
 msgid "admin_tools:button:maintenance_mode"
 msgstr "🚧 Maintenance mode"
 
-#: app/bot/routers/admin_tools/keyboard.py:70
+#: app/bot/routers/admin_tools/keyboard.py:68
 msgid "admin_tools:button:restart_bot"
 msgstr "🔄 Restart bot"
 
-#: app/bot/routers/admin_tools/keyboard.py:76
+#: app/bot/routers/admin_tools/keyboard.py:74
 msgid "admin_tools:button:test_button"
 msgstr "🔍 Test button"
 
-#: app/bot/routers/admin_tools/keyboard.py:90
+#: app/bot/routers/admin_tools/keyboard.py:88
 msgid "promocode_editor:button:create"
 msgstr "🆕 Create"
 
-#: app/bot/routers/admin_tools/keyboard.py:96
+#: app/bot/routers/admin_tools/keyboard.py:94
 msgid "promocode_editor:button:delete"
 msgstr "🗑 Delete"
 
-#: app/bot/routers/admin_tools/keyboard.py:102
+#: app/bot/routers/admin_tools/keyboard.py:100
 msgid "promocode_editor:button:edit"
 msgstr "✏️ Edit"
 
-#: app/bot/routers/admin_tools/keyboard.py:117 app/bot/utils/formatting.py:73
+#: app/bot/routers/admin_tools/keyboard.py:116 app/bot/utils/formatting.py:73
 #, python-brace-format
 msgid "1 day"
 msgid_plural "{} days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/bot/routers/admin_tools/keyboard.py:136
+#: app/bot/routers/admin_tools/keyboard.py:135
 msgid "maintenance_mode:button:disable"
 msgstr "🔴 Disable"
 
-#: app/bot/routers/admin_tools/keyboard.py:143
+#: app/bot/routers/admin_tools/keyboard.py:142
 msgid "maintenance_mode:button:enable"
 msgstr "🟢 Enable"
 
@@ -263,67 +252,67 @@ msgstr "🔄 Sync"
 msgid "server_management:button:add"
 msgstr "🆕 Add"
 
-#: app/bot/routers/admin_tools/keyboard.py:189
+#: app/bot/routers/admin_tools/keyboard.py:190
 msgid "server_management:button:ping"
 msgstr "📶 Ping"
 
-#: app/bot/routers/admin_tools/keyboard.py:195
+#: app/bot/routers/admin_tools/keyboard.py:196
 msgid "server_management:button:delete"
 msgstr "🗑 Delete"
 
-#: app/bot/routers/admin_tools/keyboard.py:210
+#: app/bot/routers/admin_tools/keyboard.py:211
 msgid "server_management:button:confirm"
 msgstr "✅ Confirm"
 
-#: app/bot/routers/admin_tools/keyboard.py:225
+#: app/bot/routers/admin_tools/keyboard.py:226
 msgid "notification:button:send_to_user"
 msgstr "📩 Send to user"
 
-#: app/bot/routers/admin_tools/keyboard.py:229
+#: app/bot/routers/admin_tools/keyboard.py:230
 msgid "notification:button:send_to_all"
 msgstr "📣 Send to all"
 
-#: app/bot/routers/admin_tools/keyboard.py:236
+#: app/bot/routers/admin_tools/keyboard.py:237
 msgid "notification:button:last_notification"
 msgstr "💬 Last notification"
 
-#: app/bot/routers/admin_tools/keyboard.py:250
+#: app/bot/routers/admin_tools/keyboard.py:252
 msgid "notification:button:edit"
 msgstr "✏️ Edit"
 
-#: app/bot/routers/admin_tools/keyboard.py:257
+#: app/bot/routers/admin_tools/keyboard.py:259
 msgid "notification:button:delete"
 msgstr "🗑 Delete"
 
-#: app/bot/routers/admin_tools/keyboard.py:271
+#: app/bot/routers/admin_tools/keyboard.py:273
 msgid "notification:button:confirm"
 msgstr "✅ Confirm and send"
 
-#: app/bot/routers/admin_tools/keyboard.py:284
+#: app/bot/routers/admin_tools/keyboard.py:286
 msgid "invite_editor:button:create_invite"
 msgstr "➕ Create New Invite Link"
 
-#: app/bot/routers/admin_tools/keyboard.py:291
+#: app/bot/routers/admin_tools/keyboard.py:293
 msgid "invite_editor:button:list_invites"
 msgstr "📋 List Invite Links"
 
-#: app/bot/routers/admin_tools/keyboard.py:322
+#: app/bot/routers/admin_tools/keyboard.py:323
 msgid "invite_editor:button:previous_page"
 msgstr "◀️ Previous page"
 
-#: app/bot/routers/admin_tools/keyboard.py:330
+#: app/bot/routers/admin_tools/keyboard.py:331
 msgid "invite_editor:button:next_page"
 msgstr "▶️ Next page"
 
-#: app/bot/routers/admin_tools/keyboard.py:348
+#: app/bot/routers/admin_tools/keyboard.py:350
 msgid "invite_editor:button:disable"
 msgstr "🔴 Disable"
 
-#: app/bot/routers/admin_tools/keyboard.py:355
+#: app/bot/routers/admin_tools/keyboard.py:357
 msgid "invite_editor:button:enable"
 msgstr "🟢 Enable"
 
-#: app/bot/routers/admin_tools/keyboard.py:362
+#: app/bot/routers/admin_tools/keyboard.py:364
 msgid "invite_editor:button:delete"
 msgstr "🗑️ Delete"
 
