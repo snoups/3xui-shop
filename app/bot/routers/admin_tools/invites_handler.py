@@ -71,7 +71,7 @@ async def handle_invite_input(
         bot_username = (await message.bot.get_me()).username
         invite_link = f"https://t.me/{bot_username}?start={invite.hash_code}"
 
-        await state.clear()
+        await state.set_state(None)
 
         await message.bot.edit_message_text(
             text=_("invite_editor:message:created_success").format(
