@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Any, Self
+from typing import Any, Optional, Self
 
 from sqlalchemy import ForeignKey, String, func, select, update
 from sqlalchemy.exc import IntegrityError
@@ -68,6 +68,9 @@ class User(Base):
         primaryjoin="User.tg_id == Referral.referred_tg_id",
         back_populates="referred",
         uselist=False
+    )
+    source_invite_name: Mapped[Optional[str]] = mapped_column(
+        String(100), nullable=True
     )
 
     def __repr__(self) -> str:
