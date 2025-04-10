@@ -109,7 +109,7 @@ async def callback_list_invites(
         )
 
 
-@router.callback_query(F.data.startswith("invite_page:"), IsAdmin())
+@router.callback_query(F.data.startswith(f"{NavAdminTools.SHOW_INVITE_PAGE}:"), IsAdmin())
 async def callback_invite_page(
     callback: CallbackQuery, user: User, session: AsyncSession
 ) -> None:
@@ -124,7 +124,7 @@ async def callback_invite_page(
     )
 
 
-@router.callback_query(F.data.startswith("invite:"), IsAdmin())
+@router.callback_query(F.data.startswith(f"{NavAdminTools.SHOW_INVITE_DETAILS}:"), IsAdmin())
 async def callback_invite_details(
     callback: CallbackQuery,
     user: User,
@@ -183,7 +183,7 @@ async def callback_invite_details(
         )
 
 
-@router.callback_query(F.data.startswith("toggle_invite:"), IsAdmin())
+@router.callback_query(F.data.startswith(f"{NavAdminTools.TOGGLE_INVITE_STATUS}:"), IsAdmin())
 async def callback_toggle_invite(
     callback: CallbackQuery,
     user: User,
@@ -221,7 +221,7 @@ async def callback_toggle_invite(
     )
 
 
-@router.callback_query(F.data.startswith("delete_invite:"), IsAdmin())
+@router.callback_query(F.data.startswith(f"{NavAdminTools.DELETE_INVITE_CONFIRM}:"), IsAdmin())
 async def callback_delete_invite(
     callback: CallbackQuery,
     user: User,
