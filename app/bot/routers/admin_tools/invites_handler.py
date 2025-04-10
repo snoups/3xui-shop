@@ -149,26 +149,14 @@ async def callback_invite_details(
 
         stats = await services.invite_stats.get_detailed_stats(invite.name, session)
 
-        revenue_text = "\n\n" + "* " + _("invite_editor:revenue:title")
         if stats["revenue"] and len(stats["revenue"]) > 0:
+            revenue_lines = []
             for currency, amount in stats["revenue"].items():
                 currency_symbol = Currency.from_code(currency).symbol
-                revenue_text += f"\n* {amount:.2f} {currency_symbol}"
+                revenue_lines.append(f"• {amount:.2f} {currency_symbol}")
+            revenue_text = "\n".join(revenue_lines)
         else:
-            revenue_text += " " + _("invite_editor:revenue:none")
-
-        users_stats_text = "\n\n* " + _(
-            "invite_editor:statistics:users_count"
-        ).format(count=stats["users_count"])
-        users_stats_text += "\n* " + _(
-            "invite_editor:statistics:trial_users_count"
-        ).format(count=stats["trial_users_count"])
-        users_stats_text += "\n* " + _(
-            "invite_editor:statistics:paid_users_count"
-        ).format(count=stats["paid_users_count"])
-        users_stats_text += "\n* " + _(
-            "invite_editor:statistics:repeat_customers_count"
-        ).format(count=stats["repeat_customers_count"])
+            revenue_text = "• " + _("invite_editor:revenue:none")
 
         await callback.message.edit_text(
             text=_("invite_editor:message:details").format(
@@ -177,9 +165,12 @@ async def callback_invite_details(
                 clicks=invite.clicks,
                 created_at=invite.created_at.strftime("%Y-%m-%d %H:%M"),
                 status=status,
-            )
-            + revenue_text
-            + users_stats_text,
+                revenue_text=revenue_text,
+                users_count=stats["users_count"],
+                trial_users_count=stats["trial_users_count"],
+                paid_users_count=stats["paid_users_count"],
+                repeat_customers_count=stats["repeat_customers_count"],
+            ),
             reply_markup=invite_details_keyboard(invite),
         )
 
