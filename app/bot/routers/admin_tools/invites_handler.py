@@ -195,7 +195,10 @@ async def callback_toggle_invite(
     invite = await session.get(Invite, invite_id)
 
     if not invite:
-        await callback.answer(_("invite_editor:ntf:not_found"), show_alert=True)
+        await services.notification.show_popup(
+            callback=callback,
+            text=_("invite_editor:ntf:not_found"),
+        )
         return
 
     invite.is_active = not invite.is_active
@@ -210,8 +213,10 @@ async def callback_toggle_invite(
         if invite.is_active
         else _("invite_editor:status:inactive")
     )
-    await callback.answer(
-        _("invite_editor:ntf:status_changed").format(status=status), show_alert=True
+
+    await services.notification.show_popup(
+        callback=callback,
+        text=_("invite_editor:ntf:status_changed").format(status=status),
     )
 
     await callback_invite_details(
@@ -227,12 +232,16 @@ async def callback_delete_invite(
     callback: CallbackQuery,
     user: User,
     session: AsyncSession,
+    services: ServicesContainer,
 ) -> None:
     invite_id = int(callback.data.split(":")[1])
     invite = await session.get(Invite, invite_id)
 
     if not invite:
-        await callback.answer(_("invite_editor:ntf:not_found"), show_alert=True)
+        await services.notification.show_popup(
+            callback=callback,
+            text=_("invite_editor:ntf:not_found"),
+        )
         return
 
     invite_name = invite.name
@@ -242,8 +251,9 @@ async def callback_delete_invite(
     await session.delete(invite)
     await session.commit()
 
-    await callback.answer(
-        _("invite_editor:ntf:deleted").format(name=invite_name), show_alert=True
+    await services.notification.show_popup(
+        callback=callback,
+        text=_("invite_editor:ntf:deleted").format(name=invite_name),
     )
 
     await callback_list_invites(
