@@ -31,6 +31,7 @@ async def callback_invite_editor(
     callback: CallbackQuery, user: User, state: FSMContext
 ) -> None:
     logger.info(f"Admin {user.tg_id} opened invite editor.")
+    await state.set_state(None)
     await callback.message.edit_text(
         text=_("invite_editor:message:main"),
         reply_markup=invite_editor_keyboard(),
