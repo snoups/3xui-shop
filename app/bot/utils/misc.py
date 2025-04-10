@@ -20,8 +20,14 @@ def generate_code(length: int = 8) -> str:
 def generate_hash(text: str, length: int = 8) -> str:
     """
     Generate a hash from text, using timestamp for uniqueness.
+    Always includes at least one letter to distinguish from numeric IDs.
     """
     timestamp = datetime.utcnow().timestamp()
     combined = f"{text}_{timestamp}"
     full_hash = hashlib.md5(combined.encode()).hexdigest()
-    return full_hash[:length]
+
+    result = full_hash[:length-1]
+
+    result += secrets.choice(string.ascii_lowercase)
+
+    return result
