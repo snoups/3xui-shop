@@ -172,15 +172,15 @@ msgstr ""
 
 #: app/bot/routers/admin_tools/invites_handler.py:191
 #: app/bot/routers/admin_tools/invites_handler.py:234
-msgid "invite_editor:ntf:not_found"
+msgid "invite_editor:popup:not_found"
 msgstr "❌ Инвайт-ссылка не найдена"
 
 #: app/bot/routers/admin_tools/invites_handler.py:210
-msgid "invite_editor:ntf:status_changed"
+msgid "invite_editor:popup:status_changed"
 msgstr "Статус инвайт-ссылки изменен: {status}"
 
 #: app/bot/routers/admin_tools/invites_handler.py:247
-msgid "invite_editor:ntf:deleted"
+msgid "invite_editor:popup:deleted"
 msgstr "Инвайт-ссылка \"{name}\" удалена"
 
 #: app/bot/routers/admin_tools/keyboard.py:19

@@ -188,7 +188,7 @@ async def callback_toggle_invite(
     if not invite:
         await services.notification.show_popup(
             callback=callback,
-            text=_("invite_editor:ntf:not_found"),
+            text=_("invite_editor:popup:not_found"),
         )
         return
 
@@ -207,7 +207,7 @@ async def callback_toggle_invite(
 
     await services.notification.show_popup(
         callback=callback,
-        text=_("invite_editor:ntf:status_changed").format(status=status),
+        text=_("invite_editor:popup:status_changed").format(status=status),
     )
 
     await callback_invite_details(
@@ -231,7 +231,7 @@ async def callback_delete_invite(
     if not invite:
         await services.notification.show_popup(
             callback=callback,
-            text=_("invite_editor:ntf:not_found"),
+            text=_("invite_editor:popup:not_found"),
         )
         return
 
@@ -244,7 +244,7 @@ async def callback_delete_invite(
 
     await services.notification.show_popup(
         callback=callback,
-        text=_("invite_editor:ntf:deleted").format(name=invite_name),
+        text=_("invite_editor:popup:deleted").format(name=invite_name),
     )
 
     await callback_list_invites(
