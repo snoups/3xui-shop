@@ -298,6 +298,7 @@ def invite_editor_keyboard() -> InlineKeyboardMarkup:
     )
 
     builder.row(back_button(NavAdminTools.MAIN))
+    builder.row(back_to_main_menu_button())
     return builder.as_markup()
 
 
