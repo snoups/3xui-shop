@@ -139,44 +139,58 @@ async def callback_invite_details(
     invite_id = int(callback.data.split("_")[3])
     invite = await session.get(Invite, invite_id)
 
+    if not invite:
+        await services.notification.show_popup(
+            callback=callback,
+            text=_("invite_editor:popup:not_found"),
+        )
+        return
+
     logger.info(f"Admin {user.tg_id} is checking invite {invite.name}.")
 
-    if invite:
-        bot_username = (await callback.bot.get_me()).username
-        invite_link = f"https://t.me/{bot_username}?start={invite.hash_code}"
+    bot_username = (await callback.bot.get_me()).username
+    invite_link = f"https://t.me/{bot_username}?start={invite.hash_code}"
 
-        status = (
-            _("invite_editor:status:active")
-            if invite.is_active
-            else _("invite_editor:status:inactive")
-        )
+    status = (
+        _("invite_editor:status:active")
+        if invite.is_active
+        else _("invite_editor:status:inactive")
+    )
 
+    try:
         stats = await services.invite_stats.get_detailed_stats(invite.name, session)
-
-        if stats["revenue"] and len(stats["revenue"]) > 0:
-            revenue_lines = []
-            for currency, amount in stats["revenue"].items():
-                currency_symbol = Currency.from_code(currency).symbol
-                revenue_lines.append(f"• {amount:.2f} {currency_symbol}")
-            revenue_text = "\n".join(revenue_lines)
-        else:
-            revenue_text = "• " + _("invite_editor:revenue:none")
-
-        await callback.message.edit_text(
-            text=_("invite_editor:message:details").format(
-                name=invite.name,
-                link=invite_link,
-                clicks=invite.clicks,
-                created_at=invite.created_at.strftime("%Y-%m-%d %H:%M"),
-                status=status,
-                revenue_text=revenue_text,
-                users_count=stats["users_count"],
-                trial_users_count=stats["trial_users_count"],
-                paid_users_count=stats["paid_users_count"],
-                repeat_customers_count=stats["repeat_customers_count"],
-            ),
-            reply_markup=invite_details_keyboard(invite),
+    except Exception as e:
+        logger.error(f"Failed to get invite stats for {invite.name}: {e}")
+        await services.notification.show_popup(
+            callback=callback,
+            text=_("invite_editor:revenue:none"),
         )
+        return
+
+    if stats.revenue and len(stats.revenue) > 0:
+        revenue_lines = []
+        for currency, amount in stats.revenue.items():
+            currency_symbol = Currency.from_code(currency).symbol
+            revenue_lines.append(f"• {amount:.2f} {currency_symbol}")
+        revenue_text = "\n".join(revenue_lines)
+    else:
+        revenue_text = "• " + _("invite_editor:revenue:none")
+
+    await callback.message.edit_text(
+        text=_("invite_editor:message:details").format(
+            name=invite.name,
+            link=invite_link,
+            clicks=invite.clicks,
+            created_at=invite.created_at.strftime("%Y-%m-%d %H:%M"),
+            status=status,
+            revenue_text=revenue_text,
+            users_count=stats.users_count,
+            trial_users_count=stats.trial_users_count,
+            paid_users_count=stats.paid_users_count,
+            repeat_customers_count=stats.repeat_customers_count,
+        ),
+        reply_markup=invite_details_keyboard(invite),
+    )
 
 
 @router.callback_query(F.data.startswith(NavAdminTools.TOGGLE_INVITE_STATUS), IsAdmin())
@@ -233,6 +247,7 @@ async def callback_delete_invite_prompt(
 ) -> None:
     invite_id = int(callback.data.split("_")[3])
     invite = await session.get(Invite, invite_id)
+
     if not invite:
         await services.notification.show_popup(
             callback=callback,
