@@ -16,6 +16,7 @@ from app.db.models.invite import Invite
 from app.db.models.user import User
 
 from .keyboard import (
+    confirm_delete_invite_keyboard,
     invite_details_keyboard,
     invite_editor_keyboard,
     invite_list_keyboard,
@@ -222,15 +223,41 @@ async def callback_toggle_invite(
 
 
 @router.callback_query(
-    F.data.startswith(NavAdminTools.DELETE_INVITE_CONFIRM), IsAdmin()
+    F.data.startswith(NavAdminTools.CONFIRM_DELETE_INVITE), IsAdmin()
 )
-async def callback_delete_invite(
+async def callback_delete_invite_prompt(
     callback: CallbackQuery,
     user: User,
     session: AsyncSession,
     services: ServicesContainer,
 ) -> None:
     invite_id = int(callback.data.split("_")[3])
+    invite = await session.get(Invite, invite_id)
+    if not invite:
+        await services.notification.show_popup(
+            callback=callback,
+            text=_("invite_editor:popup:not_found"),
+        )
+        return
+
+    invite_name = invite.name
+
+    logger.info(f"Admin {user.tg_id} confirmed deletion of invite {invite_name}.")
+
+    await callback.message.edit_text(
+        text=_("invite_editor:message:confirm_delete").format(name=invite.name),
+        reply_markup=confirm_delete_invite_keyboard(invite_id),
+    )
+
+
+@router.callback_query(F.data.startswith(NavAdminTools.DELETE_INVITE), IsAdmin())
+async def callback_delete_invite(
+    callback: CallbackQuery,
+    user: User,
+    session: AsyncSession,
+    services: ServicesContainer,
+) -> None:
+    invite_id = int(callback.data.split("_")[2])
     invite = await session.get(Invite, invite_id)
 
     if not invite:

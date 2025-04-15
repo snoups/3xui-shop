@@ -365,10 +365,23 @@ def invite_details_keyboard(invite: Invite) -> InlineKeyboardMarkup:
     builder.row(
         InlineKeyboardButton(
             text=_("invite_editor:button:delete"),
-            callback_data=NavAdminTools.DELETE_INVITE_CONFIRM + f"_{invite.id}",
+            callback_data=NavAdminTools.CONFIRM_DELETE_INVITE + f"_{invite.id}",
         )
     )
 
     builder.row(back_button(NavAdminTools.LIST_INVITES))
 
+    return builder.as_markup()
+
+
+def confirm_delete_invite_keyboard(invite_id: int) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("invite_editor:button:confirm_delete"),
+            callback_data=NavAdminTools.DELETE_INVITE + f"_{invite_id}",
+        ),
+    )
+    builder.row(cancel_button(NavAdminTools.SHOW_INVITE_DETAILS + f"_{invite_id}"))
     return builder.as_markup()
