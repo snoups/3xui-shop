@@ -15,8 +15,11 @@ from app.bot.utils.navigation import NavAdminTools
 from app.db.models.invite import Invite
 from app.db.models.user import User
 
-from .keyboard import (invite_details_keyboard, invite_editor_keyboard,
-                       invite_list_keyboard)
+from .keyboard import (
+    invite_details_keyboard,
+    invite_editor_keyboard,
+    invite_list_keyboard,
+)
 
 logger = logging.getLogger(__name__)
 router = Router(name=__name__)
@@ -110,11 +113,11 @@ async def callback_list_invites(
         )
 
 
-@router.callback_query(F.data.startswith(f"{NavAdminTools.SHOW_INVITE_PAGE}:"), IsAdmin())
+@router.callback_query(F.data.startswith(NavAdminTools.SHOW_INVITE_PAGE), IsAdmin())
 async def callback_invite_page(
     callback: CallbackQuery, user: User, session: AsyncSession
 ) -> None:
-    page = int(callback.data.split(":")[1])
+    page = int(callback.data.split("_")[3])
     invites = await Invite.get_all(session=session)
 
     logger.info(f"Admin {user.tg_id} is now on page #{page + 1} of invites.")
@@ -132,7 +135,7 @@ async def callback_invite_details(
     session: AsyncSession,
     services: ServicesContainer,
 ) -> None:
-    invite_id = int(callback.data.split(":")[1])
+    invite_id = int(callback.data.split("_")[3])
     invite = await session.get(Invite, invite_id)
 
     logger.info(f"Admin {user.tg_id} is checking invite {invite.name}.")
@@ -182,7 +185,7 @@ async def callback_toggle_invite(
     session: AsyncSession,
     services: ServicesContainer,
 ) -> None:
-    invite_id = int(callback.data.split(":")[1])
+    invite_id = int(callback.data.split("_")[3])
     invite = await session.get(Invite, invite_id)
 
     if not invite:
@@ -218,14 +221,16 @@ async def callback_toggle_invite(
     )
 
 
-@router.callback_query(F.data.startswith(NavAdminTools.DELETE_INVITE_CONFIRM), IsAdmin())
+@router.callback_query(
+    F.data.startswith(NavAdminTools.DELETE_INVITE_CONFIRM), IsAdmin()
+)
 async def callback_delete_invite(
     callback: CallbackQuery,
     user: User,
     session: AsyncSession,
     services: ServicesContainer,
 ) -> None:
-    invite_id = int(callback.data.split(":")[1])
+    invite_id = int(callback.data.split("_")[3])
     invite = await session.get(Invite, invite_id)
 
     if not invite:
