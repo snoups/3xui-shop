@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.filters import IsAdmin
 from app.bot.models import ServicesContainer
+from app.bot.payment_gateways import GatewayFactory
 from app.bot.routers.misc.keyboard import back_keyboard
 from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY, Currency
 from app.bot.utils.navigation import NavAdminTools
@@ -135,6 +136,7 @@ async def callback_invite_details(
     user: User,
     session: AsyncSession,
     services: ServicesContainer,
+    gateway_factory: GatewayFactory,
 ) -> None:
     invite_id = int(callback.data.split("_")[3])
     invite = await session.get(Invite, invite_id)
@@ -157,8 +159,16 @@ async def callback_invite_details(
         else _("invite_editor:status:inactive")
     )
 
+    payment_method_currencies = {}
+    for gateway in gateway_factory.get_gateways():
+        payment_method_currencies[gateway.callback] = gateway.currency.code
+
     try:
-        stats = await services.invite_stats.get_detailed_stats(invite.name, session)
+        stats = await services.invite_stats.get_detailed_stats(
+            invite_name=invite.name,
+            session=session,
+            payment_method_currencies=payment_method_currencies
+        )
     except Exception as e:
         logger.error(f"Failed to get invite stats for {invite.name}: {e}")
         await services.notification.show_popup(
@@ -199,6 +209,7 @@ async def callback_toggle_invite(
     user: User,
     session: AsyncSession,
     services: ServicesContainer,
+    gateway_factory: GatewayFactory,
 ) -> None:
     invite_id = int(callback.data.split("_")[3])
     invite = await session.get(Invite, invite_id)
@@ -233,6 +244,7 @@ async def callback_toggle_invite(
         user=user,
         session=session,
         services=services,
+        gateway_factory=gateway_factory,
     )
 
 

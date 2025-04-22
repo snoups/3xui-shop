@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import logging
+from typing import TYPE_CHECKING, Dict, Optional
 
 if TYPE_CHECKING:
     from app.bot.services import PaymentStatsService
-
-import logging
-from typing import Optional
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -38,7 +36,10 @@ class InviteStatsService:
         logger.debug("InviteStatsService initialized")
 
     async def get_detailed_stats(
-        self, invite_name: str, session: Optional[AsyncSession] = None
+        self,
+        invite_name: str,
+        session: Optional[AsyncSession] = None,
+        payment_method_currencies: Optional[Dict[str, str]] = None
     ) -> InviteStats:
         """
         Get detailed statistics for a specific invite link.
@@ -46,9 +47,10 @@ class InviteStatsService:
         Args:
             invite_name: Name of the invite link
             session: Optional existing database session
+            payment_method_currencies: Dictionary mapping payment methods to currency codes
 
         Returns:
-            Dict containing detailed statistics
+            InviteStats object containing detailed statistics
         """
 
         async def _get_stats(s: AsyncSession) -> InviteStats:
@@ -88,10 +90,12 @@ class InviteStatsService:
             repeat_customers = set(user_id for user_id, in repeat_users_query)
 
             # Get revenue totals from payment stats service
-            all_revenue = {}
+            all_revenue: Dict[str, float] = {}
             for user_id in user_ids:
                 user_revenue = await self.payment_stats.get_user_payment_stats(
-                    user_id, s
+                    user_id=user_id,
+                    session=s,
+                    payment_method_currencies=payment_method_currencies
                 )
                 for currency, amount in user_revenue.items():
                     if currency not in all_revenue:

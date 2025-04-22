@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.bot.models import SubscriptionData
-from app.bot.utils.constants import Currency, TransactionStatus
+from app.bot.utils.constants import TransactionStatus
 from app.db.models import Transaction
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,10 @@ class PaymentStatsService:
         logger.debug("PaymentStatsService initialized")
 
     async def get_user_payment_stats(
-        self, user_id: int, session: Optional[AsyncSession] = None
+        self,
+        user_id: int,
+        session: Optional[AsyncSession] = None,
+        payment_method_currencies: Optional[Dict[str, str]] = None
     ) -> Dict[str, float]:
         """
         Calculate total payments by currency for a specific user using transactions table.
@@ -33,6 +36,7 @@ class PaymentStatsService:
         Args:
             user_id: Telegram user ID
             session: Optional existing database session
+            payment_method_currencies: Dictionary mapping payment methods to currency codes
 
         Returns:
             Dict mapping currency codes to total amounts
@@ -52,9 +56,19 @@ class PaymentStatsService:
                 try:
                     data = SubscriptionData.unpack(tx.subscription)
                     payment_method = data.state.value
-                    currency = self._get_currency_from_payment_method(payment_method)
+
+                    currency = None
+                    if payment_method_currencies:
+                        for method, curr in payment_method_currencies.items():
+                            if method in payment_method:
+                                currency = curr
+                                break
+                    else:
+                        logger.warning(f"payment_method_currencies not provided for payment_method: {payment_method}")
+                        continue
 
                     if not currency:
+                        logger.warning(f"Unknown payment method: {payment_method}")
                         continue
 
                     if currency not in results:
@@ -72,13 +86,16 @@ class PaymentStatsService:
                 return await _get_stats(session)
 
     async def get_total_revenue_stats(
-        self, session: Optional[AsyncSession] = None
+        self,
+        session: Optional[AsyncSession] = None,
+        payment_method_currencies: Optional[Dict[str, str]] = None
     ) -> Dict[str, float]:
         """
         Calculate total revenue across all completed transactions by currency.
 
         Args:
             session: Optional existing database session
+            payment_method_currencies: Dictionary mapping payment methods to currency codes
 
         Returns:
             Dict mapping currency codes to total amounts
@@ -96,9 +113,19 @@ class PaymentStatsService:
                 try:
                     data = SubscriptionData.unpack(tx.subscription)
                     payment_method = data.state.value
-                    currency = self._get_currency_from_payment_method(payment_method)
+
+                    currency = None
+                    if payment_method_currencies:
+                        for method, curr in payment_method_currencies.items():
+                            if method in payment_method:
+                                currency = curr
+                                break
+                    else:
+                        logger.warning(f"payment_method_currencies not provided for payment_method: {payment_method}")
+                        continue
 
                     if not currency:
+                        logger.warning(f"Unknown payment method: {payment_method}")
                         continue
 
                     if currency not in results:
@@ -114,27 +141,3 @@ class PaymentStatsService:
         else:
             async with self.session_factory() as session:
                 return await _get_stats(session)
-
-    def _get_currency_from_payment_method(self, payment_method: str) -> Optional[str]:
-        """
-        Extract currency code from payment method.
-
-        Args:
-            payment_method: Payment method string (e.g., 'pay_yookassa')
-
-        Returns:
-            Currency code or None if not recognized
-        """
-        method_to_currency = {
-            'pay_yookassa': 'RUB',
-            'pay_yoomoney': 'RUB',
-            'pay_cryptomus': 'USD',
-            'pay_heleket': 'USD',
-            'pay_telegram_stars': 'XTR'
-        }
-
-        for method, currency in method_to_currency.items():
-            if method in payment_method:
-                return currency
-
-        return None
