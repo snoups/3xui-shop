@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.bot.services import PaymentStatsService
+
 import logging
 from typing import Optional
 
@@ -15,7 +22,9 @@ class InviteStatsService:
     """Service for collecting and analyzing invite link statistics."""
 
     def __init__(
-        self, session_factory: async_sessionmaker, payment_stats_service
+        self,
+        session_factory: async_sessionmaker,
+        payment_stats_service: PaymentStatsService,
     ) -> None:
         """
         Initialize InviteStatsService.
