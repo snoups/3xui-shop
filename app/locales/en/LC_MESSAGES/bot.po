@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-16 01:00+0300\n"
+"POT-Creation-Date: 2025-04-23 03:16+0300\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.15.0\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: app/bot/middlewares/maintenance.py:45
 msgid "maintenance:ntf:try_later"
@@ -90,20 +90,20 @@ msgstr "❌ Failed to send backup."
 msgid "backup:popup:error"
 msgstr "❌ An error occurred during backup."
 
-#: app/bot/routers/admin_tools/invites_handler.py:40
+#: app/bot/routers/admin_tools/invites_handler.py:41
 msgid "invite_editor:message:main"
 msgstr ""
 "📊 <b>Invite Link Management</b>\n"
 "\n"
 "Here you can create and manage invite links to track user sources."
 
-#: app/bot/routers/admin_tools/invites_handler.py:54
+#: app/bot/routers/admin_tools/invites_handler.py:55
 msgid "invite_editor:message:enter_name"
 msgstr ""
 "<b>Enter a name for the invite link.</b>\n"
 "<i>This name will be used to generate a unique tracking code.</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:81
+#: app/bot/routers/admin_tools/invites_handler.py:82
 msgid "invite_editor:message:created_success"
 msgstr ""
 "✅ <b>Invite link created successfully!</b>\n"
@@ -114,45 +114,45 @@ msgstr ""
 "\n"
 "<i>Share this link to track users coming from this source.</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:92
+#: app/bot/routers/admin_tools/invites_handler.py:93
 msgid "invite_editor:ntf:create_failed"
 msgstr "❌ Failed to create invite link. Please try a different name."
 
-#: app/bot/routers/admin_tools/invites_handler.py:107
-#: app/bot/routers/admin_tools/invites_handler.py:127
+#: app/bot/routers/admin_tools/invites_handler.py:108
+#: app/bot/routers/admin_tools/invites_handler.py:128
 msgid "invite_editor:message:list"
 msgstr ""
 "📊 <b>Invite Links</b>\n"
 "\n"
 "<i>Select a link to see details:</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:112
+#: app/bot/routers/admin_tools/invites_handler.py:113
 msgid "invite_editor:message:no_invites"
 msgstr "<i>There are no invite links yet. Create your first invite link!</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:145
-#: app/bot/routers/admin_tools/invites_handler.py:209
-#: app/bot/routers/admin_tools/invites_handler.py:254
-#: app/bot/routers/admin_tools/invites_handler.py:281
+#: app/bot/routers/admin_tools/invites_handler.py:147
+#: app/bot/routers/admin_tools/invites_handler.py:220
+#: app/bot/routers/admin_tools/invites_handler.py:266
+#: app/bot/routers/admin_tools/invites_handler.py:293
 msgid "invite_editor:popup:not_found"
 msgstr "❌ Invite link not found"
 
-#: app/bot/routers/admin_tools/invites_handler.py:155
-#: app/bot/routers/admin_tools/invites_handler.py:221
+#: app/bot/routers/admin_tools/invites_handler.py:157
+#: app/bot/routers/admin_tools/invites_handler.py:232
 msgid "invite_editor:status:active"
 msgstr "🟢"
 
-#: app/bot/routers/admin_tools/invites_handler.py:157
-#: app/bot/routers/admin_tools/invites_handler.py:223
+#: app/bot/routers/admin_tools/invites_handler.py:159
+#: app/bot/routers/admin_tools/invites_handler.py:234
 msgid "invite_editor:status:inactive"
 msgstr "🔴"
 
-#: app/bot/routers/admin_tools/invites_handler.py:166
-#: app/bot/routers/admin_tools/invites_handler.py:177
+#: app/bot/routers/admin_tools/invites_handler.py:176
+#: app/bot/routers/admin_tools/invites_handler.py:187
 msgid "invite_editor:revenue:none"
 msgstr "no data"
 
-#: app/bot/routers/admin_tools/invites_handler.py:180
+#: app/bot/routers/admin_tools/invites_handler.py:190
 msgid "invite_editor:message:details"
 msgstr ""
 "📊 <b>Invite Link Details</b>\n"
@@ -172,15 +172,15 @@ msgstr ""
 "• <b>Made payment:</b> {paid_users_count}\n"
 "• <b>Repeat customers:</b> {repeat_customers_count}"
 
-#: app/bot/routers/admin_tools/invites_handler.py:228
+#: app/bot/routers/admin_tools/invites_handler.py:239
 msgid "invite_editor:popup:status_changed"
 msgstr "Invite link status changed: {status}"
 
-#: app/bot/routers/admin_tools/invites_handler.py:263
+#: app/bot/routers/admin_tools/invites_handler.py:275
 msgid "invite_editor:message:confirm_delete"
 msgstr "Are you sure you want to delete Invite Link <b>{name}</b>?"
 
-#: app/bot/routers/admin_tools/invites_handler.py:294
+#: app/bot/routers/admin_tools/invites_handler.py:306
 msgid "invite_editor:popup:deleted"
 msgstr "✅ Invite link \"{name}\" deleted"
 
