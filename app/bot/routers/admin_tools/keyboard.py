@@ -9,6 +9,7 @@ from app.bot.routers.misc.keyboard import (
 )
 from app.bot.utils.navigation import NavAdminTools
 from app.db.models import Server
+from app.db.models.invite import Invite
 
 
 def admin_tools_keyboard(is_dev: bool) -> InlineKeyboardMarkup:
@@ -32,6 +33,12 @@ def admin_tools_keyboard(is_dev: bool) -> InlineKeyboardMarkup:
         InlineKeyboardButton(
             text=_("admin_tools:button:user_editor"),
             callback_data=NavAdminTools.USER_EDITOR,
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(
+            text=_("admin_tools:button:invite_editor"),
+            callback_data=NavAdminTools.INVITE_EDITOR,
         )
     )
     builder.row(
@@ -270,4 +277,111 @@ def confirm_send_notification_keyboard() -> InlineKeyboardMarkup:
         )
     )
     builder.row(cancel_button(NavAdminTools.NOTIFICATION))
+    return builder.as_markup()
+
+
+def invite_editor_keyboard() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("invite_editor:button:create_invite"),
+            callback_data=NavAdminTools.CREATE_INVITE,
+        )
+    )
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("invite_editor:button:list_invites"),
+            callback_data=NavAdminTools.LIST_INVITES,
+        )
+    )
+
+    builder.row(back_button(NavAdminTools.MAIN))
+    builder.row(back_to_main_menu_button())
+    return builder.as_markup()
+
+
+def invite_list_keyboard(
+    invites: list[Invite], page: int = 0, limit: int = 5
+) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    total_invites = len(invites)
+    start_idx = page * limit
+    end_idx = min(start_idx + limit, total_invites)
+
+    for i in range(start_idx, end_idx):
+        invite = invites[i]
+        builder.row(
+            InlineKeyboardButton(
+                text=f"{invite.name} ({invite.clicks} clicks)",
+                callback_data=NavAdminTools.SHOW_INVITE_DETAILS + f"_{invite.id}",
+            )
+        )
+
+    row = []
+    if page > 0:
+        row.append(
+            InlineKeyboardButton(
+                text=_("invite_editor:button:previous_page"),
+                callback_data=NavAdminTools.SHOW_INVITE_PAGE + f"_{page-1}",
+            )
+        )
+
+    if (page + 1) * limit < total_invites:
+        row.append(
+            InlineKeyboardButton(
+                text=_("invite_editor:button:next_page"),
+                callback_data=NavAdminTools.SHOW_INVITE_PAGE + f"_{page+1}",
+            )
+        )
+
+    if row:
+        builder.row(*row)
+
+    builder.row(back_button(NavAdminTools.INVITE_EDITOR))
+
+    return builder.as_markup()
+
+
+def invite_details_keyboard(invite: Invite) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    if invite.is_active:
+        builder.row(
+            InlineKeyboardButton(
+                text=_("invite_editor:button:disable"),
+                callback_data=NavAdminTools.TOGGLE_INVITE_STATUS + f"_{invite.id}",
+            )
+        )
+    else:
+        builder.row(
+            InlineKeyboardButton(
+                text=_("invite_editor:button:enable"),
+                callback_data=NavAdminTools.TOGGLE_INVITE_STATUS + f"_{invite.id}",
+            )
+        )
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("invite_editor:button:delete"),
+            callback_data=NavAdminTools.CONFIRM_DELETE_INVITE + f"_{invite.id}",
+        )
+    )
+
+    builder.row(back_button(NavAdminTools.LIST_INVITES))
+
+    return builder.as_markup()
+
+
+def confirm_delete_invite_keyboard(invite_id: int) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=_("invite_editor:button:confirm_delete"),
+            callback_data=NavAdminTools.DELETE_INVITE + f"_{invite_id}",
+        ),
+    )
+    builder.row(cancel_button(NavAdminTools.SHOW_INVITE_DETAILS + f"_{invite_id}"))
     return builder.as_markup()

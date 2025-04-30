@@ -1,4 +1,5 @@
 from ._base import Base
+from .invite import Invite
 from .promocode import Promocode
 from .referral import Referral
 from .referrer_reward import ReferrerReward

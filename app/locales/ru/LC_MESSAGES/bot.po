@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-01 00:01+0500\n"
+"POT-Creation-Date: 2025-04-23 03:16+0300\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -93,55 +93,156 @@ msgstr "❌ Не удалось отправить резервную копию
 msgid "backup:popup:error"
 msgstr "❌ Возникла ошибка при создании резервной копии."
 
-#: app/bot/routers/admin_tools/keyboard.py:20
+#: app/bot/routers/admin_tools/invites_handler.py:41
+msgid "invite_editor:message:main"
+msgstr ""
+"📊 <b>Управление инвайт-ссылками</b>\n"
+"\n"
+"Здесь вы можете создавать и управлять инвайт-ссылками для отслеживания "
+"источников пользователей."
+
+#: app/bot/routers/admin_tools/invites_handler.py:55
+msgid "invite_editor:message:enter_name"
+msgstr ""
+"<b>Введите название для инвайт-ссылки.</b>\n"
+"<i>Это название будет использовано для генерации уникального "
+"трекинг-кода.</i>"
+
+#: app/bot/routers/admin_tools/invites_handler.py:82
+msgid "invite_editor:message:created_success"
+msgstr ""
+"✅ <b>Инвайт-ссылка успешно создана!</b>\n"
+"\n"
+"<b>Название:</b> {name}\n"
+"\n"
+"<b>Ссылка:</b> <code>{link}</code>\n"
+"\n"
+"<i>Используйте эту ссылку для отслеживания статистики по перешедшим по "
+"ней пользователям.</i>"
+
+#: app/bot/routers/admin_tools/invites_handler.py:93
+msgid "invite_editor:ntf:create_failed"
+msgstr "❌ Не удалось создать ссылку. Пожалуйста, попробуйте другое имя."
+
+#: app/bot/routers/admin_tools/invites_handler.py:108
+#: app/bot/routers/admin_tools/invites_handler.py:128
+msgid "invite_editor:message:list"
+msgstr ""
+"📊 <b>Инвайт-ссылки</b>\n"
+"\n"
+"<i>Выберите ссылку для подробностей:</i>"
+
+#: app/bot/routers/admin_tools/invites_handler.py:113
+msgid "invite_editor:message:no_invites"
+msgstr "<i>У вас ещё нет инвайт-ссылок. Сперва создайте хотя бы одну ссылку!</i>"
+
+#: app/bot/routers/admin_tools/invites_handler.py:147
+#: app/bot/routers/admin_tools/invites_handler.py:220
+#: app/bot/routers/admin_tools/invites_handler.py:266
+#: app/bot/routers/admin_tools/invites_handler.py:293
+msgid "invite_editor:popup:not_found"
+msgstr "❌ Инвайт-ссылка не найдена"
+
+#: app/bot/routers/admin_tools/invites_handler.py:157
+#: app/bot/routers/admin_tools/invites_handler.py:232
+msgid "invite_editor:status:active"
+msgstr "🟢"
+
+#: app/bot/routers/admin_tools/invites_handler.py:159
+#: app/bot/routers/admin_tools/invites_handler.py:234
+msgid "invite_editor:status:inactive"
+msgstr "🔴"
+
+#: app/bot/routers/admin_tools/invites_handler.py:176
+#: app/bot/routers/admin_tools/invites_handler.py:187
+msgid "invite_editor:revenue:none"
+msgstr "нет данных"
+
+#: app/bot/routers/admin_tools/invites_handler.py:190
+msgid "invite_editor:message:details"
+msgstr ""
+"📊 <b>Подробности инвайт-ссылки</b>\n"
+"\n"
+"<b>Название:</b> {name}\n"
+"<b>Ссылка:</b> <code>{link}</code>\n"
+"<b>Клики:</b> {clicks}\n"
+"<b>Создано:</b> {created_at}\n"
+"<b>Статус:</b> {status}\n"
+"\n"
+"<b>💵 Выручка:</b>\n"
+"{revenue_text}\n"
+"\n"
+"<b>👥 Статистика пользователей:</b>\n"
+"• <b>Всего пользователей:</b> {users_count}\n"
+"• <b>Использовали триал:</b> {trial_users_count}\n"
+"• <b>Сделали оплату:</b> {paid_users_count}\n"
+"• <b>Повторные покупки:</b> {repeat_customers_count}"
+
+#: app/bot/routers/admin_tools/invites_handler.py:239
+msgid "invite_editor:popup:status_changed"
+msgstr "Статус инвайт-ссылки изменен: {status}"
+
+#: app/bot/routers/admin_tools/invites_handler.py:275
+msgid "invite_editor:message:confirm_delete"
+msgstr "Вы уверены, что хотите удалить инвайт-ссылку <b>{name}</b>?"
+
+#: app/bot/routers/admin_tools/invites_handler.py:306
+msgid "invite_editor:popup:deleted"
+msgstr "✅ Инвайт-ссылка \"{name}\" удалена"
+
+#: app/bot/routers/admin_tools/keyboard.py:21
 msgid "admin_tools:button:server_management"
 msgstr "🌐 Управление серверами"
 
-#: app/bot/routers/admin_tools/keyboard.py:27
+#: app/bot/routers/admin_tools/keyboard.py:28
 msgid "admin_tools:button:statistics"
 msgstr "📈 Статистика"
 
-#: app/bot/routers/admin_tools/keyboard.py:33
+#: app/bot/routers/admin_tools/keyboard.py:34
 msgid "admin_tools:button:user_editor"
 msgstr "👤 Редактор пользователей"
 
-#: app/bot/routers/admin_tools/keyboard.py:39
+#: app/bot/routers/admin_tools/keyboard.py:40
+msgid "admin_tools:button:invite_editor"
+msgstr "🔗 Инвайт-ссылки"
+
+#: app/bot/routers/admin_tools/keyboard.py:46
 msgid "admin_tools:button:promocode_editor"
 msgstr "🎟 Редактор промокодов"
 
-#: app/bot/routers/admin_tools/keyboard.py:45
+#: app/bot/routers/admin_tools/keyboard.py:52
 msgid "admin_tools:button:notification"
 msgstr "📣 Отправить уведомление"
 
-#: app/bot/routers/admin_tools/keyboard.py:51
+#: app/bot/routers/admin_tools/keyboard.py:58
 msgid "admin_tools:button:create_backup"
 msgstr "💾 Создать резервную копию"
 
-#: app/bot/routers/admin_tools/keyboard.py:57
+#: app/bot/routers/admin_tools/keyboard.py:64
 msgid "admin_tools:button:maintenance_mode"
 msgstr "🚧 Режим обслуживания"
 
-#: app/bot/routers/admin_tools/keyboard.py:63
+#: app/bot/routers/admin_tools/keyboard.py:70
 msgid "admin_tools:button:restart_bot"
 msgstr "🔄 Перезапустить бота"
 
-#: app/bot/routers/admin_tools/keyboard.py:69
+#: app/bot/routers/admin_tools/keyboard.py:76
 msgid "admin_tools:button:test_button"
 msgstr "🔍 Тестовая кнопка"
 
-#: app/bot/routers/admin_tools/keyboard.py:83
+#: app/bot/routers/admin_tools/keyboard.py:90
 msgid "promocode_editor:button:create"
 msgstr "🆕 Создать"
 
-#: app/bot/routers/admin_tools/keyboard.py:89
+#: app/bot/routers/admin_tools/keyboard.py:96
 msgid "promocode_editor:button:delete"
 msgstr "🗑 Удалить"
 
-#: app/bot/routers/admin_tools/keyboard.py:95
+#: app/bot/routers/admin_tools/keyboard.py:102
 msgid "promocode_editor:button:edit"
 msgstr "✏️ Изменить"
 
-#: app/bot/routers/admin_tools/keyboard.py:111 app/bot/utils/formatting.py:73
+#: app/bot/routers/admin_tools/keyboard.py:118 app/bot/utils/formatting.py:73
 #, python-brace-format
 msgid "1 day"
 msgid_plural "{} days"
@@ -149,57 +250,89 @@ msgstr[0] "1 день"
 msgstr[1] "{} дня"
 msgstr[2] "{} дней"
 
-#: app/bot/routers/admin_tools/keyboard.py:130
+#: app/bot/routers/admin_tools/keyboard.py:137
 msgid "maintenance_mode:button:disable"
 msgstr "🔴 Выключить"
 
-#: app/bot/routers/admin_tools/keyboard.py:137
+#: app/bot/routers/admin_tools/keyboard.py:144
 msgid "maintenance_mode:button:enable"
 msgstr "🟢 Включить"
 
-#: app/bot/routers/admin_tools/keyboard.py:153
+#: app/bot/routers/admin_tools/keyboard.py:160
 msgid "server_management:button:sync"
 msgstr "🔄 Синхронизировать"
 
-#: app/bot/routers/admin_tools/keyboard.py:160
+#: app/bot/routers/admin_tools/keyboard.py:167
 msgid "server_management:button:add"
 msgstr "🆕 Добавить"
 
-#: app/bot/routers/admin_tools/keyboard.py:185
+#: app/bot/routers/admin_tools/keyboard.py:192
 msgid "server_management:button:ping"
 msgstr "📶 Пинг"
 
-#: app/bot/routers/admin_tools/keyboard.py:191
+#: app/bot/routers/admin_tools/keyboard.py:198
 msgid "server_management:button:delete"
 msgstr "🗑 Удалить"
 
-#: app/bot/routers/admin_tools/keyboard.py:206
+#: app/bot/routers/admin_tools/keyboard.py:213
 msgid "server_management:button:confirm"
 msgstr "✅ Подтвердить"
 
-#: app/bot/routers/admin_tools/keyboard.py:221
+#: app/bot/routers/admin_tools/keyboard.py:228
 msgid "notification:button:send_to_user"
 msgstr "📩 Пользователю"
 
-#: app/bot/routers/admin_tools/keyboard.py:225
+#: app/bot/routers/admin_tools/keyboard.py:232
 msgid "notification:button:send_to_all"
 msgstr "📣 Всем"
 
-#: app/bot/routers/admin_tools/keyboard.py:232
+#: app/bot/routers/admin_tools/keyboard.py:239
 msgid "notification:button:last_notification"
 msgstr "💬 Последнее уведомление"
 
-#: app/bot/routers/admin_tools/keyboard.py:247
+#: app/bot/routers/admin_tools/keyboard.py:254
 msgid "notification:button:edit"
 msgstr "✏️ Изменить"
 
-#: app/bot/routers/admin_tools/keyboard.py:254
+#: app/bot/routers/admin_tools/keyboard.py:261
 msgid "notification:button:delete"
 msgstr "🗑 Удалить"
 
-#: app/bot/routers/admin_tools/keyboard.py:268
+#: app/bot/routers/admin_tools/keyboard.py:275
 msgid "notification:button:confirm"
 msgstr "✅ Подтвердить и отправить"
+
+#: app/bot/routers/admin_tools/keyboard.py:288
+msgid "invite_editor:button:create_invite"
+msgstr "➕ Создать новую инвайт-ссылку"
+
+#: app/bot/routers/admin_tools/keyboard.py:295
+msgid "invite_editor:button:list_invites"
+msgstr "📋 Показать все инвайт-ссылки"
+
+#: app/bot/routers/admin_tools/keyboard.py:326
+msgid "invite_editor:button:previous_page"
+msgstr "◀️ Предыдущая страница"
+
+#: app/bot/routers/admin_tools/keyboard.py:334
+msgid "invite_editor:button:next_page"
+msgstr "▶️ Следующая страница"
+
+#: app/bot/routers/admin_tools/keyboard.py:353
+msgid "invite_editor:button:disable"
+msgstr "🔴 Выключить"
+
+#: app/bot/routers/admin_tools/keyboard.py:360
+msgid "invite_editor:button:enable"
+msgstr "🟢 Включить"
+
+#: app/bot/routers/admin_tools/keyboard.py:367
+msgid "invite_editor:button:delete"
+msgstr "🗑️ Удалить"
+
+#: app/bot/routers/admin_tools/keyboard.py:382
+msgid "invite_editor:button:confirm_delete"
+msgstr "✅ Подтвердить удаление"
 
 #: app/bot/routers/admin_tools/maintenance_handler.py:24
 #: app/bot/routers/admin_tools/maintenance_handler.py:45
@@ -584,9 +717,9 @@ msgstr "📥 Скачать"
 msgid "download:button:connect"
 msgstr "🔌 Подключиться"
 
-#: app/bot/routers/main_menu/handler.py:81
 #: app/bot/routers/main_menu/handler.py:105
-#: app/bot/routers/main_menu/handler.py:136
+#: app/bot/routers/main_menu/handler.py:129
+#: app/bot/routers/main_menu/handler.py:160
 msgid "main_menu:message:main"
 msgstr ""
 "Добро пожаловать, {name}! 🎉\n"
