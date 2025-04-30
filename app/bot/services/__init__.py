@@ -28,7 +28,6 @@ async def initialize(
     payment_stats = PaymentStatsService(session_factory=session)
     invite_stats = InviteStatsService(session_factory=session, payment_stats_service=payment_stats)
 
-
     return ServicesContainer(
         server_pool=server_pool,
         plan=plan,

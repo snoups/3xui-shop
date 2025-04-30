@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bot 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-23 03:16+0300\n"
+"POT-Creation-Date: 2025-04-30 08:19+0500\n"
 "PO-Revision-Date: 2024-12-05 10:24+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -93,7 +93,7 @@ msgstr "❌ Не удалось отправить резервную копию
 msgid "backup:popup:error"
 msgstr "❌ Возникла ошибка при создании резервной копии."
 
-#: app/bot/routers/admin_tools/invites_handler.py:41
+#: app/bot/routers/admin_tools/invites_handler.py:38
 msgid "invite_editor:message:main"
 msgstr ""
 "📊 <b>Управление инвайт-ссылками</b>\n"
@@ -101,14 +101,14 @@ msgstr ""
 "Здесь вы можете создавать и управлять инвайт-ссылками для отслеживания "
 "источников пользователей."
 
-#: app/bot/routers/admin_tools/invites_handler.py:55
+#: app/bot/routers/admin_tools/invites_handler.py:50
 msgid "invite_editor:message:enter_name"
 msgstr ""
 "<b>Введите название для инвайт-ссылки.</b>\n"
 "<i>Это название будет использовано для генерации уникального "
 "трекинг-кода.</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:82
+#: app/bot/routers/admin_tools/invites_handler.py:77
 msgid "invite_editor:message:created_success"
 msgstr ""
 "✅ <b>Инвайт-ссылка успешно создана!</b>\n"
@@ -120,45 +120,48 @@ msgstr ""
 "<i>Используйте эту ссылку для отслеживания статистики по перешедшим по "
 "ней пользователям.</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:93
+#: app/bot/routers/admin_tools/invites_handler.py:88
 msgid "invite_editor:ntf:create_failed"
 msgstr "❌ Не удалось создать ссылку. Пожалуйста, попробуйте другое имя."
 
-#: app/bot/routers/admin_tools/invites_handler.py:108
-#: app/bot/routers/admin_tools/invites_handler.py:128
+#: app/bot/routers/admin_tools/invites_handler.py:103
+#: app/bot/routers/admin_tools/invites_handler.py:121
 msgid "invite_editor:message:list"
 msgstr ""
 "📊 <b>Инвайт-ссылки</b>\n"
 "\n"
 "<i>Выберите ссылку для подробностей:</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:113
+#: app/bot/routers/admin_tools/invites_handler.py:108
 msgid "invite_editor:message:no_invites"
 msgstr "<i>У вас ещё нет инвайт-ссылок. Сперва создайте хотя бы одну ссылку!</i>"
 
-#: app/bot/routers/admin_tools/invites_handler.py:147
-#: app/bot/routers/admin_tools/invites_handler.py:220
-#: app/bot/routers/admin_tools/invites_handler.py:266
-#: app/bot/routers/admin_tools/invites_handler.py:293
+#: app/bot/routers/admin_tools/invites_handler.py:140
+#: app/bot/routers/admin_tools/invites_handler.py:211
+#: app/bot/routers/admin_tools/invites_handler.py:253
+#: app/bot/routers/admin_tools/invites_handler.py:280
 msgid "invite_editor:popup:not_found"
 msgstr "❌ Инвайт-ссылка не найдена"
 
-#: app/bot/routers/admin_tools/invites_handler.py:157
-#: app/bot/routers/admin_tools/invites_handler.py:232
+#: app/bot/routers/admin_tools/invites_handler.py:150
+#: app/bot/routers/admin_tools/invites_handler.py:223
 msgid "invite_editor:status:active"
 msgstr "🟢"
 
-#: app/bot/routers/admin_tools/invites_handler.py:159
-#: app/bot/routers/admin_tools/invites_handler.py:234
+#: app/bot/routers/admin_tools/invites_handler.py:150
+#: app/bot/routers/admin_tools/invites_handler.py:223
 msgid "invite_editor:status:inactive"
 msgstr "🔴"
 
-#: app/bot/routers/admin_tools/invites_handler.py:176
-#: app/bot/routers/admin_tools/invites_handler.py:187
+#: app/bot/routers/admin_tools/invites_handler.py:167
+msgid "invite_editor:popup:failed_get_stats"
+msgstr "❌ Ошибка получения статистики"
+
+#: app/bot/routers/admin_tools/invites_handler.py:178
 msgid "invite_editor:revenue:none"
 msgstr "нет данных"
 
-#: app/bot/routers/admin_tools/invites_handler.py:190
+#: app/bot/routers/admin_tools/invites_handler.py:181
 msgid "invite_editor:message:details"
 msgstr ""
 "📊 <b>Подробности инвайт-ссылки</b>\n"
@@ -178,15 +181,15 @@ msgstr ""
 "• <b>Сделали оплату:</b> {paid_users_count}\n"
 "• <b>Повторные покупки:</b> {repeat_customers_count}"
 
-#: app/bot/routers/admin_tools/invites_handler.py:239
+#: app/bot/routers/admin_tools/invites_handler.py:228
 msgid "invite_editor:popup:status_changed"
 msgstr "Статус инвайт-ссылки изменен: {status}"
 
-#: app/bot/routers/admin_tools/invites_handler.py:275
+#: app/bot/routers/admin_tools/invites_handler.py:262
 msgid "invite_editor:message:confirm_delete"
 msgstr "Вы уверены, что хотите удалить инвайт-ссылку <b>{name}</b>?"
 
-#: app/bot/routers/admin_tools/invites_handler.py:306
+#: app/bot/routers/admin_tools/invites_handler.py:293
 msgid "invite_editor:popup:deleted"
 msgstr "✅ Инвайт-ссылка \"{name}\" удалена"
 
@@ -717,9 +720,9 @@ msgstr "📥 Скачать"
 msgid "download:button:connect"
 msgstr "🔌 Подключиться"
 
-#: app/bot/routers/main_menu/handler.py:105
-#: app/bot/routers/main_menu/handler.py:129
-#: app/bot/routers/main_menu/handler.py:160
+#: app/bot/routers/main_menu/handler.py:103
+#: app/bot/routers/main_menu/handler.py:127
+#: app/bot/routers/main_menu/handler.py:158
 msgid "main_menu:message:main"
 msgstr ""
 "Добро пожаловать, {name}! 🎉\n"

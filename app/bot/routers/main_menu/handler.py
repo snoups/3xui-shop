@@ -14,7 +14,7 @@ from app.bot.models import ServicesContainer
 from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY
 from app.bot.utils.navigation import NavMain
 from app.config import Config
-from app.db.models import Referral, User, Invite
+from app.db.models import Invite, Referral, User
 
 from .keyboard import main_menu_keyboard
 
@@ -96,9 +96,7 @@ async def command_main_menu(
                 session=session, user=user, referrer_id=int(command.args)
             )
         else:
-            await process_invite_attribution(
-                session=session, user=user, invite_hash=command.args
-            )
+            await process_invite_attribution(session=session, user=user, invite_hash=command.args)
 
     is_admin = await IsAdmin()(user_id=user.tg_id)
     main_menu = await message.answer(

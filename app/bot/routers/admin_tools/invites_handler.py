@@ -13,8 +13,7 @@ from app.bot.payment_gateways import GatewayFactory
 from app.bot.routers.misc.keyboard import back_keyboard
 from app.bot.utils.constants import MAIN_MESSAGE_ID_KEY, Currency
 from app.bot.utils.navigation import NavAdminTools
-from app.db.models.invite import Invite
-from app.db.models.user import User
+from app.db.models import Invite, User
 
 from .keyboard import (
     confirm_delete_invite_keyboard,
@@ -32,9 +31,7 @@ class CreateInviteStates(StatesGroup):
 
 
 @router.callback_query(F.data == NavAdminTools.INVITE_EDITOR, IsAdmin())
-async def callback_invite_editor(
-    callback: CallbackQuery, user: User, state: FSMContext
-) -> None:
+async def callback_invite_editor(callback: CallbackQuery, user: User, state: FSMContext) -> None:
     logger.info(f"Admin {user.tg_id} opened invite editor.")
     await state.set_state(None)
     await callback.message.edit_text(
@@ -44,9 +41,7 @@ async def callback_invite_editor(
 
 
 @router.callback_query(F.data == NavAdminTools.CREATE_INVITE, IsAdmin())
-async def callback_create_invite(
-    callback: CallbackQuery, user: User, state: FSMContext
-) -> None:
+async def callback_create_invite(callback: CallbackQuery, user: User, state: FSMContext) -> None:
     logger.info(f"Admin {user.tg_id} started creating invite link.")
     await state.set_state(CreateInviteStates.invite_input)
     await state.update_data({MAIN_MESSAGE_ID_KEY: callback.message.message_id})
@@ -116,9 +111,7 @@ async def callback_list_invites(
 
 
 @router.callback_query(F.data.startswith(NavAdminTools.SHOW_INVITE_PAGE), IsAdmin())
-async def callback_invite_page(
-    callback: CallbackQuery, user: User, session: AsyncSession
-) -> None:
+async def callback_invite_page(callback: CallbackQuery, user: User, session: AsyncSession) -> None:
     page = int(callback.data.split("_")[3])
     invites = await Invite.get_all(session=session)
 
@@ -154,9 +147,7 @@ async def callback_invite_details(
     invite_link = f"https://t.me/{bot_username}?start={invite.hash_code}"
 
     status = (
-        _("invite_editor:status:active")
-        if invite.is_active
-        else _("invite_editor:status:inactive")
+        _("invite_editor:status:active") if invite.is_active else _("invite_editor:status:inactive")
     )
 
     payment_method_currencies = {}
@@ -167,13 +158,13 @@ async def callback_invite_details(
         stats = await services.invite_stats.get_detailed_stats(
             invite_name=invite.name,
             session=session,
-            payment_method_currencies=payment_method_currencies
+            payment_method_currencies=payment_method_currencies,
         )
     except Exception as e:
         logger.error(f"Failed to get invite stats for {invite.name}: {e}")
         await services.notification.show_popup(
             callback=callback,
-            text=_("invite_editor:revenue:none"),
+            text=_("invite_editor:popup:failed_get_stats"),
         )
         return
 
@@ -229,9 +220,7 @@ async def callback_toggle_invite(
     )
 
     status = (
-        _("invite_editor:status:active")
-        if invite.is_active
-        else _("invite_editor:status:inactive")
+        _("invite_editor:status:active") if invite.is_active else _("invite_editor:status:inactive")
     )
 
     await services.notification.show_popup(
@@ -248,9 +237,7 @@ async def callback_toggle_invite(
     )
 
 
-@router.callback_query(
-    F.data.startswith(NavAdminTools.CONFIRM_DELETE_INVITE), IsAdmin()
-)
+@router.callback_query(F.data.startswith(NavAdminTools.CONFIRM_DELETE_INVITE), IsAdmin())
 async def callback_delete_invite_prompt(
     callback: CallbackQuery,
     user: User,

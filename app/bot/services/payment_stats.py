@@ -28,7 +28,7 @@ class PaymentStatsService:
         self,
         user_id: int,
         session: Optional[AsyncSession] = None,
-        payment_method_currencies: Optional[Dict[str, str]] = None
+        payment_method_currencies: Optional[Dict[str, str]] = None,
     ) -> Dict[str, float]:
         """
         Calculate total payments by currency for a specific user using transactions table.
@@ -41,12 +41,12 @@ class PaymentStatsService:
         Returns:
             Dict mapping currency codes to total amounts
         """
+
         async def _get_stats(s: AsyncSession) -> Dict[str, float]:
             # Get completed transactions for this user
             query = await s.execute(
                 select(Transaction).where(
-                    Transaction.tg_id == user_id,
-                    Transaction.status == TransactionStatus.COMPLETED
+                    Transaction.tg_id == user_id, Transaction.status == TransactionStatus.COMPLETED
                 )
             )
             transactions = query.scalars().all()
@@ -64,7 +64,9 @@ class PaymentStatsService:
                                 currency = curr
                                 break
                     else:
-                        logger.warning(f"payment_method_currencies not provided for payment_method: {payment_method}")
+                        logger.warning(
+                            f"payment_method_currencies not provided for payment_method: {payment_method}"
+                        )
                         continue
 
                     if not currency:
@@ -75,7 +77,9 @@ class PaymentStatsService:
                         results[currency] = 0
                     results[currency] += float(data.price)
                 except Exception as e:
-                    logger.warning(f"Could not parse subscription data: {tx.subscription}. Error: {e}")
+                    logger.warning(
+                        f"Could not parse subscription data: {tx.subscription}. Error: {e}"
+                    )
 
             return results
 
@@ -88,7 +92,7 @@ class PaymentStatsService:
     async def get_total_revenue_stats(
         self,
         session: Optional[AsyncSession] = None,
-        payment_method_currencies: Optional[Dict[str, str]] = None
+        payment_method_currencies: Optional[Dict[str, str]] = None,
     ) -> Dict[str, float]:
         """
         Calculate total revenue across all completed transactions by currency.
@@ -100,11 +104,10 @@ class PaymentStatsService:
         Returns:
             Dict mapping currency codes to total amounts
         """
+
         async def _get_stats(s: AsyncSession) -> Dict[str, float]:
             query = await s.execute(
-                select(Transaction).where(
-                    Transaction.status == TransactionStatus.COMPLETED
-                )
+                select(Transaction).where(Transaction.status == TransactionStatus.COMPLETED)
             )
             transactions = query.scalars().all()
 
@@ -121,7 +124,9 @@ class PaymentStatsService:
                                 currency = curr
                                 break
                     else:
-                        logger.warning(f"payment_method_currencies not provided for payment_method: {payment_method}")
+                        logger.warning(
+                            f"payment_method_currencies not provided for payment_method: {payment_method}"
+                        )
                         continue
 
                     if not currency:
@@ -132,7 +137,9 @@ class PaymentStatsService:
                         results[currency] = 0
                     results[currency] += float(data.price)
                 except Exception as e:
-                    logger.warning(f"Could not parse subscription data: {tx.subscription}. Error: {e}")
+                    logger.warning(
+                        f"Could not parse subscription data: {tx.subscription}. Error: {e}"
+                    )
 
             return results
 

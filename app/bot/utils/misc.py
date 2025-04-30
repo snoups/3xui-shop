@@ -26,7 +26,7 @@ def generate_hash(text: str, length: int = 8) -> str:
     combined = f"{text}_{timestamp}"
     full_hash = hashlib.md5(combined.encode()).hexdigest()
 
-    result = full_hash[:length-1]
+    result = full_hash[: length - 1]
 
     result += secrets.choice(string.ascii_lowercase)
 
