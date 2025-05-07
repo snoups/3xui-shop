@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Any, Self
+from typing import Any, Optional, Self
 
 from sqlalchemy import ForeignKey, String, func, select, update
 from sqlalchemy.exc import IntegrityError
@@ -60,15 +60,16 @@ class User(Base):
         foreign_keys="Referral.referrer_tg_id",
         primaryjoin="User.tg_id == Referral.referrer_tg_id",
         back_populates="referrer",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
     )
-    referral: Mapped["Referral | None"] = relationship( # type: ignore
+    referral: Mapped["Referral | None"] = relationship(  # type: ignore
         "Referral",
         foreign_keys="Referral.referred_tg_id",
         primaryjoin="User.tg_id == Referral.referred_tg_id",
         back_populates="referred",
-        uselist=False
+        uselist=False,
     )
+    source_invite_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
     def __repr__(self) -> str:
         return (
@@ -161,9 +162,7 @@ class User(Base):
             logger.warning(f"User {tg_id} not found to update trial status.")
             return False
 
-        await session.execute(
-            update(User).where(User.tg_id == tg_id).values(is_trial_used=used)
-        )
+        await session.execute(update(User).where(User.tg_id == tg_id).values(is_trial_used=used))
         await session.commit()
         logger.info(f"Trial status updated for user {tg_id}: {used}")
         return True

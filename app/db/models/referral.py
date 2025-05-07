@@ -26,24 +26,24 @@ class Referral(Base):
         referred (User): Relationship to the user who has been invited.
         referrer (User): Relationship to the user who invited.
     """
+
     __tablename__ = "referrals"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    referred_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id", ondelete="CASCADE"), unique=True,
-                                                nullable=False)
-    referrer_tg_id: Mapped[int] = mapped_column(ForeignKey("users.tg_id", ondelete="CASCADE"), nullable=False)
+    referred_tg_id: Mapped[int] = mapped_column(
+        ForeignKey("users.tg_id", ondelete="CASCADE"), unique=True, nullable=False
+    )
+    referrer_tg_id: Mapped[int] = mapped_column(
+        ForeignKey("users.tg_id", ondelete="CASCADE"), nullable=False
+    )
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     referred_rewarded_at: Mapped[datetime | None] = mapped_column(nullable=True)
     referred_bonus_days: Mapped[int] = mapped_column(Integer, nullable=True)
     referrer: Mapped["User"] = relationship(  # type: ignore
-        "User",
-        foreign_keys=[referrer_tg_id],  # type: ignore
-        back_populates="referrals_sent"
+        "User", foreign_keys=[referrer_tg_id], back_populates="referrals_sent"  # type: ignore
     )
     referred: Mapped["User"] = relationship(  # type: ignore
-        "User",
-        foreign_keys=[referred_tg_id],  # type: ignore
-        back_populates="referral"
+        "User", foreign_keys=[referred_tg_id], back_populates="referral"  # type: ignore
     )
 
     def __repr__(self) -> str:
@@ -60,10 +60,9 @@ class Referral(Base):
         filters = [Referral.id == referral_id]
 
         query = await session.execute(
-            select(Referral).options(
-                selectinload(Referral.referrer),
-                selectinload(Referral.referred)
-            ).where(*filters)
+            select(Referral)
+            .options(selectinload(Referral.referrer), selectinload(Referral.referred))
+            .where(*filters)
         )
         return query.scalar_one_or_none()
 
@@ -71,9 +70,7 @@ class Referral(Base):
     async def get_referral_count(cls, session: AsyncSession, referrer_tg_id: int) -> int:
         filters = [Referral.referrer_tg_id == referrer_tg_id]
 
-        query = await session.execute(
-            select(func.count()).where(*filters)
-        )
+        query = await session.execute(select(func.count()).where(*filters))
         return query.scalar() or 0
 
     @classmethod
@@ -81,32 +78,29 @@ class Referral(Base):
         filters = [Referral.referred_tg_id == referred_tg_id]
 
         query = await session.execute(
-            select(Referral)
-            .options(selectinload(Referral.referrer))
-            .where(*filters)
+            select(Referral).options(selectinload(Referral.referrer)).where(*filters)
         )
         return query.scalar_one_or_none()
 
     @classmethod
-    async def get_referral_with_users(cls, session: AsyncSession, referred_tg_id: int) -> Self | None:
+    async def get_referral_with_users(
+        cls, session: AsyncSession, referred_tg_id: int
+    ) -> Self | None:
         filters = [Referral.referred_tg_id == referred_tg_id]
 
         query = await session.execute(
             select(Referral)
-            .options(
-                selectinload(Referral.referrer),
-                selectinload(Referral.referred)
-            )
+            .options(selectinload(Referral.referrer), selectinload(Referral.referred))
             .where(*filters)
         )
         return query.scalar_one_or_none()
 
     @classmethod
     async def create(
-            cls,
-            session: AsyncSession,
-            referrer_tg_id: int,
-            referred_tg_id: int,
+        cls,
+        session: AsyncSession,
+        referrer_tg_id: int,
+        referred_tg_id: int,
     ) -> Self | None:
         """
         Creates new referral relation between invited (referred) user and a user who invited him (referred).
@@ -122,7 +116,9 @@ class Referral(Base):
         existing_referral = await cls.get_referral(session, referred_tg_id)
 
         if existing_referral:
-            logger.warning(f"User {referred_tg_id} is already invited by {existing_referral.referrer_tg_id}.")
+            logger.warning(
+                f"User {referred_tg_id} is already invited by {existing_referral.referrer_tg_id}."
+            )
             return False
 
         referral = Referral(
@@ -137,15 +133,17 @@ class Referral(Base):
             return referral
         except IntegrityError as exception:
             await session.rollback()
-            logger.error(f"Error occurred while creating referral {referrer_tg_id} → {referred_tg_id}: {exception}")
+            logger.error(
+                f"Error occurred while creating referral {referrer_tg_id} → {referred_tg_id}: {exception}"
+            )
             return False
 
     @classmethod
     async def set_rewarded(
-            cls,
-            session: AsyncSession,
-            referral: Self,
-            referred_bonus_days: int,
+        cls,
+        session: AsyncSession,
+        referral: Self,
+        referred_bonus_days: int,
     ) -> bool:
         """
         Marks referral and/or referrer as rewarded and assigns bonus days.
@@ -176,9 +174,9 @@ class Referral(Base):
 
     @classmethod
     async def rollback_rewarded(
-            cls,
-            session: AsyncSession,
-            referral: Self,
+        cls,
+        session: AsyncSession,
+        referral: Self,
     ) -> bool:
         """
         This method allows to cancel the referred reward.
