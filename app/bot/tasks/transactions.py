@@ -27,15 +27,14 @@ async def cancel_expired_transactions(
 
         if expired_transactions:
             logger.info(
-                f"[Background check] Found {len(expired_transactions)} expired transactions.",
-                len(expired_transactions),
+                f"[Background check] Found {len(expired_transactions)} expired transactions."
             )
 
             for transaction in expired_transactions:
                 transaction.status = TransactionStatus.CANCELED
             await session.commit()
 
-            logger.info(f"[Background check] Successfully canceled expired transactions.")
+            logger.info("[Background check] Successfully canceled expired transactions.")
         else:
             logger.info("[Background check] No expired transactions found.")
 

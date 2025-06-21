@@ -10,4 +10,4 @@ class SubscriptionData(CallbackData, prefix="subscription"):
     user_id: int = 0
     devices: int = 0
     duration: int = 0
-    price: int = 0
+    price: float = 0

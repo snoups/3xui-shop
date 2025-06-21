@@ -1,5 +1,5 @@
 # region: Download
-APP_IOS_LINK = "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215"
+APP_IOS_LINK = "https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"
 APP_ANDROID_LINK = "https://play.google.com/store/apps/details?id=com.happproxy"
 APP_WINDOWS_LINK = (
     "https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x86.exe"
