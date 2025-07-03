@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.db.models import User
+from app.db.models import User, Server
 from app.bot.services.vpn import VPNService
 from app.config import Config
 
@@ -22,21 +22,25 @@ async def cleanup_expired_vpn_users(
         result = await session.execute(stmt)
         users = result.scalars().all()
 
-        now = datetime.now(timezone.utc).timestamp()
+        now = datetime.now(timezone.utc)
         deleted_count = 0
         users_to_update = []
+        servers_to_refresh = set()
 
         for user in users:
             try:
                 expiry_time = await vpn_service.get_expiry_time(user)
                 if expiry_time and expiry_time != 0:
-                    days_since_expiry = (now - expiry_time) / 86400  # 86400 секунд в сутках
-                    if days_since_expiry > config.shop.EXPIRED_SUBSCRIPTION_DELETION_PERIOD:
+                    expiry_time = datetime.fromtimestamp(expiry_time / 1000, timezone.utc)
+                    days_since_expiry = (now - expiry_time).days 
+                    if days_since_expiry >= config.shop.EXPIRED_SUBSCRIPTION_DELETION_PERIOD:
                         deleted = await vpn_service.delete_client(user)
                         if deleted:
+                            if user.server_id:
+                                servers_to_refresh.add(user.server_id)
                             user.server_id = None
-                            users_to_update.append(user)
                             deleted_count += 1
+                            users_to_update.append(user)
                             logger.info(
                                 f"Deleted VPN client for user {user.tg_id} (expired {days_since_expiry:.1f} days ago)"
                             )
@@ -45,6 +49,11 @@ async def cleanup_expired_vpn_users(
 
         if users_to_update:
             await session.commit()
+
+            for server_id in servers_to_refresh:
+                server = await session.get(Server, server_id)
+                if server:
+                    await session.refresh(server, attribute_names=["users"])
 
         try:
             if users_to_update:

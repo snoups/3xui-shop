@@ -256,8 +256,9 @@ class VPNService:
                 return False
             
             client.id = user.vpn_id
+            inbound_id = await self.server_pool_service.get_inbound_id(connection.api)
 
-            await connection.api.client.delete(client_uuid=client.id)
+            await connection.api.client.delete(inbound_id=inbound_id, client_uuid=client.id)
             logger.info(f"Client {user.tg_id} deleted successfully.")
             return True
         except Exception as exception:
