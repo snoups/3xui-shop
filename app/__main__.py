@@ -54,7 +54,12 @@ async def on_startup(config: Config, bot: Bot, services: ServicesContainer, db: 
         tasks.referral.start_scheduler(
             session_factory=db.session, referral_service=services.referral
         )
-
+    # Запуск задачи очистки просроченных VPN-пользователей
+    tasks.deletion.start_scheduler(
+        db.session,
+        services.vpn,
+        config
+    )
 
 async def main() -> None:
     # Create web application

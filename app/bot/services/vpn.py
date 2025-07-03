@@ -50,6 +50,25 @@ class VPNService:
 
         return client
 
+    async def get_expiry_time(self, user: User) -> int | None:
+        connection = await self.server_pool_service.get_connection(user)
+
+        if not connection:
+            return None
+
+        try:
+            client = await connection.api.client.get_by_email(str(user.tg_id))
+            if client:
+                expiry_time = client.expiry_time
+                logger.debug(f"Client {user.tg_id} expiry time: {expiry_time}.")
+                return expiry_time
+            else:
+                logger.critical(f"Client {user.tg_id} not found on server {connection.server.name}.")
+                return None
+        except Exception as exception:
+            logger.error(f"Error fetching expiry time for {user.tg_id}: {exception}")
+            return None
+
     async def get_limit_ip(self, user: User, client: Client) -> int | None:
         connection = await self.server_pool_service.get_connection(user)
 
@@ -220,6 +239,30 @@ class VPNService:
             return True
         except Exception as exception:
             logger.error(f"Error updating client {user.tg_id}: {exception}")
+            return False
+
+    async def delete_client(self, user: User) -> bool:
+        logger.info(f"Deleting client {user.tg_id}.")
+        connection = await self.server_pool_service.get_connection(user)
+
+        if not connection:
+            return False
+
+        try:
+            client = await connection.api.client.get_by_email(str(user.tg_id))
+
+            if not client:
+                logger.warning(f"Client {user.tg_id} not found for deletion.")
+                return False
+            
+            client.id = user.vpn_id
+            inbound_id = await self.server_pool_service.get_inbound_id(connection.api)
+
+            await connection.api.client.delete(inbound_id=inbound_id, client_uuid=client.id)
+            logger.info(f"Client {user.tg_id} deleted successfully.")
+            return True
+        except Exception as exception:
+            logger.error(f"Error deleting client {user.tg_id}: {exception}")
             return False
 
     async def create_subscription(self, user: User, devices: int, duration: int) -> bool:
