@@ -13,6 +13,7 @@ from .heleket import Heleket
 from .telegram_stars import TelegramStars
 from .yookassa import Yookassa
 from .yoomoney import Yoomoney
+from .pally import PallyPaymentGateway
 
 
 class GatewayFactory:
@@ -49,6 +50,7 @@ class GatewayFactory:
             (config.shop.PAYMENT_HELEKET_ENABLED, Heleket),
             (config.shop.PAYMENT_YOOKASSA_ENABLED, Yookassa),
             (config.shop.PAYMENT_YOOMONEY_ENABLED, Yoomoney),
+            (config.shop.PAYMENT_PALLY_ENABLED, PallyPaymentGateway),
         ]
 
         for enabled, gateway_cls in gateways:

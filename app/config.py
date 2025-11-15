@@ -40,6 +40,7 @@ DEFAULT_SHOP_PAYMENT_CRYPTOMUS_ENABLED = False
 DEFAULT_SHOP_PAYMENT_HELEKET_ENABLED = False
 DEFAULT_SHOP_PAYMENT_YOOKASSA_ENABLED = False
 DEFAULT_SHOP_PAYMENT_YOOMONEY_ENABLED = False
+DEFAULT_SHOP_PAYMENT_PALLY_ENABLED = False
 DEFAULT_DB_NAME = "bot_database"
 
 DEFAULT_REDIS_DB_NAME = "0"
@@ -90,6 +91,7 @@ class ShopConfig:
     PAYMENT_HELEKET_ENABLED: bool
     PAYMENT_YOOKASSA_ENABLED: bool
     PAYMENT_YOOMONEY_ENABLED: bool
+    PAYMENT_PALLY_ENABLED: bool
 
 
 @dataclass
@@ -121,6 +123,12 @@ class YooKassaConfig:
 class YooMoneyConfig:
     NOTIFICATION_SECRET: str | None
     WALLET_ID: str | None
+
+
+@dataclass
+class PallyConfig:
+    API_TOKEN: str | None
+    SHOP_ID: str | None
 
 
 @dataclass
@@ -167,6 +175,7 @@ class Config:
     heleket: HeleketConfig
     yookassa: YooKassaConfig
     yoomoney: YooMoneyConfig
+    pally: PallyConfig
     database: DatabaseConfig
     redis: RedisConfig
     logging: LoggingConfig
@@ -241,12 +250,26 @@ def load_config() -> Config:
             )
             payment_yoomoney_enabled = False
 
+    payment_pally_enabled = env.bool(
+        "SHOP_PAYMENT_PALLY_ENABLED",
+        default=DEFAULT_SHOP_PAYMENT_PALLY_ENABLED,
+    )
+    if payment_pally_enabled:
+        pally_api_token = env.str("PALLY_API_TOKEN", default=None)
+        pally_shop_id = env.str("PALLY_SHOP_ID", default=None)
+        if not pally_api_token or not pally_shop_id:
+            logger.error(
+                "PALLY_API_TOKEN or PALLY_SHOP_ID is not set. Payment Pally is disabled."
+            )
+            payment_pally_enabled = False
+
     if (
         not payment_stars_enabled
         and not payment_cryptomus_enabled
         and not payment_heleket_enabled
         and not payment_yookassa_enabled
         and not payment_yoomoney_enabled
+        and not payment_pally_enabled
     ):
         logger.warning("No payment methods are enabled. Enabling Stars payment method.")
         payment_stars_enabled = True
@@ -336,6 +359,7 @@ def load_config() -> Config:
             PAYMENT_HELEKET_ENABLED=payment_heleket_enabled,
             PAYMENT_YOOKASSA_ENABLED=payment_yookassa_enabled,
             PAYMENT_YOOMONEY_ENABLED=payment_yoomoney_enabled,
+            PAYMENT_PALLY_ENABLED=payment_pally_enabled,
         ),
         xui=XUIConfig(
             USERNAME=env.str("XUI_USERNAME"),
@@ -362,6 +386,10 @@ def load_config() -> Config:
         yoomoney=YooMoneyConfig(
             NOTIFICATION_SECRET=env.str("YOOMONEY_NOTIFICATION_SECRET", default=None),
             WALLET_ID=env.str("YOOMONEY_WALLET_ID", default=None),
+        ),
+        pally=PallyConfig(
+            API_TOKEN=env.str("PALLY_API_TOKEN", default=None),
+            SHOP_ID=env.str("PALLY_SHOP_ID", default=None),
         ),
         database=DatabaseConfig(
             HOST=env.str("DB_HOST", default=None),
